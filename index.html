@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Castagnari Benny Visualizer</title>
+<meta name="description" content="Interaktive Visualisierung für Castagnari Benny C/G (3-reihig, Heim) – Akkorde, Skalen, Stücke lernen">
+<meta name="theme-color" content="#0a84ff">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="assets/manifest.json">
+
+<style>
+/* ──────────── RESET & VARS ──────────── */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+    --bg:#1c1c1e; --bg-card:#2c2c2e; --bg-inset:#3a3a3c;
+    --txt:#f2f2f7; --txt2:#8e8e93; --txt3:#636366;
+    --sep:#38383a;
+    --accent:#0a84ff; --accent-sub:rgba(10,132,255,0.18);
+    --p0:#f0ece7; --p1:#ddd8d1; --p2:#ccc7bf;
+    --p-shadow:rgba(0,0,0,0.30);
+    --p-text:#3a3a3c;
+    --act-bg:#4a4a4c;
+    --act-txt:#f2f2f7;
+    --root-bg:#3a3a3c;
+    --root-txt:#f2f2f7;
+}
+
+html,body { height:100%; background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+
+.container { max-width:1200px; margin:0 auto; padding:16px 16px 40px; }
+
+/* ──────────── HEADER ──────────── */
+header { text-align:center; padding:20px 0 14px; }
+header h1 { font-size:1.6em; font-weight:600; letter-spacing:-0.3px; }
+header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-top:3px; text-transform:uppercase; }
+
+/* ──────────── SECTION CARD ──────────── */
+.section { background:var(--bg-card); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+.sec-hdr { padding:9px 16px 3px; font-size:0.7em; font-weight:600; color:var(--txt2);
+    text-transform:uppercase; letter-spacing:1px; }
+
+/* ──────────── SEGMENTED CONTROL ──────────── */
+.seg { display:flex; background:var(--bg-inset); border-radius:8px; overflow:hidden; height:34px; margin:8px 12px; }
+.seg button { flex:1; border:none; background:transparent; color:var(--txt2);
+    font-size:0.86em; font-weight:500; cursor:pointer; font-family:inherit; transition:.15s; }
+.seg button.active { background:var(--bg-card); color:var(--txt); border-radius:6px;
+    margin:2px; height:calc(100% - 4px); box-shadow:0 1px 3px rgba(0,0,0,.4); }
+
+/* ──────────── CHORD PANEL ──────────── */
+.chord-panel { padding:0 12px 12px; }
+.chord-panel .cp-label { font-size:0.7em; font-weight:600; color:var(--txt2);
+    text-transform:uppercase; letter-spacing:1px; margin:10px 0 6px; }
+
+.chip-row { display:flex; gap:6px; flex-wrap:wrap; }
+.chip { height:28px; padding:0 13px; border-radius:14px; border:1px solid var(--sep);
+    background:var(--bg-inset); color:var(--txt2); font-size:0.8em; font-weight:500;
+    font-family:inherit; cursor:pointer; transition:.12s; }
+.chip:active { opacity:.7; }
+.chip.active { background:var(--accent-sub); border-color:var(--accent); color:var(--accent); }
+
+.root-grid { display:flex; gap:5px; flex-wrap:wrap; margin-top:2px; }
+.root-btn { min-width:38px; height:34px; padding:0 10px; border-radius:6px;
+    border:1px solid var(--sep); background:var(--bg-inset); color:var(--txt2);
+    font-size:0.82em; font-weight:600; font-family:inherit; cursor:pointer; transition:.12s; }
+.root-btn:active { opacity:.7; }
+.root-btn.active { background:var(--accent-sub); border-color:var(--accent); color:var(--accent); }
+
+/* ──────────── AUDIO CONTROLS ──────────── */
+.audio-section { margin:12px 0; padding:12px; background:var(--bg-inset); border-radius:8px; }
+.play-btn { width:100%; height:44px; border-radius:8px; border:none;
+    background:var(--accent); color:#fff; font-size:0.95em; font-weight:600;
+    font-family:inherit; cursor:pointer; transition:.15s; margin-bottom:12px; }
+.play-btn:active { opacity:.8; transform:scale(.98); }
+.play-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+.audio-controls { display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; }
+.audio-controls label { font-size:0.8em; color:var(--txt2); }
+.audio-controls select, .audio-controls input[type="range"] {
+    background:var(--bg-card); border:1px solid var(--sep); border-radius:6px;
+    color:var(--txt); font-size:0.8em; font-family:inherit; padding:4px 8px; }
+.audio-controls input[type="range"] { padding:0; }
+.audio-controls .duration-display { grid-column:2; font-size:0.75em; color:var(--txt3); }
+
+.checkbox-row { grid-column:1/3; margin-top:4px; }
+.checkbox-row label { display:flex; align-items:center; gap:8px; font-size:0.82em; cursor:pointer; }
+.checkbox-row input[type="checkbox"] { width:18px; height:18px; cursor:pointer; }
+
+/* Warning box */
+.warning-box { margin:8px 0; padding:10px 12px; background:rgba(255,159,10,0.15);
+    border-left:3px solid #ff9f0a; border-radius:6px; font-size:0.8em; color:#ff9f0a; }
+
+/* ──────────── ACCORDION LAYOUT ──────────── */
+.layout-section { display:block; }
+.accordion-flex { display:flex; gap:20px; justify-content:center; align-items:flex-start; }
+.bass-side, .treble-wrapper { flex-shrink:0; }
+.lay-title { font-size:0.7em; font-weight:600; color:var(--txt2); text-transform:uppercase;
+    letter-spacing:1px; padding:10px 2px 6px; text-align:center; }
+
+.treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start; }
+.row { display:flex; flex-direction:column; gap:4px; align-items:center; }
+.row-label { font-size:0.66em; color:var(--txt3); font-weight:600; letter-spacing:0.7px;
+    text-align:center; margin-bottom:2px; }
+
+/* ──────────── PERLMUTT-TASTE ──────────── */
+.note-button {
+    width:66px; height:66px; border-radius:50%;
+    background:linear-gradient(160deg, var(--p0) 0%, var(--p1) 42%, var(--p2) 100%);
+    border:1.5px solid rgba(255,255,255,.30);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
+                inset 0 -1px 2px rgba(0,0,0,.10),
+                0 2px 5px var(--p-shadow);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; position:relative;
+    transition:transform .12s, box-shadow .12s, background .12s, border-color .12s;
+}
+.note-button::before { content:''; position:absolute; top:7%; left:17%;
+    width:38%; height:34%; border-radius:50%; pointer-events:none;
+    background:radial-gradient(ellipse, rgba(255,255,255,.52) 0%, transparent 70%); }
+
+.note-button .note-name { font-size:0.85em; font-weight:600; color:var(--p-text);
+    position:relative; z-index:1; text-align:center; line-height:1.1; }
+.note-button:active { transform:scale(.93); }
+
+.note-button.active {
+    background:linear-gradient(160deg, #585858 0%, var(--act-bg) 50%, #404040 100%);
+    border-color:rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.12),
+                inset 0 -1px 2px rgba(0,0,0,.25),
+                0 2px 4px rgba(0,0,0,.35);
+}
+.note-button.active .note-name { color:var(--act-txt); }
+.note-button.active::before { opacity:.15; }
+
+.note-button.root {
+    border:2.5px solid var(--accent);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
+                inset 0 -1px 2px rgba(0,0,0,.10),
+                0 2px 5px var(--p-shadow),
+                0 0 0 2px var(--accent-sub);
+}
+.note-button.root.active {
+    background:linear-gradient(160deg, #424242 0%, var(--root-bg) 50%, #2e2e2e 100%);
+    border-color:var(--accent);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.08),
+                inset 0 -1px 2px rgba(0,0,0,.30),
+                0 0 0 2px var(--accent-sub),
+                0 0 8px rgba(10,132,255,.3);
+}
+.note-button.root.active .note-name { color:var(--root-txt); }
+
+.note-button.scale-tone {
+    box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
+                inset 0 -1px 2px rgba(0,0,0,.10),
+                0 2px 5px var(--p-shadow),
+                0 0 0 2px rgba(142,142,147,.22);
+}
+
+/* ──────────── BASS-TASTE ──────────── */
+.bass-container { display:flex; gap:20px; justify-content:center; margin-top:4px; }
+.bass-column { display:flex; flex-direction:column; gap:4px; align-items:center; }
+.bass-col-label { font-size:0.66em; color:var(--txt3); font-weight:600;
+    letter-spacing:0.7px; margin-bottom:2px; }
+
+.bass-button {
+    width:54px; height:54px; border-radius:50%;
+    background:linear-gradient(160deg, var(--p0) 0%, var(--p1) 42%, var(--p2) 100%);
+    border:1.5px solid rgba(255,255,255,.30);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
+                inset 0 -1px 2px rgba(0,0,0,.10),
+                0 2px 5px var(--p-shadow);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; position:relative;
+    font-size:0.88em; font-weight:700; color:var(--p-text);
+    transition:transform .12s, box-shadow .12s, background .12s;
+}
+.bass-button::before { content:''; position:absolute; top:7%; left:17%;
+    width:38%; height:34%; border-radius:50%; pointer-events:none;
+    background:radial-gradient(ellipse, rgba(255,255,255,.52) 0%, transparent 70%); }
+.bass-button:active { transform:scale(.90); }
+.bass-button.active {
+    background:linear-gradient(160deg, #585858 0%, var(--act-bg) 50%, #404040 100%);
+    border-color:rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,.12),
+                inset 0 -1px 2px rgba(0,0,0,.25),
+                0 2px 4px rgba(0,0,0,.35);
+    color:var(--act-txt);
+}
+.bass-button.active::before { opacity:.15; }
+.bass-button.is-chord { font-size:0.80em; }
+
+/* ──────────── LEGEND ──────────── */
+.legend { background:var(--bg-card); border-radius:12px; margin-top:10px; padding:10px 16px; }
+.legend .lg-title { font-size:0.7em; font-weight:600; color:var(--txt2);
+    text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.lg-row { display:flex; align-items:center; gap:9px; margin-bottom:4px; font-size:0.8em; color:var(--txt2); }
+.lg-sw { width:20px; height:20px; border-radius:50%; flex-shrink:0; }
+.lg-sw.pearl  { background:linear-gradient(160deg,var(--p0),var(--p2)); border:1.5px solid rgba(255,255,255,.30); }
+.lg-sw.act    { background:var(--act-bg); border:1.5px solid rgba(255,255,255,.18); }
+.lg-sw.root   { background:var(--root-bg); border:2.5px solid var(--accent); box-shadow:0 0 0 2px var(--accent-sub); }
+.lg-sw.scale  { background:linear-gradient(160deg,var(--p0),var(--p2)); border:1.5px solid rgba(255,255,255,.30);
+    box-shadow:0 0 0 2px rgba(142,142,147,.22); }
+
+/* ──────────── RESPONSIVE ──────────── */
+@media (min-width:800px) { .accordion-flex { flex-direction:row; } }
+@media (max-width:799px) {
+    .accordion-flex { flex-direction:column; align-items:center; }
+    .bass-side { order:2; }
+    .treble-wrapper { order:1; }
+}
+@media (max-width:400px) {
+    .note-button { width:56px; height:56px; }
+    .note-button .note-name { font-size:0.78em; }
+    .bass-button { width:46px; height:46px; font-size:0.80em; }
+    .treble-side { gap:5px; }
+    .bass-container { gap:14px; }
+    .root-grid { gap:4px; }
+    .root-btn { min-width:34px; height:30px; font-size:0.78em; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+    <h1>🪗 Castagnari Benny Visualizer</h1>
+    <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
+</header>
+
+<!-- ── STEUERUNG ── -->
+<div class="section">
+    <div class="sec-hdr">Balgrichtung</div>
+    <div class="seg">
+        <button class="active" data-dir="pull">← Pull (Ziehen)</button>
+        <button class="seg-btn" data-dir="push">Push (Drücken) →</button>
+    </div>
+
+    <div class="chord-panel">
+        <div class="cp-label">Akkordtyp</div>
+        <div class="chip-row" id="chordTypeRow">
+            <button class="chip active" data-ctype="">Dur</button>
+            <button class="chip" data-ctype="m">Moll</button>
+            <button class="chip" data-ctype="dim">dim</button>
+            <button class="chip" data-ctype="aug">aug</button>
+            <button class="chip" data-ctype="sus2">sus2</button>
+            <button class="chip" data-ctype="sus4">sus4</button>
+            <button class="chip" data-ctype="7">7</button>
+            <button class="chip" data-ctype="maj7">maj7</button>
+            <button class="chip" data-ctype="m7">m7</button>
+            <button class="chip" data-ctype="dim7">dim7</button>
+            <button class="chip" data-ctype="m7b5">ø (m7b5)</button>
+            <button class="chip" data-ctype="6">6</button>
+            <button class="chip" data-ctype="m6">m6</button>
+        </div>
+
+        <div class="cp-label">Modale Skalen</div>
+        <div class="chip-row" id="scaleRow">
+            <button class="chip" data-scale="dorian">Dorisch</button>
+            <button class="chip" data-scale="mixolydian">Mixolydisch</button>
+            <button class="chip" data-scale="phrygian">Phrygisch</button>
+            <button class="chip" data-scale="lydian">Lydisch</button>
+        </div>
+
+        <div class="cp-label">Grundton</div>
+        <div class="root-grid" id="rootGrid"></div>
+
+        <!-- AUDIO CONTROLS -->
+        <div class="audio-section">
+            <button class="play-btn" id="playBtn" disabled>▶️ Akkord abspielen</button>
+            <div class="audio-controls">
+                <label>Klang:</label>
+                <select id="toneType">
+                    <option value="warm">Akkordeon-like</option>
+                    <option value="pure">Rein (Sinus)</option>
+                    <option value="bright">Hell</option>
+                    <option value="soft">Weich ausklingend</option>
+                </select>
+
+                <label>Länge:</label>
+                <input type="range" id="duration" min="1" max="5" step="1" value="2">
+                <div class="duration-display"><span id="durationLabel">2</span> Sekunden</div>
+
+                <div class="checkbox-row">
+                    <label>
+                        <input type="checkbox" id="autoPlay">
+                        Auto-Play bei Akkordwechsel
+                    </label>
+                </div>
+            </div>
+            <div id="warningBox" class="warning-box" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── AKKORDEON ── -->
+<div class="layout-section" id="accordion-layout">
+    <div class="accordion-flex">
+        <div class="bass-side">
+            <div class="lay-title">Bass – <span id="bassDir">Pull</span></div>
+            <div class="bass-container" id="bass-container"></div>
+        </div>
+        <div class="treble-wrapper">
+            <div class="lay-title">Diskant – <span id="trebleDir">Pull (Ziehen)</span> – Sicht von oben</div>
+            <div class="treble-side" id="treble-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── LEGENDE ── -->
+<div class="legend">
+    <div class="lg-title">Legende</div>
+    <div class="lg-row"><div class="lg-sw pearl"></div>Taste – nicht aktiv (Perlmutt)</div>
+    <div class="lg-row"><div class="lg-sw act"></div>Taste – aktiv (Akkordton)</div>
+    <div class="lg-row"><div class="lg-sw root"></div>Grundton des Akkords (dunkles Grau + blau)</div>
+    <div class="lg-row"><div class="lg-sw scale"></div>Skalenton (bei modalen Skalen)</div>
+</div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+// Audio playback using Web Audio API.
+// Frequency calculation and envelope shaping inspired by:
+// https://github.com/chandlervdw/harmonic (MIT License) by @chandlervdw
+// Adapted for Castagnari Benny C/G diatonic button accordion visualization.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let activeOscillators = [];
+
+function playChord(frequencies, duration, toneType) {
+    stopAll();
+    
+    frequencies.forEach((freq, idx) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        // Tone shaping
+        switch(toneType) {
+            case 'warm':
+                oscillator.type = 'triangle';
+                break;
+            case 'pure':
+                oscillator.type = 'sine';
+                break;
+            case 'bright':
+                oscillator.type = 'sawtooth';
+                break;
+            case 'soft':
+                oscillator.type = 'sine';
+                break;
+            default:
+                oscillator.type = 'triangle';
+        }
+        
+        oscillator.frequency.value = freq;
+        
+        // ADSR Envelope
+        const now = audioContext.currentTime;
+        const attack = toneType === 'soft' ? 0.1 : 0.05;
+        const release = toneType === 'soft' ? 0.3 : 0.1;
+        const sustainLevel = 0.2;
+        
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.3, now + attack);
+        gainNode.gain.linearRampToValueAtTime(sustainLevel, now + duration - release);
+        gainNode.gain.linearRampToValueAtTime(0, now + duration);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start(now);
+        oscillator.stop(now + duration);
+        
+        activeOscillators.push({ oscillator, gainNode });
+    });
+}
+
+function stopAll() {
+    activeOscillators.forEach(({ oscillator, gainNode }) => {
+        try {
+            oscillator.stop();
+            oscillator.disconnect();
+            gainNode.disconnect();
+        } catch(e) {}
+    });
+    activeOscillators = [];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MUSIC THEORY
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CHORD_FORMULAS = {
+    '':     [0,4,7],        // Dur
+    'm':    [0,3,7],        // Moll
+    'dim':  [0,3,6],        // vermindert
+    'aug':  [0,4,8],        // übermäßig
+    'sus2': [0,2,7],        // sus2
+    'sus4': [0,5,7],        // sus4
+    '7':    [0,4,7,10],     // Dom 7
+    'maj7': [0,4,7,11],     // Maj 7
+    'm7':   [0,3,7,10],     // Moll 7
+    'dim7': [0,3,6,9],      // dim 7
+    'm7b5': [0,3,6,10],     // Half-diminished
+    '6':    [0,4,7,9],      // Sixte
+    'm6':   [0,3,7,9],      // Moll Sixte
+};
+
+const SCALE_FORMULAS = {
+    dorian:    [0,2,3,5,7,9,10],
+    mixolydian:[0,2,4,5,7,9,10],
+    phrygian:  [0,1,3,5,7,8,10],
+    lydian:    [0,2,4,6,7,9,11]
+};
+
+const NOTE_TO_SEMITONE = {
+    'C':0,'C#':1,'Db':1,'D':2,'D#':3,'Eb':3,'E':4,'F':5,
+    'F#':6,'Gb':6,'G':7,'G#':8,'Ab':8,'A':9,'A#':10,'Bb':10,'B':11
+};
+
+const SEMITONE_TO_NOTE = ['C','C#','D','Eb','E','F','F#','G','G#','A','Bb','B'];
+const ROOTS = ['C','D','E','F','G','A','Bb','Ab','Eb'];
+
+// Note to Frequency (A4 = 440 Hz)
+function noteToFrequency(noteName, octave = 4) {
+    const A4 = 440;
+    const semitone = NOTE_TO_SEMITONE[noteName];
+    const distance = (octave - 4) * 12 + semitone - 9; // A4 is 9 semitones from C4
+    return A4 * Math.pow(2, distance / 12);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LAYOUT DATA
+// ═══════════════════════════════════════════════════════════════════════════
+
+const layout = {
+    pull: {
+        treble: {
+            Heim: ['C# 10','Bb 9','G# 8','G 7','C# 6','Bb 5','G# 4','G 3','C# 2','Bb 1'],
+            C:    ['D 11','B 10','A 9','F 8','D 7','B 6','A 5','F 4','D 3','B 2','G 1'],
+            G:    ['C 12','A 11','F# 10','E 9','C 8','A 7','F# 6','E 5','C 4','A 3','F# 2','E 1']
+        },
+        bass: { col1:['G','g','D','d','B','b'], col2:['F','f','A','a','Bb','bb'] }
+    },
+    push: {
+        treble: {
+            Heim: ['G# 10','Eb 9','A 8','G# 7','Eb 6','A 5','G# 4','Eb 3','A 2','G# 1'],
+            C:    ['G 11','E 10','C 9','G 8','E 7','C 6','G 5','E 4','C 3','G 2','E 1'],
+            G:    ['G 12','D 11','B 10','G 9','D 8','B 7','G 6','D 5','B 4','G 3','D 2','B 1']
+        },
+        bass: { col1:['C','c','G','g','Ab','ab'], col2:['F','f','E','e','Eb','eb'] }
+    }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+
+let dir          = 'pull';
+let chordRoot    = null;
+let chordType    = '';
+let scaleType    = null;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function pureName(s){ return s.replace(/\s*\d+$/,'').trim(); }
+function bassToRoot(s){ const m=s.match(/^([A-G][b#]?)/); return m?m[1]:s.charAt(0).toUpperCase(); }
+
+function getBennyNotes(direction) {
+    const notes = new Set();
+    Object.values(layout[direction].treble).forEach(row => {
+        row.forEach(btn => notes.add(pureName(btn)));
+    });
+    return notes;
+}
+
+function checkAvailability(chordNotes) {
+    const pullNotes = getBennyNotes('pull');
+    const pushNotes = getBennyNotes('push');
+    
+    return {
+        pull: {
+            available: chordNotes.filter(n => pullNotes.has(n)),
+            missing:   chordNotes.filter(n => !pullNotes.has(n))
+        },
+        push: {
+            available: chordNotes.filter(n => pushNotes.has(n)),
+            missing:   chordNotes.filter(n => !pushNotes.has(n))
+        }
+    };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderAll() {
+    renderTreble();
+    renderBass();
+}
+
+function renderTreble() {
+    const cont = document.getElementById('treble-container');
+    cont.innerHTML = '';
+    ['Heim','C','G'].forEach(row => {
+        const div = document.createElement('div');
+        div.className = 'row';
+        const lbl = document.createElement('div');
+        lbl.className = 'row-label';
+        lbl.textContent = row==='Heim'?'HELFER (10)':row==='C'?'C-REIHE (11)':'G-REIHE (12)';
+        div.appendChild(lbl);
+        layout[dir].treble[row].forEach(note => {
+            const btn = document.createElement('div');
+            btn.className = 'note-button';
+            btn.dataset.note = note;
+            const sp = document.createElement('div');
+            sp.className = 'note-name';
+            sp.textContent = note;
+            btn.appendChild(sp);
+            div.appendChild(btn);
+        });
+        cont.appendChild(div);
+    });
+    applyStyles();
+}
+
+function renderBass() {
+    const cont = document.getElementById('bass-container');
+    cont.innerHTML = '';
+    ['col1','col2'].forEach(col => {
+        const column = document.createElement('div');
+        column.className = 'bass-column';
+        const lbl = document.createElement('div');
+        lbl.className = 'bass-col-label';
+        lbl.textContent = 'Spalte '+(col==='col1'?'1':'2');
+        column.appendChild(lbl);
+        layout[dir].bass[col].forEach(note => {
+            const btn = document.createElement('div');
+            btn.className = 'bass-button';
+            if(note !== note.toUpperCase()) btn.classList.add('is-chord');
+            btn.dataset.note = note;
+            btn.textContent  = note;
+            btn.addEventListener('click', ()=> onBassClick(note));
+            column.appendChild(btn);
+        });
+        cont.appendChild(column);
+    });
+    applyStyles();
+}
+
+function renderRootGrid() {
+    const grid = document.getElementById('rootGrid');
+    grid.innerHTML = '';
+    ROOTS.forEach(r => {
+        const btn = document.createElement('button');
+        btn.className = 'root-btn';
+        btn.dataset.root = r;
+        btn.textContent  = r;
+        btn.addEventListener('click', ()=> selectRoot(r));
+        grid.appendChild(btn);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// APPLY STYLES
+// ═══════════════════════════════════════════════════════════════════════════
+
+function applyStyles() {
+    if (!chordRoot) {
+        document.querySelectorAll('.note-button, .bass-button').forEach(b => {
+            b.classList.remove('active','root','scale-tone');
+        });
+        return;
+    }
+    
+    const formula = scaleType ? SCALE_FORMULAS[scaleType] : CHORD_FORMULAS[chordType];
+    const base = NOTE_TO_SEMITONE[chordRoot];
+    const chordNotes = formula.map(i => SEMITONE_TO_NOTE[(base+i)%12]);
+    
+    const rootSet = new Set([chordRoot]);
+    const chordSet = new Set(chordNotes);
+    
+    // Check availability
+    const avail = checkAvailability(chordNotes);
+    const missing = dir === 'pull' ? avail.pull.missing : avail.push.missing;
+    
+    if (missing.length > 0) {
+        const box = document.getElementById('warningBox');
+        box.textContent = `⚠️ Nicht alle Töne auf ${dir.toUpperCase()} verfügbar: ${missing.join(', ')}. Audio spielt vollständigen Akkord.`;
+        box.style.display = 'block';
+    } else {
+        document.getElementById('warningBox').style.display = 'none';
+    }
+    
+    // Treble
+    document.querySelectorAll('.note-button').forEach(btn => {
+        const note = btn.dataset.note;
+        const name = pureName(note);
+        
+        btn.classList.remove('active','root','scale-tone');
+        
+        if(rootSet.has(name)){
+            btn.classList.add('root','active');
+        } else if(chordSet.has(name)){
+            btn.classList.add('active');
+        }
+        
+        if(scaleType && chordSet.has(name) && !rootSet.has(name)){
+            btn.classList.add('scale-tone');
+        }
+    });
+    
+    // Bass - mark if matches root
+    document.querySelectorAll('.bass-button').forEach(btn => {
+        const note = btn.dataset.note;
+        const root = bassToRoot(note);
+        btn.classList.toggle('active', root === chordRoot);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INTERACTION
+// ═══════════════════════════════════════════════════════════════════════════
+
+function onBassClick(note) {
+    const root = bassToRoot(note);
+    const isUpper = (note === note.toUpperCase());
+    
+    chordType = isUpper ? '' : 'm';
+    scaleType = null;
+    selectRoot(root);
+    
+    // Update chip active states
+    document.querySelectorAll('.chip[data-ctype]').forEach(b => {
+        b.classList.toggle('active', b.dataset.ctype === chordType);
+    });
+    document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
+}
+
+function selectRoot(root) {
+    chordRoot = root;
+    document.querySelectorAll('.root-btn').forEach(b => b.classList.toggle('active', b.dataset.root === root));
+    document.getElementById('playBtn').disabled = false;
+    applyStyles();
+    
+    if(document.getElementById('autoPlay').checked) {
+        playCurrentChord();
+    }
+}
+
+function playCurrentChord() {
+    if(!chordRoot) return;
+    
+    const formula = scaleType ? SCALE_FORMULAS[scaleType] : CHORD_FORMULAS[chordType];
+    const base = NOTE_TO_SEMITONE[chordRoot];
+    const chordNotes = formula.map(i => SEMITONE_TO_NOTE[(base+i)%12]);
+    const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
+    
+    const duration = parseFloat(document.getElementById('duration').value);
+    const tone = document.getElementById('toneType').value;
+    
+    playChord(frequencies, duration, tone);
+}
+
+function switchDir(newDir) {
+    dir = newDir;
+    document.getElementById('bassDir').textContent = newDir === 'pull' ? 'Pull' : 'Push';
+    document.getElementById('trebleDir').textContent = newDir === 'pull' ? 'Pull (Ziehen)' : 'Push (Drücken)';
+    renderAll();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.seg button').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        switchDir(btn.dataset.dir);
+    });
+});
+
+document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.chip[data-ctype]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        chordType = btn.dataset.ctype;
+        scaleType = null;
+        document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
+        if(chordRoot) applyStyles();
+    });
+});
+
+document.querySelectorAll('.chip[data-scale]').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+        const was = btn.classList.contains('active');
+        document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
+        scaleType = was ? null : btn.dataset.scale;
+        if(!was) btn.classList.add('active');
+        if(scaleType) document.querySelectorAll('.chip[data-ctype]').forEach(b => b.classList.remove('active'));
+        if(chordRoot) applyStyles();
+    });
+});
+
+document.getElementById('playBtn').addEventListener('click', playCurrentChord);
+
+document.getElementById('duration').addEventListener('input', e => {
+    document.getElementById('durationLabel').textContent = e.target.value;
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+renderRootGrid();
+renderAll();
+</script>
+</body>
+</html>

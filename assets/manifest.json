@@ -1,0 +1,27 @@
+{
+  "name": "Castagnari Benny Visualizer",
+  "short_name": "Benny",
+  "description": "Interaktive Visualisierung für Castagnari Benny C/G (3-reihig, Heim)",
+  "start_url": "../benny-visualizer.html",
+  "display": "standalone",
+  "background_color": "#1c1c1e",
+  "theme_color": "#0a84ff",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "education"],
+  "lang": "de-DE",
+  "dir": "ltr"
+}
