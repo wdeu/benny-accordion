@@ -45,14 +45,43 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 /* ──────────── SECTION CARD ──────────── */
 .section { background:var(--bg-card); border-radius:12px; margin-bottom:10px; overflow:hidden; }
 .sec-hdr { padding:9px 16px 3px; font-size:0.7em; font-weight:600; color:var(--txt2);
-    text-transform:uppercase; letter-spacing:1px; }
+    text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; justify-content:space-between; }
 
-/* ──────────── SEGMENTED CONTROL ──────────── */
-.seg { display:flex; background:var(--bg-inset); border-radius:8px; overflow:hidden; height:34px; margin:8px 12px; }
-.seg button { flex:1; border:none; background:transparent; color:var(--txt2);
-    font-size:0.86em; font-weight:500; cursor:pointer; font-family:inherit; transition:.15s; }
-.seg button.active { background:var(--bg-card); color:var(--txt); border-radius:6px;
+/* ──────────── BELLOWS TRAPEZOID SWITCH ──────────── */
+.bellows-container { padding:8px 12px; position:relative; }
+.bellows-switch { display:flex; justify-content:center; align-items:center; gap:20px; 
+    height:80px; position:relative; }
+
+/* Bottom bellows (nach Bass) */
+.bellows-bottom { margin-top:16px; padding-top:16px; border-top:1px solid var(--sep); }
+
+.bellows-btn { position:relative; width:140px; height:70px; cursor:pointer; 
+    border:none; background:transparent; display:flex; align-items:center; justify-content:center;
+    font-size:0.85em; font-weight:600; color:var(--txt2); transition:.2s; }
+
+.bellows-btn svg { position:absolute; top:0; left:0; width:100%; height:100%; }
+.bellows-btn .label { position:relative; z-index:2; display:flex; align-items:center; gap:6px; }
+
+.bellows-btn.pull .label::before { content:'◄'; font-size:1.2em; }
+.bellows-btn.push .label::after { content:'►'; font-size:1.2em; }
+
+.bellows-btn.active { color:#fff; }
+.bellows-btn.active .trapezoid-fill { fill:var(--accent); }
+.bellows-btn.active .trapezoid-stroke { stroke:var(--accent); }
+
+.bellows-btn:not(.active) .trapezoid-fill { fill:transparent; }
+.bellows-btn:not(.active) .trapezoid-stroke { stroke:var(--txt3); }
+
+/* Minimalist mode */
+.bellows-switch.minimal { height:34px; background:var(--bg-inset); border-radius:8px; gap:0; }
+.bellows-switch.minimal .bellows-btn { width:50%; height:100%; }
+.bellows-switch.minimal .bellows-btn svg { display:none; }
+.bellows-switch.minimal .bellows-btn.active { background:var(--bg-card); border-radius:6px; 
     margin:2px; height:calc(100% - 4px); box-shadow:0 1px 3px rgba(0,0,0,.4); }
+
+.style-toggle { background:none; border:none; color:var(--txt3); font-size:0.7em; 
+    cursor:pointer; padding:4px 8px; border-radius:4px; transition:.15s; }
+.style-toggle:hover { color:var(--txt2); background:var(--bg-inset); }
 
 /* ──────────── CHORD PANEL ──────────── */
 .chord-panel { padding:0 12px 12px; }
@@ -93,7 +122,6 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .checkbox-row label { display:flex; align-items:center; gap:8px; font-size:0.82em; cursor:pointer; }
 .checkbox-row input[type="checkbox"] { width:18px; height:18px; cursor:pointer; }
 
-/* Warning box */
 .warning-box { margin:8px 0; padding:10px 12px; background:rgba(255,159,10,0.15);
     border-left:3px solid #ff9f0a; border-radius:6px; font-size:0.8em; color:#ff9f0a; }
 
@@ -197,7 +225,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .bass-button.is-chord { font-size:0.80em; }
 
 /* ──────────── LEGEND ──────────── */
-.legend { background:var(--bg-card); border-radius:12px; margin-top:10px; padding:10px 16px; }
+.legend { background:var(--bg-card); border-radius:12px; margin-top:20px; padding:10px 16px; }
 .legend .lg-title { font-size:0.7em; font-weight:600; color:var(--txt2);
     text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
 .lg-row { display:flex; align-items:center; gap:9px; margin-bottom:4px; font-size:0.8em; color:var(--txt2); }
@@ -223,6 +251,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     .bass-container { gap:14px; }
     .root-grid { gap:4px; }
     .root-btn { min-width:34px; height:30px; font-size:0.78em; }
+    .bellows-btn { width:120px; height:60px; font-size:0.8em; }
 }
 </style>
 </head>
@@ -236,10 +265,27 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 <!-- ── STEUERUNG ── -->
 <div class="section">
-    <div class="sec-hdr">Balgrichtung</div>
-    <div class="seg">
-        <button class="active" data-dir="pull">← Pull (Ziehen)</button>
-        <button class="seg-btn" data-dir="push">Push (Drücken) →</button>
+    <div class="sec-hdr">
+        Balgrichtung
+        <button class="style-toggle" id="styleToggle" title="Darstellung umschalten">⚙️</button>
+    </div>
+    <div class="bellows-container">
+        <div class="bellows-switch" id="bellowsSwitch">
+            <button class="bellows-btn pull" data-dir="pull">
+                <svg viewBox="0 0 140 70" preserveAspectRatio="none">
+                    <polygon class="trapezoid-fill" points="20,10 120,0 120,70 20,60"/>
+                    <polygon class="trapezoid-stroke" points="20,10 120,0 120,70 20,60" fill="none" stroke-width="2"/>
+                </svg>
+                <span class="label">Pull</span>
+            </button>
+            <button class="bellows-btn push active" data-dir="push">
+                <svg viewBox="0 0 140 70" preserveAspectRatio="none">
+                    <polygon class="trapezoid-fill" points="20,0 120,10 120,60 20,70"/>
+                    <polygon class="trapezoid-stroke" points="20,0 120,10 120,60 20,70" fill="none" stroke-width="2"/>
+                </svg>
+                <span class="label">Push</span>
+            </button>
+        </div>
     </div>
 
     <div class="chord-panel">
@@ -273,7 +319,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
         <!-- AUDIO CONTROLS -->
         <div class="audio-section">
-            <button class="play-btn" id="playBtn" disabled>▶️ Akkord abspielen</button>
+            <button class="play-btn" id="playBtn">▶️ Akkord abspielen</button>
             <div class="audio-controls">
                 <label>Klang:</label>
                 <select id="toneType">
@@ -289,7 +335,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
                 <div class="checkbox-row">
                     <label>
-                        <input type="checkbox" id="autoPlay">
+                        <input type="checkbox" id="autoPlay" checked>
                         Auto-Play bei Akkordwechsel
                     </label>
                 </div>
@@ -303,11 +349,31 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="layout-section" id="accordion-layout">
     <div class="accordion-flex">
         <div class="bass-side">
-            <div class="lay-title">Bass – <span id="bassDir">Pull</span></div>
+            <div class="lay-title">Bass – <span id="bassDir">Push</span></div>
             <div class="bass-container" id="bass-container"></div>
+            
+            <!-- ZWEITE TRAPEZE (bei Bass für schnellen Zugriff) -->
+            <div class="bellows-container bellows-bottom">
+                <div class="bellows-switch bellows-switch-2" id="bellowsSwitch2">
+                    <button class="bellows-btn pull" data-dir="pull">
+                        <svg viewBox="0 0 140 70" preserveAspectRatio="none">
+                            <polygon class="trapezoid-fill" points="20,10 120,0 120,70 20,60"/>
+                            <polygon class="trapezoid-stroke" points="20,10 120,0 120,70 20,60" fill="none" stroke-width="2"/>
+                        </svg>
+                        <span class="label">Pull</span>
+                    </button>
+                    <button class="bellows-btn push active" data-dir="push">
+                        <svg viewBox="0 0 140 70" preserveAspectRatio="none">
+                            <polygon class="trapezoid-fill" points="20,0 120,10 120,60 20,70"/>
+                            <polygon class="trapezoid-stroke" points="20,0 120,10 120,60 20,70" fill="none" stroke-width="2"/>
+                        </svg>
+                        <span class="label">Push</span>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="treble-wrapper">
-            <div class="lay-title">Diskant – <span id="trebleDir">Pull (Ziehen)</span> – Sicht von oben</div>
+            <div class="lay-title">Diskant – <span id="trebleDir">Push (Drücken)</span> – Sicht von oben</div>
             <div class="treble-side" id="treble-container"></div>
         </div>
     </div>
@@ -344,7 +410,6 @@ function playChord(frequencies, duration, toneType) {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
-        // Tone shaping
         switch(toneType) {
             case 'warm':
                 oscillator.type = 'triangle';
@@ -364,7 +429,6 @@ function playChord(frequencies, duration, toneType) {
         
         oscillator.frequency.value = freq;
         
-        // ADSR Envelope
         const now = audioContext.currentTime;
         const attack = toneType === 'soft' ? 0.1 : 0.05;
         const release = toneType === 'soft' ? 0.3 : 0.1;
@@ -401,19 +465,19 @@ function stopAll() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CHORD_FORMULAS = {
-    '':     [0,4,7],        // Dur
-    'm':    [0,3,7],        // Moll
-    'dim':  [0,3,6],        // vermindert
-    'aug':  [0,4,8],        // übermäßig
-    'sus2': [0,2,7],        // sus2
-    'sus4': [0,5,7],        // sus4
-    '7':    [0,4,7,10],     // Dom 7
-    'maj7': [0,4,7,11],     // Maj 7
-    'm7':   [0,3,7,10],     // Moll 7
-    'dim7': [0,3,6,9],      // dim 7
-    'm7b5': [0,3,6,10],     // Half-diminished
-    '6':    [0,4,7,9],      // Sixte
-    'm6':   [0,3,7,9],      // Moll Sixte
+    '':     [0,4,7],
+    'm':    [0,3,7],
+    'dim':  [0,3,6],
+    'aug':  [0,4,8],
+    'sus2': [0,2,7],
+    'sus4': [0,5,7],
+    '7':    [0,4,7,10],
+    'maj7': [0,4,7,11],
+    'm7':   [0,3,7,10],
+    'dim7': [0,3,6,9],
+    'm7b5': [0,3,6,10],
+    '6':    [0,4,7,9],
+    'm6':   [0,3,7,9],
 };
 
 const SCALE_FORMULAS = {
@@ -431,11 +495,10 @@ const NOTE_TO_SEMITONE = {
 const SEMITONE_TO_NOTE = ['C','C#','D','Eb','E','F','F#','G','G#','A','Bb','B'];
 const ROOTS = ['C','D','E','F','G','A','Bb','Ab','Eb'];
 
-// Note to Frequency (A4 = 440 Hz)
 function noteToFrequency(noteName, octave = 4) {
     const A4 = 440;
     const semitone = NOTE_TO_SEMITONE[noteName];
-    const distance = (octave - 4) * 12 + semitone - 9; // A4 is 9 semitones from C4
+    const distance = (octave - 4) * 12 + semitone - 9;
     return A4 * Math.pow(2, distance / 12);
 }
 
@@ -466,9 +529,9 @@ const layout = {
 // STATE
 // ═══════════════════════════════════════════════════════════════════════════
 
-let dir          = 'pull';
-let chordRoot    = null;
-let chordType    = '';
+let dir          = 'push';  // DEFAULT: PUSH
+let chordRoot    = 'C';     // DEFAULT: C
+let chordType    = '';      // DEFAULT: Dur
 let scaleType    = null;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -592,7 +655,6 @@ function applyStyles() {
     const rootSet = new Set([chordRoot]);
     const chordSet = new Set(chordNotes);
     
-    // Check availability
     const avail = checkAvailability(chordNotes);
     const missing = dir === 'pull' ? avail.pull.missing : avail.push.missing;
     
@@ -604,7 +666,6 @@ function applyStyles() {
         document.getElementById('warningBox').style.display = 'none';
     }
     
-    // Treble
     document.querySelectorAll('.note-button').forEach(btn => {
         const note = btn.dataset.note;
         const name = pureName(note);
@@ -622,7 +683,6 @@ function applyStyles() {
         }
     });
     
-    // Bass - mark if matches root
     document.querySelectorAll('.bass-button').forEach(btn => {
         const note = btn.dataset.note;
         const root = bassToRoot(note);
@@ -642,17 +702,19 @@ function onBassClick(note) {
     scaleType = null;
     selectRoot(root);
     
-    // Update chip active states
     document.querySelectorAll('.chip[data-ctype]').forEach(b => {
         b.classList.toggle('active', b.dataset.ctype === chordType);
     });
     document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
+    
+    if(document.getElementById('autoPlay').checked) {
+        playCurrentChord();
+    }
 }
 
 function selectRoot(root) {
     chordRoot = root;
     document.querySelectorAll('.root-btn').forEach(b => b.classList.toggle('active', b.dataset.root === root));
-    document.getElementById('playBtn').disabled = false;
     applyStyles();
     
     if(document.getElementById('autoPlay').checked) {
@@ -678,20 +740,33 @@ function switchDir(newDir) {
     dir = newDir;
     document.getElementById('bassDir').textContent = newDir === 'pull' ? 'Pull' : 'Push';
     document.getElementById('trebleDir').textContent = newDir === 'pull' ? 'Pull (Ziehen)' : 'Push (Drücken)';
+    
+    // Sync BOTH bellows switches
+    document.querySelectorAll('.bellows-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.dir === newDir);
+    });
+    
     renderAll();
+}
+
+function toggleBellowsStyle() {
+    const switches = document.querySelectorAll('.bellows-switch');
+    switches.forEach(sw => sw.classList.toggle('minimal'));
+    
+    const isMinimal = switches[0].classList.contains('minimal');
+    localStorage.setItem('bellowsStyle', isMinimal ? 'minimal' : 'trapezoid');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-document.querySelectorAll('.seg button').forEach(btn => {
-    btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        switchDir(btn.dataset.dir);
-    });
+// BOTH bellows switches
+document.querySelectorAll('.bellows-btn').forEach(btn => {
+    btn.addEventListener('click', ()=> switchDir(btn.dataset.dir));
 });
+
+document.getElementById('styleToggle').addEventListener('click', toggleBellowsStyle);
 
 document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
     btn.addEventListener('click', ()=>{
@@ -700,7 +775,12 @@ document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
         chordType = btn.dataset.ctype;
         scaleType = null;
         document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
-        if(chordRoot) applyStyles();
+        if(chordRoot) {
+            applyStyles();
+            if(document.getElementById('autoPlay').checked) {
+                playCurrentChord();
+            }
+        }
     });
 });
 
@@ -711,7 +791,12 @@ document.querySelectorAll('.chip[data-scale]').forEach(btn => {
         scaleType = was ? null : btn.dataset.scale;
         if(!was) btn.classList.add('active');
         if(scaleType) document.querySelectorAll('.chip[data-ctype]').forEach(b => b.classList.remove('active'));
-        if(chordRoot) applyStyles();
+        if(chordRoot) {
+            applyStyles();
+            if(document.getElementById('autoPlay').checked) {
+                playCurrentChord();
+            }
+        }
     });
 });
 
@@ -727,6 +812,26 @@ document.getElementById('duration').addEventListener('input', e => {
 
 renderRootGrid();
 renderAll();
+
+// Set default selection: C-Dur, PUSH, Auto-Play ON
+document.querySelectorAll('.root-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.root === 'C');
+});
+document.querySelectorAll('.chip[data-ctype]').forEach(b => {
+    b.classList.toggle('active', b.dataset.ctype === '');
+});
+document.getElementById('autoPlay').checked = true;
+
+// Load bellows style preference
+const savedStyle = localStorage.getItem('bellowsStyle');
+if(savedStyle === 'minimal') {
+    document.querySelectorAll('.bellows-switch').forEach(sw => {
+        sw.classList.add('minimal');
+    });
+}
+
+// Apply initial chord visualization
+applyStyles();
 </script>
 </body>
 </html>
