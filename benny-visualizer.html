@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Visualizer</title>
-<meta name="description" content="Interaktive Visualisierung für Castagnari Benny C/G (3-reihig, Heim) – Akkorde, Skalen, Stücke lernen">
+<title>Castagnari Benny Accordion</title>
+<meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
 <!-- Favicons -->
@@ -133,9 +133,15 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     letter-spacing:1px; padding:10px 2px 6px; text-align:center; }
 
 .treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start; }
-.row { display:flex; flex-direction:column; gap:4px; align-items:center; }
+.row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:70px; }
+
+/* Topographic offset - buttons interlock like real Benny */
+.row:nth-child(1) { margin-top: 0; }      /* 3. Reihe - baseline */
+.row:nth-child(2) { margin-top: -35px; }  /* C-Reihe - offset from 3. */
+.row:nth-child(3) { margin-top: -70px; }  /* G-Reihe - offset from C-Reihe (cumulative) */
+
 .row-label { font-size:0.66em; color:var(--txt3); font-weight:600; letter-spacing:0.7px;
-    text-align:center; margin-bottom:2px; }
+    text-align:center; margin-bottom:8px; }
 
 /* ──────────── PERLMUTT-TASTE ──────────── */
 .note-button {
@@ -189,6 +195,15 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 inset 0 -1px 2px rgba(0,0,0,.10),
                 0 2px 5px var(--p-shadow),
                 0 0 0 2px rgba(142,142,147,.22);
+}
+
+.note-button.highlight-temp {
+    animation: pulse-highlight 0.3s ease-in-out;
+}
+
+@keyframes pulse-highlight {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); box-shadow: 0 0 12px var(--accent); }
 }
 
 /* ──────────── BASS-TASTE ──────────── */
@@ -259,7 +274,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1>🪗 Castagnari Benny Visualizer</h1>
+    <h1>🪗 Castagnari Benny Accordion</h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -308,10 +323,12 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
         <div class="cp-label">Modale Skalen</div>
         <div class="chip-row" id="scaleRow">
+            <button class="chip" data-scale="ionian">Ionisch (Dur)</button>
             <button class="chip" data-scale="dorian">Dorisch</button>
-            <button class="chip" data-scale="mixolydian">Mixolydisch</button>
             <button class="chip" data-scale="phrygian">Phrygisch</button>
             <button class="chip" data-scale="lydian">Lydisch</button>
+            <button class="chip" data-scale="mixolydian">Mixolydisch</button>
+            <button class="chip" data-scale="aeolian">Äolisch (Moll)</button>
         </div>
 
         <div class="cp-label">Grundton</div>
@@ -449,6 +466,72 @@ function playChord(frequencies, duration, toneType) {
     });
 }
 
+function playScale(notes, tempo = 0.3) {
+    stopAll();
+    
+    notes.forEach((note, idx) => {
+        setTimeout(() => {
+            const freq = noteToFrequency(note, 4);
+            const tone = document.getElementById('toneType').value;
+            const noteDuration = tempo * 0.8;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            switch(tone) {
+                case 'warm':
+                    oscillator.type = 'triangle';
+                    break;
+                case 'pure':
+                    oscillator.type = 'sine';
+                    break;
+                case 'bright':
+                    oscillator.type = 'sawtooth';
+                    break;
+                case 'soft':
+                    oscillator.type = 'sine';
+                    break;
+                default:
+                    oscillator.type = 'triangle';
+            }
+            
+            oscillator.frequency.value = freq;
+            
+            const now = audioContext.currentTime;
+            const attack = tone === 'soft' ? 0.05 : 0.03;
+            const release = tone === 'soft' ? 0.15 : 0.08;
+            
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.3, now + attack);
+            gainNode.gain.linearRampToValueAtTime(0.15, now + noteDuration - release);
+            gainNode.gain.linearRampToValueAtTime(0, now + noteDuration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start(now);
+            oscillator.stop(now + noteDuration);
+            
+            activeOscillators.push({ oscillator, gainNode });
+            
+            // Visual highlight
+            highlightNoteButton(note, tempo);
+        }, idx * tempo * 1000);
+    });
+}
+
+function highlightNoteButton(noteName, duration) {
+    document.querySelectorAll('.note-button').forEach(btn => {
+        const btnNote = pureName(btn.dataset.note);
+        if(btnNote === noteName && !btn.classList.contains('highlight-temp')) {
+            btn.classList.add('highlight-temp');
+            setTimeout(() => {
+                btn.classList.remove('highlight-temp');
+            }, duration * 800);
+        }
+    });
+}
+
 function stopAll() {
     activeOscillators.forEach(({ oscillator, gainNode }) => {
         try {
@@ -481,10 +564,12 @@ const CHORD_FORMULAS = {
 };
 
 const SCALE_FORMULAS = {
+    ionian:    [0,2,4,5,7,9,11],    // Dur
     dorian:    [0,2,3,5,7,9,10],
-    mixolydian:[0,2,4,5,7,9,10],
     phrygian:  [0,1,3,5,7,8,10],
-    lydian:    [0,2,4,6,7,9,11]
+    lydian:    [0,2,4,6,7,9,11],
+    mixolydian:[0,2,4,5,7,9,10],
+    aeolian:   [0,2,3,5,7,8,10]     // Moll
 };
 
 const NOTE_TO_SEMITONE = {
@@ -582,7 +667,7 @@ function renderTreble() {
         div.className = 'row';
         const lbl = document.createElement('div');
         lbl.className = 'row-label';
-        lbl.textContent = row==='Heim'?'HELFER (10)':row==='C'?'C-REIHE (11)':'G-REIHE (12)';
+        lbl.textContent = row==='Heim'?'3. REIHE (10)':row==='C'?'C-REIHE (11)':'G-REIHE (12)';
         div.appendChild(lbl);
         layout[dir].treble[row].forEach(note => {
             const btn = document.createElement('div');
@@ -728,12 +813,17 @@ function playCurrentChord() {
     const formula = scaleType ? SCALE_FORMULAS[scaleType] : CHORD_FORMULAS[chordType];
     const base = NOTE_TO_SEMITONE[chordRoot];
     const chordNotes = formula.map(i => SEMITONE_TO_NOTE[(base+i)%12]);
-    const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
     
-    const duration = parseFloat(document.getElementById('duration').value);
-    const tone = document.getElementById('toneType').value;
-    
-    playChord(frequencies, duration, tone);
+    if(scaleType) {
+        // Scales: play as arpeggio (ascending)
+        playScale(chordNotes, 0.3);
+    } else {
+        // Chords: play simultaneously
+        const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
+        const duration = parseFloat(document.getElementById('duration').value);
+        const tone = document.getElementById('toneType').value;
+        playChord(frequencies, duration, tone);
+    }
 }
 
 function switchDir(newDir) {
