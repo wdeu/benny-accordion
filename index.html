@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Castagnari Benny Accordion</title>
+<meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -51,8 +52,18 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
         align-items: start;
     }
     
-    .bass-column { grid-column: 1; }
+    /* Bass column: STICKY! */
+    .bass-column { 
+        grid-column: 1;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+    
     .treble-column { grid-column: 2; }
+    
+    /* Jam-Box column: STICKY! */
     .jam-box-column { 
         grid-column: 3;
         position: sticky;

@@ -1,483 +1,442 @@
-# 🪗 Castagnari Benny Visualizer - Installation & Nutzung (v4.0)
+# 🪗 Castagnari Benny Accordion - Installation & Nutzung (v5.3)
 
 ## ✨ Was ist das?
 
-Eine **interaktive Web-App** zur Visualisierung deines **Castagnari Benny C/G (3-reihig, Heim)** – perfekt zum Lernen von Akkorden, Skalen und Stücken.
+Eine **interaktive Web-App** zur Visualisierung deines **Castagnari Benny C/G (3-reihig, Heim)** – perfekt zum Lernen von Akkorden, modalen Skalen und Bellows-Technik.
 
-### 🆕 Neue Features (v5.0)
+### 🆕 Neue Features (v5.3)
 
-- ✅ **Audio-Playback:** Web Audio API – Akkorde hören ohne MIDI-Hardware
-- ✅ **13 Akkordtypen:** Dreiklänge, Septakkorde, Sixte-Akkorde
-- ✅ **4 Klang-Typen:** Akkordeon-like, Rein (Sinus), Hell, Weich ausklingend
-- ✅ **Auto-Play:** Optional automatisch abspielen bei Akkordwechsel
-- ✅ **Benny-Check:** Warnung wenn Töne auf dem Instrument fehlen
-- ✅ **Bass-Shortcuts:** Großbuchstabe = Dur, Kleinbuchstabe = Moll
-- ✅ **Akkord-Fokus:** Normal-Modus entfernt, Fokus auf Audio-Lernen
-- ✅ **MIT Attribution:** Audio-Konzept von Harmonic Extension
+- ✅ **iPad ONE Screen Layout:** 3-Spalten (Bass | Diskant | Jam-Box), alles sichtbar!
+- ✅ **Tempo-Slider:** 0.2s - 1.0s pro Ton (endlich nicht mehr zu schnell!)
+- ✅ **Loop-Modus:** Endless Arpeggio zum Mitspielen
+- ✅ **Modal-Highlighting:** Nur Skala-Töne leuchten, Rest ausgeblendet
+- ✅ **Stop-Button:** Sofortiges Beenden der Wiedergabe
+- ✅ **Kompakte UI:** Optimiert für Tablet Landscape
 
 ---
 
-## 📱 Auf dem iPhone nutzen
+## 🚀 Quick Start
 
-### ✅ Empfohlene Methode: Als Web-App
+### Option 1: Online (Einfachste Methode) ⭐
+Besuche **[wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)**
 
-#### Schritt-für-Schritt:
+### Option 2: iPhone/iPad Home Screen
+1. Öffne in Safari: [wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)
+2. Tippe Share-Button (Quadrat mit Pfeil)
+3. Scrolle zu "Zum Home-Bildschirm"
+4. Tippe "Hinzufügen"
 
-1. **Datei auf iPhone übertragen:**
-   - Per AirDrop von Mac/PC
-   - ODER via iCloud Drive hochladen
+✅ **Fertig!** Jetzt hast du eine App auf dem Home-Screen!
 
-2. **In Safari öffnen:**
-   - Datei antippen → "Mit Safari öffnen"
+### Option 3: Lokal nutzen
+```bash
+# Repository klonen
+git clone https://github.com/wdeu/benny-accordion.git
+cd benny-accordion
 
-3. **Zum Home-Bildschirm hinzufügen:**
-   - Tippe auf das "Teilen"-Symbol (Quadrat mit Pfeil)
-   - Scrolle zu "Zum Home-Bildschirm"
-   - Name: "Benny Visualizer"
-   - **Icon:** Automatisch das Benny-Akkordeon-Icon 🪗
-   - Tippe "Hinzufügen"
+# Im Browser öffnen
+open index.html
+```
 
-✅ **Fertig!** Du hast jetzt eine App auf dem Home-Screen mit eigenem Icon!
-
-**Was funktioniert auf iPhone:**
-- ✅ Button-Layout Visualisierung (Push/Pull)
-- ✅ Akkordmodus (13 Akkordtypen + 4 Skalen)
-- ✅ **Audio-Playback** – Akkorde hören (Web Audio API)
-- ✅ **4 Klang-Typen** – Akkordeon-like, Rein, Hell, Soft
-- ✅ Grundton-Auswahl
-- ✅ Bass-Shortcuts (Großbuchstabe=Dur, Kleinbuchstabe=Moll)
-- ✅ **Side-by-Side im Landscape-Modus** – drehe dein iPhone für optimale Übersicht!
+**Voraussetzungen:** Moderner Browser (Chrome, Firefox, Safari, Edge)  
+**Internet:** Nicht nötig nach erstem Laden (vollständig offline-fähig)
 
 ---
 
-## 💻 Auf dem Computer nutzen
-
-### Lokal verwenden:
-
-1. **Datei öffnen:**
-   - Doppelklick auf `benny-visualizer.html`
-   - Öffnet sich in deinem Standard-Browser
-
-2. **Loslegen!**
-   - Keine Installation nötig
-   - Keine Internet-Verbindung nötig (nach erstem Laden)
-
-**Unterstützte Browser:**
-- ✅ Safari
-- ✅ Chrome
-- ✅ Firefox
-- ✅ Edge
-
----
-
-## 🌐 Online hosten (für Zugriff von allen Geräten)
-
-### Option A: GitHub Pages (kostenlos, dauerhaft)
-
-#### 1. GitHub Account erstellen
-- Gehe zu [github.com](https://github.com)
-- Erstelle einen kostenlosen Account
-
-#### 2. Neues Repository erstellen
-- Klicke auf "New Repository"
-- Name: `benny-visualizer`
-- Public ✅
-- **NICHT** "Add a README file" anklicken
-- "Create repository"
-
-#### 3. Datei hochladen
-- Klicke "uploading an existing file"
-- **WICHTIG:** Lade sowohl `benny-visualizer.html` als auch den `assets/`-Ordner hoch
-- Benenne `benny-visualizer.html` um in `index.html`
-- Die Ordnerstruktur sollte sein:
-  ```
-  /
-  ├── index.html
-  └── assets/
-      ├── favicon-16x16.png
-      ├── favicon-32x32.png
-      ├── apple-touch-icon.png
-      ├── icon-192.png
-      ├── icon-512.png
-      └── manifest.json
-  ```
-- Klicke "Commit changes"
-
-#### 4. GitHub Pages aktivieren
-- Gehe zu "Settings" (Zahnrad-Symbol)
-- Linke Sidebar: "Pages"
-- Source: "Deploy from a branch"
-- Branch: `main` → Ordner: `/root`
-- "Save"
-
-#### 5. Fertig!
-- **URL:** `https://DEINNAME.github.io/benny-visualizer`
-- Nach 1-2 Minuten live!
-- Auf allen Geräten abrufbar
-
----
-
-### Option B: Netlify Drop (noch einfacher)
-
-1. Gehe zu [app.netlify.com/drop](https://app.netlify.com/drop)
-2. Ziehe `benny-visualizer.html` in den Browser
-3. **Fertig!** Du bekommst sofort eine URL wie:
-   `https://awesome-benny-123.netlify.app`
-
-**Vorteile:**
-- ✅ Keine Anmeldung nötig
-- ✅ Sofort live (keine Wartezeit)
-- ✅ Custom Domain möglich (kostenlos)
-
-**Nachteile:**
-- ⚠️ URL ist zufällig generiert
-- ⚠️ Datei wird nach 24h gelöscht (außer du meldest dich an)
-
----
-
-### Option C: IONOS Server (für eigene Domain)
-
-#### Voraussetzungen:
-- IONOS Webhosting-Paket
-- FTP-Zugang oder File Manager Zugriff
-
-#### Via FTP (FileZilla/Cyberduck):
-
-1. **FTP-Verbindung einrichten:**
-   - Host: `ftp.DEINE-DOMAIN.de`
-   - Benutzername: (von IONOS E-Mail)
-   - Passwort: (von IONOS E-Mail)
-   - Port: 21
-
-2. **Datei hochladen:**
-   - Navigiere zum Ordner `/` oder `/htdocs/`
-   - Lade `benny-visualizer.html` hoch
-   - **Optional:** Benenne um in `index.html` (dann ist es die Startseite)
-
-3. **Fertig!**
-   - URL: `https://DEINE-DOMAIN.de/benny-visualizer.html`
-   - Oder: `https://DEINE-DOMAIN.de` (wenn als index.html)
-
-#### Via IONOS File Manager:
-
-1. **Einloggen:**
-   - Gehe zu [ionos.de](https://www.ionos.de)
-   - Login → "Webhosting" → "File Manager"
-
-2. **Datei hochladen:**
-   - Navigiere zu `/htdocs/` oder `/`
-   - Klicke "Hochladen"
-   - Wähle `benny-visualizer.html`
-   - Upload abwarten
-
-3. **Fertig!**
-   - Direkt verfügbar unter deiner Domain
-
-**Tipp:** Erstelle einen Unterordner `/akkordeon/` für bessere Organisation!
-
----
-
-## 🎯 Verwendung
+## 🎓 Verwendung
 
 ### Normal-Modus
 
-**Stück lernen:**
-1. Dropdown: Stück auswählen
-2. Balgrichtung (Pull/Push) umschalten
-3. Aktive Tasten werden angezeigt
-4. Info-Panel zeigt Details (Tonart, Balg, etc.)
+**Akkorde visualisieren:**
+1. Wähle **Akkordtyp** (z.B. "Dur", "Moll", "7")
+2. Wähle **Grundton** (z.B. "C", "D", "G")
+3. → Buttons leuchten auf!
+4. (Optional) **▶️ Play** drücken zum Hören
 
-**Bass-Triaden visualisieren:**
-1. Klicke eine **Bass-Taste** (z.B. `C`)
-2. → Diskant zeigt sofort die passende Triade:
-   - **Großbuchstabe** (`C`) = Dur-Triade (C-E-G)
-   - **Kleinbuchstabe** (`c`) = Moll-Triade (C-Eb-G)
-3. Vergleiche direkt: `C` vs `c` hin und her klicken!
+**Bass-Triaden (Quick Mode):**
+1. Klicke eine **Bass-Taste** (z.B. `C` oder `c`)
+2. **Großbuchstabe** (`C`) = Dur-Triade (C-E-G)
+3. **Kleinbuchstabe** (`c`) = Moll-Triade (C-Eb-G)
+4. → Diskant zeigt sofort die Triade!
 
 **Tipp:** So lernst du die Akkordstruktur auf deinem Instrument!
 
 ---
 
-### Akkordmodus
+### Modal-Jamming (NEU in v5.3!) 🎵
 
-**Akkorde lernen – Workflow:**
+**Workflow für Skalen-Praxis:**
 
-1. **Modus aktivieren:**
-   - Klicke "🎼 Akkorde"
-   - Panel öffnet sich direkt darunter
+1. **Modale Skala wählen:**
+   - Klicke z.B. "Dorisch", "Mixolydisch", "Phrygisch"
 
-2. **Akkordtyp wählen:**
-   - Dur / Moll / Dom 7 / Maj 7 / dim / aug
-   - ODER: Modale Skala (Dorisch/Mixolydisch/Phrygisch/Lydisch)
+2. **Grundton wählen:**
+   - Klicke z.B. "D", "G", "A"
 
-3. **Grundton wählen:**
-   - Buttons direkt darunter: C, D, E, F, G, A, Bb, Ab, Eb
-   - Ein Klick → Akkord leuchtet sofort auf
+3. **Tempo anpassen:**
+   - Schiebe Slider auf **0.7s** (langsamer zum Mitspielen!)
+   - 0.2s = schnell (Finger-Übung)
+   - 0.5s = gemütlich (Standard)
+   - 1.0s = sehr langsam (Lernen)
 
-4. **Ergebnis sehen:**
-   - **Dunkles Grau + blauer Rand** = Grundton
-   - **Helles Grau** = Terz, Quinte, Septime
-   - Alles **ohne Scrollen** auf einen Blick!
+4. **Loop aktivieren:**
+   - ☑️ **Loop ∞** anklicken
+   - → Arpeggio wiederholt sich endlos!
 
-**Akkorde vergleichen:**
-- Grundton `C` klicken → C-Dur leuchtet
-- Grundton `D` klicken → D-Dur leuchtet (Akkord springt um!)
-- Direkt visueller Vergleich: Welche Töne bewegen sich?
+5. **Play drücken:**
+   - **▶️ Play** → Skala läuft hoch!
+   - **Visuell:** Nur Skala-Töne mit blauem Rand
+   - **Alle anderen Buttons:** Ausgeblendet (30% Opazität)
 
-**Modale Skalen:**
-1. "Dorisch" (oder andere Skala) wählen
-2. Grundton klicken
-3. → Alle Skalentöne werden angezeigt
-4. Charakteristische Töne erkennen!
+6. **Auf Benny nachspielen!** 🪗
+   - Du siehst GENAU, welche Buttons du spielen musst!
 
-**Beispiel: G-Dur vs G-Dorisch**
-1. "Dur" → "G" → Sehe: G, B, D, F#
-2. "Dorisch" → "G" → Sehe: G, A, Bb, C, D, E, F
-3. → Unterschied: F statt F# (charakteristischer Ton!)
+7. **Stop bei Bedarf:**
+   - **⏹️ Stop** → Sofortiger Abbruch
 
 ---
 
-## 🎨 Visuelle Kodierung
+### iPad Landscape Modus 📱
+
+**Perfektes ONE-Screen-Layout:**
+
+```
+┌─────────┬──────────────┬──────────┐
+│ BASS    │  DISKANT     │ JAM-BOX  │
+│ (sticky)│ (scrollbar)  │ (sticky!)│
+│         │              │          │
+│ [Pull]  │   ○○○ ○○ ○○ │ Akkord   │
+│ [Push]  │   ○●○ ○● ●○ │ Skalen   │
+│  ○ ○    │   ○○○ ○○ ○○ │ Grundton │
+│  ● ○    │              │          │
+│  ○ ○    │              │ Tempo    │
+│         │              │ Loop ∞   │
+│ [Pull]  │              │ Play/Stop│
+│ [Push]  │              │          │
+└─────────┴──────────────┴──────────┘
+     ↑           ↑             ↑
+  280px         flex        340px
+             (füllt Rest)  (sticky!)
+```
+
+**Vorteile:**
+- ✅ Alles auf EINEM Screen sichtbar!
+- ✅ Kein Scrollen zur Jam-Box nötig!
+- ✅ Bass + Balg immer im Blick!
+
+---
+
+## 🎨 Visuelles Feedback
 
 ### Legende
 
-| Symbol | Bedeutung | Farbe |
-|--------|-----------|-------|
-| ○ | Taste – nicht aktiv | Perlmutt |
-| ● | Taste – aktiv (Akkordton / Stück) | Helles Grau |
-| ◉ | Grundton des Akkords | Dunkles Grau + blauer Rand |
-| ◌ | Skalenton (bei modalen Skalen) | Leichter Rand-Hinweis |
+| Symbol | Bedeutung | Beispiel |
+|--------|-----------|----------|
+| ○ | Taste – nicht aktiv | Perlmutt-Button |
+| ● | Taste – aktiv | Grau, Teil des Akkords |
+| ◉ | Grundton | Grau + blauer Rand |
+| ◎ | Skalenton (modal) | Perlmutt + blauer Rand |
+| ◌ | Ausgeblendet (modal) | 30% Opazität |
 
-### Design-Prinzipien
+### Modal-Modus (NEU!)
 
-**iOS-Stil:**
-- Grautöne dominieren
-- **Eine** Farbakzentuierung (Grundton = blau)
-- Klare Hierarchie
-- Keine schreienden Farben
+**Im normalen Akkordmodus:**
+- Alle Akkordtöne = dunkelgrau
+- Grundton = dunkelgrau + blauer Rand
 
-**Perlmutt-Buttons:**
-- Sichtbar auf **hellen** Displays
-- Sichtbar auf **dunklen** Displays
-- Realistischer 3D-Effekt
+**Im modalen Skalen-Modus:**
+- Skala-Töne = **blauer Rand + Glow** (spielbar!)
+- Nicht-Skala-Töne = **ausgeblendet** (30% Opazität)
+- Grundton = extra hervorgehoben
 
----
+**Beim Arpeggio:**
+- Aktueller Ton = pulsiert extra!
 
-## 🎓 Lern-Beispiele
-
-### Beispiel 1: Dur vs Moll verstehen
-
-**Aufgabe:** Was ist der Unterschied zwischen C-Dur und c-Moll?
-
-**Lösung:**
-1. Normal-Modus
-2. Bass-Taste `C` (groß) klicken
-   - → Sehe: C (Grundton), E (Terz), G (Quinte)
-3. Bass-Taste `c` (klein) klicken
-   - → Sehe: C (Grundton), Eb (Terz!), G (Quinte)
-
-**Erkenntnis:** Die Terz macht den Unterschied! E (Dur) vs Eb (Moll)
+**→ Du siehst sofort: "DAS sind die Töne zum Nachspielen!"**
 
 ---
 
-### Beispiel 2: Dorisch vs Dur
+## 🎯 Praxis-Beispiele
+
+### Beispiel 1: Dur vs Dorisch verstehen
 
 **Aufgabe:** Was macht G-Dorisch "dorisch"?
 
 **Lösung:**
-1. Akkordmodus → "Dur" → "G"
-   - → Sehe: G, B, D, F# (alle Töne der G-Dur-Tonleiter)
-2. Wechsel zu "Dorisch" → "G" klicken
-   - → Sehe: G, A, Bb, C, D, E, F
-3. Vergleiche: **F statt F#** = charakteristischer Ton!
+1. Akkordtyp: **"Dur"** → Grundton: **"G"**
+   - Sehe: G, B, D, F# (G-Dur Tonleiter)
+2. Wechsel zu **"Dorisch"** → **"G"**
+   - Sehe: G, A, Bb, C, D, E, F
+3. **Vergleiche:** F statt F# = charakteristischer Ton!
 
-**Erkenntnis:** Dorisch = wie Dur, aber mit kleiner 7
-
----
-
-### Beispiel 3: Akkordfolge visualisieren
-
-**Aufgabe:** Wie bewegen sich die Töne bei G → D → Em → C?
-
-**Lösung:**
-1. Akkordmodus → "Dur"
-2. Nacheinander klicken:
-   - `G` → Merke Position
-   - `D` → Sehe wie Töne springen
-   - Wechsel zu "Moll" → `E` (für Em)
-   - Zurück zu "Dur" → `C`
-3. Beobachte: Welche Töne bleiben, welche bewegen sich?
-
-**💡 Tipp (Desktop/Landscape):** Bei Side-by-Side Layout kannst du Bass-Grundton und Diskant-Akkord **gleichzeitig** sehen – kein Scrollen nötig!
+**Erkenntnis:** Dorisch = Dur mit kleiner 7!
 
 ---
 
-## 🎯 Deployment-Vergleich
+### Beispiel 2: Loop-Modus für Praxis
 
-| Methode | Aufwand | Kosten | Dauerhaft | Custom Domain |
-|---------|---------|--------|-----------|---------------|
-| **iPhone (lokal)** | ⭐ Einfach | Kostenlos | ✅ Ja | ❌ Nein |
-| **Computer (lokal)** | ⭐ Einfach | Kostenlos | ✅ Ja | ❌ Nein |
-| **GitHub Pages** | ⭐⭐ Mittel | Kostenlos | ✅ Ja | ✅ Ja (gratis) |
-| **Netlify Drop** | ⭐ Sehr einfach | Kostenlos | ⚠️ 24h* | ✅ Ja (€) |
-| **IONOS** | ⭐⭐⭐ Komplex | ~5€/Monat | ✅ Ja | ✅ Ja (inklusive) |
+**Aufgabe:** D-Moll Skala üben
 
-*Mit Account dauerhaft
-
-**Empfehlung:**
-- **Lernen zuhause:** Computer (lokal)
-- **Unterwegs üben:** iPhone (lokal)
-- **Mit anderen teilen:** GitHub Pages (kostenlos + dauerhaft)
-- **Professionell:** IONOS (eigene Domain)
+**Workflow:**
+1. Modale Skalen: **"Äolisch (Moll)"**
+2. Grundton: **"D"**
+3. Tempo: **0.8s** (gemütlich)
+4. **☑️ Loop ∞** aktivieren
+5. **▶️ Play**
+6. → D-Äolisch läuft endlos: D-E-F-G-A-Bb-C-D (repeat)
+7. **Auf Benny mitspielen!**
+8. **⏹️ Stop** wenn fertig
 
 ---
 
-## 🔄 Updates & Versionsverwaltung
+### Beispiel 3: iPad ONE Screen Workflow
 
-### Neue Version deployen:
+**Situation:** Unterwegs im Zug, nur iPad dabei
 
-**GitHub Pages:**
-1. Gehe zu deinem Repository
-2. Klicke auf `index.html`
-3. Stift-Symbol (Edit) → Datei überschreiben
-4. "Commit changes"
-5. Nach 1-2 Min live!
+**Workflow:**
+1. iPad Landscape halten
+2. wdeu.github.io/benny-accordion öffnen
+3. **Alles auf EINEM Screen!**
+   - Links: Balg + Bass (immer sichtbar)
+   - Mitte: Diskant (scrollbar wenn nötig)
+   - Rechts: Jam-Box (sticky, immer sichtbar!)
+4. Benny rausholen
+5. **Dorisch** → **G** → Tempo **0.7s** → Loop ∞
+6. Play → Mitspielen! 🎵
 
-**Netlify:**
-1. Neues Deployment = neue URL
-2. ODER: Mit Account → Update auf gleicher URL
-
-**IONOS:**
-1. Alte Datei löschen
-2. Neue hochladen
-3. Sofort live!
+**Kein nerviges Scrollen mehr!** ✅
 
 ---
 
-## ❓ Häufige Fragen (FAQ)
+## 🌐 Online Deployment
+
+### GitHub Pages (Empfohlen)
+
+**Warum GitHub Pages?**
+- ✅ Kostenlos
+- ✅ Dauerhaft
+- ✅ Eigene Domain möglich
+- ✅ HTTPS included
+- ✅ Weltweit erreichbar
+
+**Setup:**
+
+```bash
+# 1. Repository erstellen auf github.com
+# Name: benny-accordion
+# Public: Ja
+
+# 2. Lokal klonen
+git clone https://github.com/DEINNAME/benny-accordion.git
+cd benny-accordion
+
+# 3. Dateien kopieren
+cp ~/Downloads/benny-visualizer.html index.html
+cp -r ~/Downloads/assets/ .
+
+# 4. Pushen
+git add .
+git commit -m "Initial commit - v5.3"
+git push
+
+# 5. GitHub Pages aktivieren
+# Settings → Pages → Source: main → Save
+
+# 6. Warten (2-3 Min)
+# → https://DEINNAME.github.io/benny-accordion
+```
+
+---
+
+### Netlify Drop (Schnellste Methode)
+
+1. Gehe zu [app.netlify.com/drop](https://app.netlify.com/drop)
+2. Ziehe `benny-visualizer.html` in den Browser
+3. **Fertig!** Sofort eine URL wie:
+   `https://awesome-benny-123.netlify.app`
+
+**Vorteil:** Kein Account nötig, sofort live!  
+**Nachteil:** Nach 24h gelöscht (außer du registrierst dich)
+
+---
+
+## ⚙️ Einstellungen
+
+### Bellows-Stil umschalten
+
+**2 Darstellungen verfügbar:**
+
+1. **Trapezoid-Modus** (Standard):
+   - Große V-förmige Buttons
+   - Visuell prominent
+   
+2. **Minimal-Modus**:
+   - Kompakte Segmented Control
+   - Spart Platz
+
+**Umschalten:** ⚙️-Button neben "Balgrichtung" klicken
+
+**Einstellung bleibt gespeichert** (LocalStorage)
+
+---
+
+### Audio-Einstellungen
+
+**Klang:**
+- **Akkordeon-like** (Empfohlen): Warmer Triangle-Wave
+- **Rein**: Purer Sinus
+- **Hell**: Sawtooth-Wave
+- **Weich**: Sanfter Sinus mit längeren Hüllkurven
+
+**Tempo:**
+- Nur für Arpeggio (Skalen-Modus)
+- 0.2s - 1.0s pro Ton
+- Default: 0.5s
+
+**Auto-Play:**
+- ☑️ = Spielt sofort beim Akkord/Skala wählen
+- ☐ = Manuell mit ▶️ Play
+
+**Loop:**
+- ☑️ = Arpeggio wiederholt endlos
+- ☐ = Einmal abspielen
+
+---
+
+## ❓ FAQ
 
 ### Allgemein
 
 **Q: Funktioniert offline?**  
 A: Ja! Nach erstem Laden komplett offline nutzbar.
 
-**Q: Welche Browser werden unterstützt?**  
-A: Alle modernen Browser (Safari, Chrome, Firefox, Edge).
+**Q: Brauche ich Internet?**  
+A: Nur für erstes Laden. Danach: Nein!
 
-**Q: Funktioniert auf iPad/Android?**  
-A: Ja! Alle Features funktionieren auf allen Geräten.
+**Q: Welche Browser?**  
+A: Alle modernen (Chrome, Firefox, Safari, Edge).
 
-**Q: Warum wurde MIDI entfernt?**  
-A: Braucht spezielle Hardware (USB-MIDI-Interface), die kaum jemand hat. Die App konzentriert sich auf visuelles Lernen ohne zusätzliche Hardware.
+**Q: Auf welchen Geräten?**  
+A: Desktop, Laptop, Tablet, Smartphone (iOS, Android, Windows, Mac, Linux).
 
 ---
 
-### Akkordmodus
+### Modal-Modus
 
 **Q: Warum leuchten manche Töne nicht?**  
-A: Nicht alle Töne existieren auf jeder Balgrichtung. Wechsel zwischen Push/Pull!
+A: Sie sind nicht Teil der gewählten Skala! Das ist Absicht – du siehst nur die "richtigen" Töne!
 
-**Q: Was bedeutet "dunkles Grau"?**  
-A: Das ist der Grundton des Akkords – der wichtigste Ton, visuell hervorgehoben.
+**Q: Kann ich zwischen Push/Pull wechseln?**  
+A: Ja! Balg-Buttons klicken → andere Töne werden verfügbar.
 
-**Q: Kann ich eigene Akkorde definieren?**  
-A: Aktuell nein, aber geplant für v5.0 als "Custom Chords".
+**Q: Tempo zu schnell?**  
+A: Slider auf 0.7s oder 1.0s stellen! 0.5s ist Standard, aber für Anfänger oft zu schnell.
 
-**Q: Warum gibt es nur bestimmte Grundtöne?**  
-A: Die Grundtöne (C, D, E, F, G, A, Bb, Ab, Eb) entsprechen den tatsächlichen Bass-Tönen auf deinem Benny. Alle anderen Grundtöne würden Töne erfordern, die auf dem Instrument nicht existieren.
-
----
-
-### Normal-Modus
-
-**Q: Bass-Taste zeigt keine Triade?**  
-A: Du bist im Akkordmodus. Wechsel zu "Normal" für Bass-Triaden.
-
-**Q: Was ist der Unterschied zwischen Bass und Akkord-Taste?**  
-A: **Großbuchstabe** (C, D, E...) = einzelner Bass-Ton. **Kleinbuchstabe** (c, d, e...) = Dreiklang (Akkord). Im Normal-Modus zeigt die App bei beiden die passende Triade auf dem Diskant.
-
-**Q: Warum wird beim Moduswechsel alles gelöscht?**  
-A: Für einen sauberen Slate. Verhindert Verwirrung zwischen Normal-Modus-Markierungen und Akkordmodus-Markierungen.
+**Q: Loop stoppt nicht?**  
+A: **⏹️ Stop** drücken! Der Button ist rechts neben Play.
 
 ---
 
-### Deployment
+### iPad/Tablet
 
-**Q: GitHub Pages lädt nicht?**  
-A: Warte 2-3 Minuten. Check Settings → Pages → Status.
+**Q: Jam-Box ist abgeschnitten?**  
+A: Das ist in v5.3 gefixt! Jam-Box ist jetzt sticky rechts. Falls du noch v5.2 hast: Hard Refresh (Cmd+Shift+R)
 
-**Q: IONOS: Datei hochgeladen, aber 404 Error?**  
-A: Check ob im richtigen Ordner (`/htdocs/`) und korrekte Berechtigungen.
+**Q: Auf iPad ist alles zu klein?**  
+A: Landscape-Modus nutzen! Dort ist das Layout optimiert.
 
-**Q: Kann ich die App auf mehreren Geräten nutzen?**  
-A: Ja! Entweder lokal auf jedem Gerät ODER online hosten (dann synchron auf allen Geräten).
-
----
-
-## 🚀 Geplante Features (v5.0)
-
-- [ ] Custom Chords definieren
-- [ ] Akkordfolgen speichern & abspielen
-- [ ] PDF-Export (Grifftabellen)
-- [ ] Multi-Akkord-Vergleich (3+ gleichzeitig)
-- [ ] Cloud-Sync (Einstellungen synchronisieren)
-- [ ] Dark/Light Mode Toggle
-- [ ] Weitere Instrumente (D/G, G/C...)
+**Q: Kann die App offline arbeiten?**  
+A: Ja! Zum Home-Screen hinzufügen → funktioniert wie native App.
 
 ---
 
-## 🎯 GitHub Etiquette & Open Source
+## 🛠️ Troubleshooting
 
-Da diese App auf GitHub gehostet werden kann, hier ein paar wichtige Punkte:
+### Kein Ton?
 
-### Forken vs. Kopieren
-- **Forken:** Macht eine verknüpfte Kopie → respektiert den Ursprung
-- **Kopieren:** Trennt die Verbindung → weniger respektvoll
+**Checklist:**
+1. Browser-Lautstärke hoch?
+2. System-Lautstärke hoch?
+3. Auto-Play aktiviert? (☑️)
+4. ▶️ Play gedrückt?
+5. Chord/Scale ausgewählt?
 
-### Attribution (Quellenangabe)
-Wenn du Code von anderen übernimmst:
-- Nenne die Quelle im README
-- Oder: Kommentar im Code (`// Basiert auf github.com/user/projekt`)
-- Das ist der Sozialvertrag von Open Source!
-
-### Branching
-- `main` = stabiler Code
-- Feature-Branches: `feature/neue-funktion`
-- Bug-Fixes: `fix/button-bug`
-
-### Pull Requests
-Wenn du zum Original beitragen willst:
-- Fork → Änderungen → Pull Request
-- Beschreibe, was du gemacht hast
-- Maintainer entscheiden über Übernahme
-
-### Lizenzen
-- MIT/Apache 2.0: Sehr permissiv, fast alles erlaubt
-- GPL: Dein Projekt muss auch GPL werden
-- **Diese App:** Persönliche Nutzung, bei Weiterentwicklung Quellenangabe erwünscht
+**iOS Safari:** Erstes Mal Play manuell drücken (Sicherheit)!
 
 ---
 
-## 📧 Support & Feedback
+### Layout kaputt?
 
-Bei Fragen, Bugs oder Feature-Wünschen:
-- GitHub Issues (wenn auf GitHub gehostet)
-- Direkte Nachricht
+**Lösung:**
+1. Hard Refresh: **Cmd+Shift+R** (Mac) / **Ctrl+Shift+R** (Windows)
+2. Cache leeren in Browser-Einstellungen
+3. Neuer Browser-Tab
 
-**Version:** 4.0  
-**Letzte Aktualisierung:** Februar 2026  
-**Kompatibilität:** Alle modernen Browser, iOS 14+, Android 8+
+---
+
+### GitHub Pages zeigt alte Version?
+
+**Lösung:**
+1. Warte 2-3 Minuten nach Push
+2. Hard Refresh: **Cmd+Shift+R**
+3. Checke: Ist `index.html` aktualisiert?
+
+```bash
+# Check in Repo
+git log --oneline -5
+
+# Sollte zeigen: "Release v5.3" oder ähnlich
+```
+
+---
+
+## 📄 Changelog
+
+### v5.3 (May 20, 2026)
+- ✅ iPad ONE Screen Layout (3-column grid)
+- ✅ Tempo-Slider (0.2s - 1.0s)
+- ✅ Loop-Toggle für endlose Wiederholung
+- ✅ Modal-Highlighting (Skala-Töne hervorgehoben)
+- ✅ Stop-Button
+- ✅ Kompakte Jam-Box (sticky)
+- ✅ Icon Set v2 (dunkel, 4×3 Grid)
+
+### v5.2 (May 18, 2026)
+- 6 Modal-Skalen (Ionisch/Äolisch added)
+- Arpeggio-Playback mit Lauflicht
+- Topografie (Buttons versetzt)
+- "3. Reihe" statt "Helferreihe"
+- "Accordion" statt "Visualizer"
+
+### v5.1.1 (May 17, 2026)
+- Doppelte Trapezoid-Controls (oben + unten)
+
+---
+
+## 📧 Support
+
+**Fragen? Feedback? Bugs?**
+
+- **GitHub Issues:** [github.com/wdeu/benny-accordion/issues](https://github.com/wdeu/benny-accordion/issues)
+- **Email:** [Deine Email]
 
 ---
 
 ## 📄 Lizenz
 
-Diese App ist für deinen persönlichen Gebrauch entwickelt worden.
+**Custom Non-Commercial License**
 
-Bei Weiterentwicklung:
-- ✅ Forken & anpassen ist erlaubt
-- ✅ Mit Quellenangabe teilen
-- ✅ Für eigene Projekte nutzen
-- ❌ Kommerziell verkaufen ohne Rücksprache
+- ✅ Privat nutzen: Kostenlos
+- ✅ Bildung: Kostenlos
+- ✅ Code studieren: Ja
+- ❌ Kommerziell: Erlaubnis nötig
 
-Viel Spaß beim Lernen! 🪗🎵
+Siehe [LICENSE](LICENSE) für Details.
+
+---
+
+**Version:** 5.3  
+**Letzte Aktualisierung:** Mai 20, 2026  
+**Kompatibilität:** Alle modernen Browser, iOS 14+, Android 8+
+
+Viel Spaß beim Lernen! 🪗🎵✨

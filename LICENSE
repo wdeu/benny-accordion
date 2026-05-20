@@ -1,0 +1,88 @@
+# Custom Non-Commercial License
+
+**Copyright © 2026 Werner Deuermeier**
+
+## About This Project
+
+This interactive learning tool was created for the Castagnari Benny C/G (3-row, Heim tuning) diatonic accordion. It combines traditional accordion pedagogy with modern web technology to help students visualize button layouts, practice chords and scales, and understand bellows technique.
+
+---
+
+## Permitted Use
+
+You are **free** to:
+
+- ✅ Use this software for **personal learning and practice**
+- ✅ Use it for **educational purposes** (teaching, workshops, classes)
+- ✅ Share it with other accordion students and teachers
+- ✅ Fork and modify the code for your own non-commercial use
+- ✅ Study the code to learn web development techniques
+
+**Attribution Required:** When sharing or using this software, please credit the original author and link back to the source repository.
+
+---
+
+## Prohibited Without Written Permission
+
+You may **NOT**:
+
+- ❌ Use this software for **commercial purposes**
+- ❌ Sell, rent, or lease this software or derivatives
+- ❌ Integrate this software into paid products or services
+- ❌ Redistribute for profit
+- ❌ Remove or modify copyright notices
+- ❌ Claim this work as your own
+
+---
+
+## Commercial Licensing
+
+**Interested in commercial use?**
+
+Commercial licensing is available for:
+- Music schools and accordion manufacturers
+- Educational institutions requiring commercial terms
+- Software companies wanting to integrate this tool
+- Publishers creating accordion learning materials
+
+For commercial licensing inquiries, please contact:
+- **Email:** [Your email address]
+- **GitHub:** [@wdeu](https://github.com/wdeu)
+
+---
+
+## Partnership Opportunities
+
+This project was developed with potential partnership with **Castagnari Accordion** in mind. The author is open to:
+
+- Official collaboration with accordion manufacturers
+- Integration into manufacturer-branded learning platforms
+- Custom development for specific accordion models
+- Educational content creation partnerships
+
+---
+
+## Disclaimer
+
+```
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+---
+
+## Questions?
+
+If you're unsure whether your intended use requires commercial licensing, please contact the author. When in doubt, ask!
+
+---
+
+**Version:** 1.0  
+**Last Updated:** May 20, 2026  
+**Repository:** https://github.com/wdeu/benny-accordion

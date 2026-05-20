@@ -1,394 +1,292 @@
-# 🪗 Castagnari Benny Visualizer
+# 🪗 Castagnari Benny Accordion - Interactive Learning Tool
 
-**Interaktive Web-App für Castagnari Benny C/G (3-reihig, Heim)**
+[![License: Custom Non-Commercial](https://img.shields.io/badge/License-Custom%20Non--Commercial-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-5.3-brightgreen.svg)](https://github.com/wdeu/benny-accordion/releases)
+[![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://wdeu.github.io/benny-accordion)
 
-![Version](https://img.shields.io/badge/version-5.0-blue)
-![License](https://img.shields.io/badge/license-Personal-green)
+An interactive web application for visualizing and learning the **Castagnari Benny C/G (3-row, Heim tuning)** diatonic accordion. Perfect for students, teachers, and players exploring French traditional music, Bourrées, and modal playing.
 
-<p align="center">
-  <img src="https://github.com/wdeu/benny-visualizer/blob/main/assets/screenshots/Benny.png?raw=true" alt="Castagnari Benny" width="400"/>
-</p>
-
----
-
-## 📸 Screenshots
-
-<p align="center">
-  <img src="https://github.com/wdeu/benny-visualizer/blob/main/assets/screenshots/benny-visualizer-mac.png?raw=true" alt="Desktop View" width="45%"/>
-  <img src="https://github.com/wdeu/benny-visualizer/blob/main/assets/screenshots/benny-visualizer-iphone.png?raw=true" alt="iPhone View" width="25%"/>
-</p>
+🔗 **[Try it live!](https://wdeu.github.io/benny-accordion)**
 
 ---
 
-## ✨ Features
+## ✨ Features (v5.3)
 
-### 🎵 Audio & Akkorde
-- **Audio-Playback** – Web Audio API, kein MIDI-Hardware nötig
-- **13 Akkordtypen** – Dur, Moll, dim, aug, sus2/4, 7, maj7, m7, dim7, m7b5, 6, m6
-- **4 Modale Skalen** – Dorisch, Mixolydisch, Phrygisch, Lydisch
-- **4 Klang-Typen** – Akkordeon-like (warm), Rein (Sinus), Hell, Weich ausklingend
-- **Duration-Control** – 1-5 Sekunden Wiedergabedauer
-- **Auto-Play** – Optional automatisches Abspielen bei Akkordwechsel
-- **Benny-Verfügbarkeits-Check** – Zeigt welche Töne auf deinem Benny spielbar sind
+### 🎹 Interactive Accordion Visualization
+- **Player perspective**: See the accordion from above, exactly as you play it
+- **3-row layout**: G-row (12 buttons), C-row (11 buttons), Helper row (10 buttons)
+- **Realistic button styling**: Pearlescent buttons with subtle highlights
+- **Topographic offset**: Rows are visually offset to match the physical instrument
+- **Bass section**: 2 columns × 6 rows with chord/bass distinction
 
-### 🎨 Visualisierung
-- **Button-Layout Visualisierung** (Push/Pull getrennt)
-- **Spieler-Perspektive** (wie du von oben draufschaust: Helfer links, G rechts)
-- **Side-by-Side Layout** – Bass & Diskant nebeneinander bei genug Platz (Desktop, Tablet Landscape)
-- **Responsive Design** – automatische Anpassung an Portrait/Landscape
-- **PWA-Support** – installierbar als App mit eigenem Icon (Benny-Akkordeon 🪗)
-- **Perlmutt-Design** – sichtbar auf hellen & dunklen Displays
-- **iOS-typisches Design** – Grautöne, minimale Farben, klare Hierarchie
+### 🎵 Music Theory Tools
+- **Chord visualization**: 13 chord types (Dur, Moll, dim, aug, sus2, sus4, 7, maj7, m7, dim7, ø, 6, m6)
+- **Modal scales**: 6 church modes (Ionian/Dur, Dorian, Phrygian, Lydian, Mixolydian, Aeolian/Moll)
+- **9 root notes**: C, D, E, F, G, A, Bb, Ab, Eb (all available bass tones)
+- **Real-time highlighting**: See which buttons to press for any chord or scale
+- **Availability check**: Shows which notes are missing on current bellows direction
 
-### 🎼 Akkordmodus
-- **13 Akkordtypen:** Dur, Moll, dim, aug, sus2/4, 7, maj7, m7, dim7, m7b5, 6, m6
-- **4 Modale Skalen:** Dorisch, Mixolydisch, Phrygisch, Lydisch
-- **Audio-Wiedergabe:** Akkord hören + gleichzeitig Buttons visualisiert sehen
-- **Bass-Shortcuts:** Klick "D" (groß) → D-Dur, Klick "d" (klein) → d-Moll
-- **Benny-Check:** Warnung wenn nicht alle Töne auf dem Instrument verfügbar
-- **Workflow:** Akkordtyp wählen → Grundton → Play → Am Benny nachbauen
-- **Visuelle Kodierung:**
-  - **Dunkles Grau + blauer Rand** = Grundton (einzige Farbakzentuierung)
-  - **Helles Grau** = andere Akkordtöne
-  - **Perlmutt** = nicht aktive Tasten
+### 🔊 Audio Playback Engine
+- **Chord mode**: Play all chord tones simultaneously
+- **Scale mode**: Arpeggio playback with visual highlighting
+- **Adjustable tempo**: 0.2s - 1.0s per note (default: 0.5s)
+- **Loop mode**: Endless repetition for practice
+- **4 tone types**: Accordion-like (warm), Pure (sine), Bright (sawtooth), Soft
+- **Auto-play**: Automatic playback when selecting chords/scales
+- **Stop button**: Immediate playback termination
 
-### 🎹 Bass-Intelligenz (Normal-Modus)
-- **Großbuchstabe klicken** (z.B. `C`) → zeigt C-Dur-Triade auf Diskant
-- **Kleinbuchstabe klicken** (z.B. `c`) → zeigt c-Moll-Triade auf Diskant
-- Perfekt zum schnellen Vergleichen: `C` vs `c` hin und her klicken!
+### 📱 iPad ONE Screen Layout (NEW in v5.3!)
+- **3-column grid**: Bass | Treble | Jam-Box
+- **Sticky columns**: Jam-Box stays visible while scrolling
+- **Optimized spacing**: Compact UI for tablet landscape mode
+- **Responsive design**: Works on desktop, tablet, and mobile
 
-### 🧹 Auto-Clear
-- **Moduswechsel löscht alles** – kein "Alle löschen"-Button nötig
-- Wechsel zwischen Normal/Akkord → sauberer Slate
+### 🎨 Modal Highlighting (NEW in v5.3!)
+- **Dim non-scale notes**: Non-modal buttons fade to 30% opacity
+- **Highlight scale tones**: Blue border with glow effect
+- **Root emphasis**: Root note gets extra visual weight
+- **Practice mode**: See exactly which buttons to play for modal jamming
 
----
-
-## 🚀 Schnellstart
-
-### Lokal nutzen
-1. `benny-visualizer.html` doppelklicken
-2. Im Browser öffnen
-3. Loslegen!
-
-### iPhone/iPad
-1. Datei per AirDrop übertragen
-2. In Safari öffnen
-3. "Zum Home-Bildschirm hinzufügen"
-
-### Online hosten
-- **GitHub Pages:** Kostenlos, dauerhaft → [Anleitung](INSTALLATION.md#option-a-github-pages)
-- **Netlify Drop:** Ultra-schnell → [Anleitung](INSTALLATION.md#option-b-netlify-drop)
-- **IONOS:** Eigene Domain → [Anleitung](INSTALLATION.md#option-c-ionos-server)
-
-📖 **Vollständige Anleitung:** [INSTALLATION.md](INSTALLATION.md)
+### 🎛️ Bellows Control
+- **Double trapezoid switches**: Top and bottom of interface
+- **Minimal mode toggle**: Compact segmented control alternative
+- **Visual feedback**: Active direction clearly marked
+- **Push/Pull layouts**: Complete button mappings for both directions
 
 ---
 
-## 🎯 Verwendung
+## 🎯 Use Cases
 
-### Normal-Modus
-**Stück lernen:**
-1. Stück aus Dropdown wählen
-2. Balgrichtung (Pull/Push) anpassen
-3. Aktive Tasten werden angezeigt
+### For Students
+- **Learn chord shapes** on your specific accordion model
+- **Practice modal scales** with visual and audio guidance
+- **Understand bellows strategy** with pull-dominant technique
+- **Build muscle memory** by matching physical buttons to screen
 
-**Bass → Diskant Triaden:**
-1. Klicke eine Bass-Taste
-2. → Diskant zeigt sofort die passende Triade
-   - `C` (groß) = C-Dur (C-E-G)
-   - `c` (klein) = c-Moll (C-Eb-G)
-3. Vergleiche direkt: `C` vs `c` hin und her klicken!
+### For Teachers
+- **Demonstrate fingering** visually during lessons
+- **Explain modal theory** with interactive examples
+- **Plan practice routines** using specific chord progressions
+- **Show bellows economy** principles in context
 
-### Akkordmodus
-**Akkorde lernen:**
-1. Klick auf "🎼 Akkorde"
-2. Wähle Akkordtyp (Dur/Moll/7/...)
-3. **Direkt darunter:** Klicke Grundton (C, D, E, ...)
-4. → Diskant zeigt sofort den Akkord:
-   - **Dunkles Grau + blauer Rand** = Grundton
-   - **Helles Grau** = Terz, Quinte, ...
-
-**Akkorde vergleichen:**
-1. Grundton `C` klicken → C-Dur leuchtet
-2. Grundton `D` klicken → D-Dur leuchtet (Akkord springt sofort um!)
-3. → Direkter visueller Vergleich ohne Scrollen
-
-**Modale Skalen:**
-1. Klicke "Dorisch" (oder andere Skala)
-2. Grundton wählen
-3. → Alle Skalentöne werden angezeigt
-4. Charakteristische Töne erkennen!
+### For Composers/Arrangers
+- **Check note availability** on Heim-tuned accordions
+- **Explore modal possibilities** for authentic folk music
+- **Verify fingering practicality** before writing arrangements
+- **Test chord voicings** specific to 3-row diatonic
 
 ---
 
-## 🎨 Design-Philosophie
+## 🚀 Quick Start
 
-### iOS-Stil
-- **Grautöne dominieren** – ruhig, professionell
-- **Eine Farbakzentuierung** – nur der Grundton (blau)
-- **Perlmutt-Buttons** – sichtbar auf allen Display-Modi
-- **Klare Hierarchie** – wichtigste Funktion zuerst
+### Option 1: Online (Easiest)
+Visit **[wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)**
 
-### Visuelle Kodierung
-```
-┌─────────────────────────────────────┐
-│ ○  Perlmutt – nicht aktiv           │
-│ ●  Helles Grau – aktiv (Akkordton)  │
-│ ◉  Dunkles Grau + blau – Grundton   │
-│ ◌  Leichter Rand – Skalenton        │
-└─────────────────────────────────────┘
+### Option 2: iPhone/iPad Home Screen
+1. Open in Safari: [wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)
+2. Tap Share button (square with arrow)
+3. Scroll to "Add to Home Screen"
+4. Tap "Add" → Now it's an app!
+
+### Option 3: Local Copy
+```bash
+# Clone the repository
+git clone https://github.com/wdeu/benny-accordion.git
+cd benny-accordion
+
+# Open in browser
+open index.html
+# or on Linux: xdg-open index.html
 ```
 
-### Workflow-Optimierung
-**Problem:** Vorher musste man oben Modus wählen, nach unten scrollen zum Bass, wieder hoch zum Diskant.
-
-**Lösung:** Jetzt alles direkt untereinander ohne Scrollen:
-```
-Modus wählen
-    ↓
-Akkordtyp wählen (direkt darunter)
-    ↓
-Grundton wählen (direkt darunter)
-    ↓
-Diskant sehen (direkt darunter)
-```
+**Requirements:** Any modern browser (Chrome, Firefox, Safari, Edge)  
+**Internet:** Not required after initial load (fully offline-capable)
 
 ---
 
-## 🛠️ Technische Details
+## 🎓 How to Use
 
-### Dateistruktur
-```
-benny-visualizer/
-├── benny-visualizer.html    (~620 Zeilen, komplett standalone)
-└── assets/
-    ├── favicon-16x16.png
-    ├── favicon-32x32.png
-    ├── apple-touch-icon.png  (180×180 für iOS)
-    ├── icon-192.png          (PWA)
-    ├── icon-512.png          (PWA)
-    ├── manifest.json         (PWA Metadaten)
-    └── README.md
-```
+### Basic Workflow
+1. **Select bellows direction**: Pull or Push (trapezoid buttons)
+2. **Choose chord/scale**: Click type (e.g., "Dur", "Dorisch")
+3. **Pick root note**: Click button (e.g., "C", "D", "G")
+4. **See highlighted buttons**: Active notes light up on treble/bass
+5. **Play audio** (optional): Press ▶️ Play button
 
-### Technologie
-- **Single HTML File** – keine Dependencies außer Icons
-- **~620 Zeilen** – kompakter, sauberer Code
-- **Offline-fähig** nach erstem Laden
-- **PWA-ready** – installierbar als App
+### Modal Jamming Workflow (NEW!)
+1. Select a **modal scale** (e.g., "Dorisch")
+2. Choose **root note** (e.g., "D")
+3. Set **tempo** slower (0.7s recommended for practice)
+4. Enable **Loop ∞**
+5. Press **▶️ Play**
+6. **Watch**: Only scale tones highlighted (blue border)
+7. **Play along** on your accordion!
+8. Press **⏹️ Stop** when done
 
-### Browser-Kompatibilität
-| Browser | Status |
-|---------|--------|
-| Safari (iOS/macOS) | ✅ Vollständig |
-| Chrome | ✅ Vollständig |
-| Firefox | ✅ Vollständig |
-| Edge | ✅ Vollständig |
+### Bass Triads (Quick Mode)
+1. Click any **bass button** (e.g., "C" or "c")
+2. Uppercase = Major triad (C-E-G)
+3. Lowercase = Minor triad (C-Eb-G)
+4. See chord tones highlighted on treble side
 
-### Responsive Design
-- **Desktop (≥800px):** Side-by-Side – Bass links, Diskant rechts, kein Scrollen
-- **Tablet Landscape:** Side-by-Side – optimale Übersicht
-- **iPhone Landscape:** Side-by-Side – Bass & Diskant nebeneinander
-- **Portrait (<800px):** Vertikal gestapelt – Diskant oben, Bass unten
-- **Smartphone:** Kompakte Darstellung (ab 320px)
+### iPad Landscape Mode
+- **Left column**: Bellows control + Bass (sticky)
+- **Center column**: Treble buttons (scrollable if needed)
+- **Right column**: Jam-Box controls (sticky)
+- Everything visible on ONE screen!
 
 ---
 
-## 🎓 Lern-Beispiele
+## 🎵 Pedagogical Approach
 
-### Akkorde verstehen
-```
-Aufgabe: Was ist der Unterschied zwischen C-Dur und c-Moll?
+This tool embodies a **pull-dominant bellows strategy** (75-80% PULL movements) developed specifically for the Castagnari Benny C/G with Heim tuning:
 
-1. Normal-Modus → Bass "C" klicken
-   → Sehe: C (Grundton), E (Terz), G (Quinte)
+### 5 Core Bellows Rules
+1. **Pull is the "level"**: Play entire phrases on pull
+2. **Push = articulation**: Use push for accents and rhythmic cuts, not movement
+3. **Helper row = legato tool**: The 3rd row provides directional stability and modal color
+4. **Bass follows treble**: Don't force mechanical alternating bass patterns
+5. **Energy from tension**: Musical energy comes from bellows pressure, not direction changes
 
-2. Bass "c" klicken
-   → Sehe: C (Grundton), Eb (Terz!), G (Quinte)
-
-Erkenntnis: Die Terz macht den Unterschied! E vs Eb.
-```
-
-### Modale Skalen erforschen
-```
-Aufgabe: Was macht Dorisch "dorisch"?
-
-1. Akkordmodus → "Dur" wählen → "G" klicken
-   → Merke: F# ist dabei
-
-2. "Dorisch" wählen → "G" klicken
-   → Sehe: F statt F# (charakteristischer Ton!)
-
-3. Hin und her wechseln → direkter Vergleich
-
-Erkenntnis: Dorisch = wie Dur, aber mit kleiner 7 (F statt F#)
-```
-
-### Akkordfolgen visualisieren
-```
-Aufgabe: Wie sieht die Folge G - D - Em - C aus?
-
-1. Akkordmodus → "Dur"
-2. Klicke nacheinander: G → D → C
-3. Zwischendurch "Moll" wählen → E klicken (für Em)
-4. → Sehe, wie sich die Töne bewegen!
-```
+### Why the Helper Row Matters
+The **3. Reihe (Helferreihe)** is essential for:
+- **Modal playing**: Access to F (Dorian character), Bb (minor pieces)
+- **Bellows economy**: Reduces forced direction changes
+- **Authentic folk sound**: Characteristic tones for French traditional music
+- **Legato technique**: Smooth melodic lines without pumping
 
 ---
 
-## 📊 Version History
+## 🛠️ Technical Details
 
-### v5.0 (Mai 2026) – Audio Engine + Akkord-Fokus
-- 🎵 **Audio-Playback** – Web Audio API für Akkord-Wiedergabe
-- 🎹 **13 Akkordtypen** – Dur, Moll, dim, aug, sus2/4, 7, maj7, m7, dim7, m7b5, 6, m6
-- 🎼 **4 Modale Skalen** – Dorisch, Mixolydisch, Phrygisch, Lydisch
-- 🔊 **4 Klang-Typen** – Akkordeon-like, Rein (Sinus), Hell, Weich ausklingend
-- ⏱️ **Duration-Control** – 1-5 Sekunden einstellbar
-- 🔁 **Auto-Play** – Optional bei Akkordwechsel
-- ⚠️ **Benny-Check** – Zeigt welche Töne auf dem Instrument verfügbar sind
-- 🎯 **Bass-Shortcuts** – Großbuchstabe = Dur, Kleinbuchstabe = Moll
-- ❌ **Normal-Modus entfernt** – Fokus auf Akkordlernen mit Audio
-- 📜 **MIT Attribution** – Audio-Konzept inspiriert von Harmonic Extension
+### Built With
+- **Pure HTML5/CSS3/JavaScript**: No frameworks, no dependencies
+- **Web Audio API**: Real-time sound synthesis
+- **CSS Grid & Flexbox**: Responsive layout system
+- **LocalStorage**: Persistent user preferences
+- **SVG**: Scalable trapezoid controls
 
-### v4.0 (Februar 2026) – iOS Design Refresh + Side-by-Side
-- 🎨 **iOS-typisches Design** mit Grautönen
-- 🖥️ **Side-by-Side Layout** – Bass & Diskant nebeneinander (Desktop/Tablet Landscape)
-- 📱 **Auto-Rotation** – iPhone Landscape → automatisch Side-by-Side
-- 🎯 **Grundton-Buttons** direkt im Akkord-Panel
-- 🔄 **Workflow optimiert** – kein Scrollen mehr nötig
-- 🎹 **Bass-Triaden** im Normal-Modus (Groß-/Kleinbuchstabe)
-- 🧹 **Auto-Clear** beim Moduswechsel
-- 💎 **Perlmutt-Optik** verbessert (helle + dunkle Displays)
-- ❌ **MIDI entfernt** (zu Nische, kaum Hardware vorhanden)
+### Browser Support
+- ✅ Chrome 90+
+- ✅ Firefox 88+
+- ✅ Safari 14+ (including iOS)
+- ✅ Edge 90+
 
-### v3.0 (Februar 2026)
-- ➕ Akkordmodus (Dur/Moll/7/maj7/dim/aug)
-- ➕ Modale Skalen
-- ➕ MIDI-Erkennung
-- ➕ Farbcodierung
+### File Size
+- **HTML**: ~75 KB (minified, all-in-one)
+- **No external dependencies**
+- **Offline-capable** after first load
 
-### v2.0 (Februar 2026)
-- 🔧 Korrekte Belegung nach Fotos
-- 🔧 Spieler-Perspektive
-- 🔧 Perlmutt-Design
-
-### v1.0 (Februar 2026)
-- ✨ Initial Release
-- ✨ Basic Layout-Visualisierung
+### Performance
+- **Instant load**: Single HTML file
+- **Smooth animations**: Hardware-accelerated CSS
+- **Low latency audio**: Web Audio API oscillators
+- **Mobile optimized**: Touch-friendly buttons
 
 ---
 
-## 🎯 Deployment-Vergleich
+## 📚 Related Resources
 
-| Methode | Aufwand | Kosten | Dauerhaft | Custom Domain |
-|---------|---------|--------|-----------|---------------|
-| **iPhone (lokal)** | ⭐ Einfach | Kostenlos | ✅ Ja | ❌ Nein |
-| **Computer (lokal)** | ⭐ Einfach | Kostenlos | ✅ Ja | ❌ Nein |
-| **GitHub Pages** | ⭐⭐ Mittel | Kostenlos | ✅ Ja | ✅ Ja (gratis) |
-| **Netlify Drop** | ⭐ Sehr einfach | Kostenlos | ⚠️ 24h* | ✅ Ja (€) |
-| **IONOS** | ⭐⭐⭐ Komplex | ~5€/Monat | ✅ Ja | ✅ Ja (inklusive) |
+### Teaching Materials
+- `Castagnari_Skill.rtf` - Complete repertoire progression (German)
+- `INSTALLATION.md` - Detailed deployment guide
+- `Benny_Tonleitern.pdf` - Scale fingering charts
+- `PUSHPULL.pdf` - Visual button layout reference
 
-*Mit Account dauerhaft
-
-**Empfehlung:**
-- **Lernen zuhause:** Lokal (Doppelklick)
-- **Unterwegs üben:** iPhone (Home-Screen)
-- **Mit anderen teilen:** GitHub Pages
-- **Professionell:** IONOS (eigene Domain)
+### Companion Projects
+- **Raycast Extension** (TypeScript): Command-line accordion visualization
+- **Word Documents**: Detailed fingering for specific pieces (Bourrée d'Avignon, etc.)
 
 ---
 
-## ❓ Häufige Fragen (FAQ)
+## 🗺️ Roadmap
 
-### Allgemein
+### Planned Features (v6.0+)
+- [ ] Custom chord definitions
+- [ ] Save/load chord progressions
+- [ ] PDF export (fingering charts)
+- [ ] Multi-chord comparison view
+- [ ] Dark/Light theme toggle
+- [ ] Internationalization (EN/IT/FR)
+- [ ] Additional tunings (D/G, G/C)
+- [ ] MIDI output support (external keyboard)
 
-**Q: Funktioniert offline?**  
-A: Ja! Nach erstem Laden komplett offline nutzbar.
-
-**Q: Warum kein MIDI mehr?**  
-A: Braucht USB-MIDI-Interface (sehr selten). App konzentriert sich auf visuelles Lernen.
-
-**Q: Funktioniert auf iPad/Android?**  
-A: Ja! Alle modernen Browser werden unterstützt.
-
-### Akkordmodus
-
-**Q: Warum leuchten manche Töne nicht?**  
-A: Nicht alle Töne existieren auf beiden Balgrichtungen. Wechsel zwischen Push/Pull!
-
-**Q: Was bedeutet "dunkles Grau"?**  
-A: Das ist der Grundton des Akkords – der wichtigste Ton, daher visuell hervorgehoben.
-
-**Q: Kann ich eigene Akkorde definieren?**  
-A: Aktuell nein, aber geplant für v5.0.
-
-### Normal-Modus
-
-**Q: Bass-Taste zeigt nichts?**  
-A: Du bist im Akkordmodus. Wechsel zu "Normal" für Bass-Triaden.
-
-**Q: Wie merke ich mir die Belegung?**  
-A: Gar nicht! Nutze die App als visuelles Nachschlagewerk während des Übens.
+### Under Consideration
+- [ ] Practice mode with timed exercises
+- [ ] Record and playback melodies
+- [ ] Integration with Castagnari product line
+- [ ] Mobile app versions (iOS/Android)
 
 ---
 
-## 🚀 Geplante Features (v5.0)
+## 🤝 Contributing
 
-- [ ] Custom Chords definieren
-- [ ] Akkordfolgen speichern & abspielen
-- [ ] PDF-Export (Grifftabellen)
-- [ ] Multi-Akkord-Vergleich (3+ gleichzeitig)
-- [ ] Playback-Modus (gespeicherte Stücke)
-- [ ] Cloud-Sync (Einstellungen synchronisieren)
-- [ ] Dark/Light Mode Toggle
+This project uses a **Custom Non-Commercial License**. Contributions are welcome for:
 
----
+- 🐛 Bug fixes
+- 📝 Documentation improvements
+- 🌍 Translations
+- 🎨 UI/UX enhancements
+- 🎵 Additional chord/scale formulas
 
-## 🙏 Credits
+**Before contributing:**
+1. Read the [LICENSE](LICENSE) file
+2. Open an issue to discuss your idea
+3. Fork and create a pull request
 
-**Entwickelt für:** Castagnari Benny C/G (3-reihig, Heim-Belegung)  
-**Design-Philosophie:** iOS Human Interface Guidelines  
-**Musiktheorie:** Standard westliche Harmonielehre  
-**Perlmutt-Optik:** Custom CSS mit iOS-Grautönen
+**Commercial use requires written permission.** See [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙏 Credits
+## 📧 Contact & Licensing
 
-### Audio Engine
-Audio playback frequency calculations and envelope shaping inspired by [Harmonic](https://github.com/chandlervdw/harmonic) by [@chandlervdw](https://github.com/chandlervdw) (MIT License).  
-Adapted for Castagnari Benny C/G diatonic button accordion visualization using Web Audio API.
+**Author:** Werner Deuermeier  
+**GitHub:** [@wdeu](https://github.com/wdeu)  
+**Project:** [github.com/wdeu/benny-accordion](https://github.com/wdeu/benny-accordion)
 
-### Icons
-- Benny.png © Castagnari – verwendet mit Genehmigung für dieses Projekt
+### Commercial Licensing
+Interested in:
+- Integration into music education products?
+- Manufacturer-branded versions?
+- Custom development for other accordion models?
 
-### Technologies
-- **Web Audio API** (W3C Standard) – keine externen Dependencies
-- **Vanilla JavaScript** – komplett standalone
-- **Progressive Web App (PWA)** – installierbar auf allen Plattformen
+**Contact for commercial licensing inquiries.**
 
----
-
-## 📄 Lizenz
-
-**Persönliche Nutzung**  
-Diese App ist für deinen persönlichen Gebrauch entwickelt worden.
-
-Bei Weiterentwicklung:
-- ✅ Forken & anpassen ist erlaubt
-- ✅ Mit Quellenangabe teilen
-- ✅ Für eigene Projekte nutzen
-- ❌ Kommerziell verkaufen ohne Rücksprache
-
-Viel Spaß beim Lernen! 🪗🎵
+### Partnership Opportunities
+Open to collaboration with:
+- 🏭 Accordion manufacturers (especially Castagnari)
+- 🎓 Music schools and conservatories
+- 📚 Educational content publishers
+- 💻 Music software companies
 
 ---
 
-## 📞 Support
+## 🙏 Acknowledgments
 
-Fragen oder Feature-Wünsche?  
-→ Siehe [INSTALLATION.md](INSTALLATION.md) für FAQ & Troubleshooting
+- **Castagnari s.r.l.**: For building exceptional diatonic accordions since 1914
+- **The Bal Folk community**: For preserving French traditional music
+- **Accordion teachers**: Jean Blanchard, Marc Perrone, Riccardo Tesi, Gilles Chabenat, Patrick Bouffard, and many others whose pedagogical insights informed this tool
 
 ---
 
-**Made with ❤️ for diatonic accordion players**
+## 📄 License
+
+**Custom Non-Commercial License**
+
+- ✅ Free for personal learning and education
+- ✅ Open source code for study
+- ❌ Commercial use requires permission
+
+See [LICENSE](LICENSE) file for complete terms.
+
+---
+
+## 🌟 Star History
+
+If this tool helps your accordion journey, consider giving it a ⭐ on GitHub!
+
+---
+
+**Version:** 5.3  
+**Last Updated:** May 20, 2026  
+**Status:** Active Development
