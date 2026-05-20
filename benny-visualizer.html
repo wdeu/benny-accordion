@@ -35,12 +35,47 @@ html,body { height:100%; background:var(--bg); color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
     -webkit-font-smoothing:antialiased; overflow-x:hidden; }
 
-.container { max-width:1200px; margin:0 auto; padding:16px 16px 40px; }
+.container { max-width:1600px; margin:0 auto; padding:16px 16px 40px; }
 
 /* ──────────── HEADER ──────────── */
 header { text-align:center; padding:20px 0 14px; }
 header h1 { font-size:1.6em; font-weight:600; letter-spacing:-0.3px; }
 header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-top:3px; text-transform:uppercase; }
+
+/* ──────────── RESPONSIVE 3-COLUMN LAYOUT (iPad Landscape) ──────────── */
+@media (min-width: 1024px) {
+    .main-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr 340px;
+        gap: 20px;
+        align-items: start;
+    }
+    
+    .bass-column { grid-column: 1; }
+    .treble-column { grid-column: 2; }
+    .jam-box-column { 
+        grid-column: 3;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    
+    /* Kompaktere Spacing auf iPad */
+    .chip-row { gap: 4px; }
+    .root-grid { gap: 4px; }
+    .chord-panel .cp-label { margin: 8px 0 4px; }
+    
+    /* Legend ausblenden auf Desktop */
+    .legend { display: none !important; }
+}
+
+/* Mobile: Stacked Layout */
+@media (max-width: 1023px) {
+    .main-grid {
+        display: block;
+    }
+}
 
 /* ──────────── SECTION CARD ──────────── */
 .section { background:var(--bg-card); border-radius:12px; margin-bottom:10px; overflow:hidden; }
@@ -52,7 +87,6 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .bellows-switch { display:flex; justify-content:center; align-items:center; gap:20px; 
     height:80px; position:relative; }
 
-/* Bottom bellows (nach Bass) */
 .bellows-bottom { margin-top:16px; padding-top:16px; border-top:1px solid var(--sep); }
 
 .bellows-btn { position:relative; width:140px; height:70px; cursor:pointer; 
@@ -72,7 +106,6 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .bellows-btn:not(.active) .trapezoid-fill { fill:transparent; }
 .bellows-btn:not(.active) .trapezoid-stroke { stroke:var(--txt3); }
 
-/* Minimalist mode */
 .bellows-switch.minimal { height:34px; background:var(--bg-inset); border-radius:8px; gap:0; }
 .bellows-switch.minimal .bellows-btn { width:50%; height:100%; }
 .bellows-switch.minimal .bellows-btn svg { display:none; }
@@ -104,11 +137,14 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 /* ──────────── AUDIO CONTROLS ──────────── */
 .audio-section { margin:12px 0; padding:12px; background:var(--bg-inset); border-radius:8px; }
-.play-btn { width:100%; height:44px; border-radius:8px; border:none;
-    background:var(--accent); color:#fff; font-size:0.95em; font-weight:600;
-    font-family:inherit; cursor:pointer; transition:.15s; margin-bottom:12px; }
-.play-btn:active { opacity:.8; transform:scale(.98); }
-.play-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+.play-controls { display:flex; gap:8px; margin-bottom:12px; }
+.play-btn, .stop-btn { flex:1; height:44px; border-radius:8px; border:none;
+    font-size:0.95em; font-weight:600; font-family:inherit; cursor:pointer; transition:.15s; }
+.play-btn { background:var(--accent); color:#fff; }
+.stop-btn { background:var(--bg-card); color:var(--txt2); border:1px solid var(--sep); }
+.play-btn:active, .stop-btn:active { opacity:.8; transform:scale(.98); }
+.play-btn:disabled, .stop-btn:disabled { opacity:.4; cursor:not-allowed; }
 
 .audio-controls { display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; }
 .audio-controls label { font-size:0.8em; color:var(--txt2); }
@@ -116,29 +152,26 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     background:var(--bg-card); border:1px solid var(--sep); border-radius:6px;
     color:var(--txt); font-size:0.8em; font-family:inherit; padding:4px 8px; }
 .audio-controls input[type="range"] { padding:0; }
-.audio-controls .duration-display { grid-column:2; font-size:0.75em; color:var(--txt3); }
 
-.checkbox-row { grid-column:1/3; margin-top:4px; }
+.checkbox-row { grid-column:1/3; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap; }
 .checkbox-row label { display:flex; align-items:center; gap:8px; font-size:0.82em; cursor:pointer; }
 .checkbox-row input[type="checkbox"] { width:18px; height:18px; cursor:pointer; }
+
+.slider-value { grid-column:2; font-size:0.75em; color:var(--txt3); }
 
 .warning-box { margin:8px 0; padding:10px 12px; background:rgba(255,159,10,0.15);
     border-left:3px solid #ff9f0a; border-radius:6px; font-size:0.8em; color:#ff9f0a; }
 
 /* ──────────── ACCORDION LAYOUT ──────────── */
-.layout-section { display:block; }
-.accordion-flex { display:flex; gap:20px; justify-content:center; align-items:flex-start; }
-.bass-side, .treble-wrapper { flex-shrink:0; }
 .lay-title { font-size:0.7em; font-weight:600; color:var(--txt2); text-transform:uppercase;
     letter-spacing:1px; padding:10px 2px 6px; text-align:center; }
 
 .treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start; }
 .row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:70px; }
 
-/* Topographic offset - buttons interlock like real Benny */
-.row:nth-child(1) { margin-top: 0; }      /* 3. Reihe - baseline */
-.row:nth-child(2) { margin-top: -35px; }  /* C-Reihe - offset from 3. */
-.row:nth-child(3) { margin-top: -70px; }  /* G-Reihe - offset from C-Reihe (cumulative) */
+.row:nth-child(1) { margin-top: 0; }
+.row:nth-child(2) { margin-top: -35px; }
+.row:nth-child(3) { margin-top: -70px; }
 
 .row-label { font-size:0.66em; color:var(--txt3); font-weight:600; letter-spacing:0.7px;
     text-align:center; margin-bottom:8px; }
@@ -153,7 +186,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 0 2px 5px var(--p-shadow);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer; position:relative;
-    transition:transform .12s, box-shadow .12s, background .12s, border-color .12s;
+    transition:transform .12s, box-shadow .12s, background .12s, border-color .12s, opacity .2s;
 }
 .note-button::before { content:''; position:absolute; top:7%; left:17%;
     width:38%; height:34%; border-radius:50%; pointer-events:none;
@@ -190,11 +223,17 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 }
 .note-button.root.active .note-name { color:var(--root-txt); }
 
+/* MODAL HIGHLIGHTING - NEW! */
+.note-button.dimmed {
+    opacity: 0.3;
+}
+
 .note-button.scale-tone {
+    border: 2px solid var(--accent);
     box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
                 inset 0 -1px 2px rgba(0,0,0,.10),
                 0 2px 5px var(--p-shadow),
-                0 0 0 2px rgba(142,142,147,.22);
+                0 0 8px rgba(10,132,255,.4);
 }
 
 .note-button.highlight-temp {
@@ -203,7 +242,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 @keyframes pulse-highlight {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); box-shadow: 0 0 12px var(--accent); }
+    50% { transform: scale(1.08); box-shadow: 0 0 16px var(--accent); }
 }
 
 /* ──────────── BASS-TASTE ──────────── */
@@ -248,11 +287,10 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .lg-sw.pearl  { background:linear-gradient(160deg,var(--p0),var(--p2)); border:1.5px solid rgba(255,255,255,.30); }
 .lg-sw.act    { background:var(--act-bg); border:1.5px solid rgba(255,255,255,.18); }
 .lg-sw.root   { background:var(--root-bg); border:2.5px solid var(--accent); box-shadow:0 0 0 2px var(--accent-sub); }
-.lg-sw.scale  { background:linear-gradient(160deg,var(--p0),var(--p2)); border:1.5px solid rgba(255,255,255,.30);
-    box-shadow:0 0 0 2px rgba(142,142,147,.22); }
+.lg-sw.scale  { background:linear-gradient(160deg,var(--p0),var(--p2)); border:2px solid var(--accent);
+    box-shadow:0 0 8px rgba(10,132,255,.4); }
 
 /* ──────────── RESPONSIVE ──────────── */
-@media (min-width:800px) { .accordion-flex { flex-direction:row; } }
 @media (max-width:799px) {
     .accordion-flex { flex-direction:column; align-items:center; }
     .bass-side { order:2; }
@@ -278,98 +316,38 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
-<!-- ── STEUERUNG ── -->
-<div class="section">
-    <div class="sec-hdr">
-        Balgrichtung
-        <button class="style-toggle" id="styleToggle" title="Darstellung umschalten">⚙️</button>
-    </div>
-    <div class="bellows-container">
-        <div class="bellows-switch" id="bellowsSwitch">
-            <button class="bellows-btn pull" data-dir="pull">
-                <svg viewBox="0 0 140 70" preserveAspectRatio="none">
-                    <polygon class="trapezoid-fill" points="20,10 120,0 120,70 20,60"/>
-                    <polygon class="trapezoid-stroke" points="20,10 120,0 120,70 20,60" fill="none" stroke-width="2"/>
-                </svg>
-                <span class="label">Pull</span>
-            </button>
-            <button class="bellows-btn push active" data-dir="push">
-                <svg viewBox="0 0 140 70" preserveAspectRatio="none">
-                    <polygon class="trapezoid-fill" points="20,0 120,10 120,60 20,70"/>
-                    <polygon class="trapezoid-stroke" points="20,0 120,10 120,60 20,70" fill="none" stroke-width="2"/>
-                </svg>
-                <span class="label">Push</span>
-            </button>
-        </div>
-    </div>
-
-    <div class="chord-panel">
-        <div class="cp-label">Akkordtyp</div>
-        <div class="chip-row" id="chordTypeRow">
-            <button class="chip active" data-ctype="">Dur</button>
-            <button class="chip" data-ctype="m">Moll</button>
-            <button class="chip" data-ctype="dim">dim</button>
-            <button class="chip" data-ctype="aug">aug</button>
-            <button class="chip" data-ctype="sus2">sus2</button>
-            <button class="chip" data-ctype="sus4">sus4</button>
-            <button class="chip" data-ctype="7">7</button>
-            <button class="chip" data-ctype="maj7">maj7</button>
-            <button class="chip" data-ctype="m7">m7</button>
-            <button class="chip" data-ctype="dim7">dim7</button>
-            <button class="chip" data-ctype="m7b5">ø (m7b5)</button>
-            <button class="chip" data-ctype="6">6</button>
-            <button class="chip" data-ctype="m6">m6</button>
-        </div>
-
-        <div class="cp-label">Modale Skalen</div>
-        <div class="chip-row" id="scaleRow">
-            <button class="chip" data-scale="ionian">Ionisch (Dur)</button>
-            <button class="chip" data-scale="dorian">Dorisch</button>
-            <button class="chip" data-scale="phrygian">Phrygisch</button>
-            <button class="chip" data-scale="lydian">Lydisch</button>
-            <button class="chip" data-scale="mixolydian">Mixolydisch</button>
-            <button class="chip" data-scale="aeolian">Äolisch (Moll)</button>
-        </div>
-
-        <div class="cp-label">Grundton</div>
-        <div class="root-grid" id="rootGrid"></div>
-
-        <!-- AUDIO CONTROLS -->
-        <div class="audio-section">
-            <button class="play-btn" id="playBtn">▶️ Akkord abspielen</button>
-            <div class="audio-controls">
-                <label>Klang:</label>
-                <select id="toneType">
-                    <option value="warm">Akkordeon-like</option>
-                    <option value="pure">Rein (Sinus)</option>
-                    <option value="bright">Hell</option>
-                    <option value="soft">Weich ausklingend</option>
-                </select>
-
-                <label>Länge:</label>
-                <input type="range" id="duration" min="1" max="5" step="1" value="2">
-                <div class="duration-display"><span id="durationLabel">2</span> Sekunden</div>
-
-                <div class="checkbox-row">
-                    <label>
-                        <input type="checkbox" id="autoPlay" checked>
-                        Auto-Play bei Akkordwechsel
-                    </label>
+<div class="main-grid">
+    <!-- COLUMN 1: BASS (Left on iPad) -->
+    <div class="bass-column">
+        <div class="section">
+            <div class="sec-hdr">
+                Balgrichtung
+                <button class="style-toggle" id="styleToggle" title="Darstellung umschalten">⚙️</button>
+            </div>
+            <div class="bellows-container">
+                <div class="bellows-switch" id="bellowsSwitch">
+                    <button class="bellows-btn pull" data-dir="pull">
+                        <svg viewBox="0 0 140 70" preserveAspectRatio="none">
+                            <polygon class="trapezoid-fill" points="20,10 120,0 120,70 20,60"/>
+                            <polygon class="trapezoid-stroke" points="20,10 120,0 120,70 20,60" fill="none" stroke-width="2"/>
+                        </svg>
+                        <span class="label">Pull</span>
+                    </button>
+                    <button class="bellows-btn push active" data-dir="push">
+                        <svg viewBox="0 0 140 70" preserveAspectRatio="none">
+                            <polygon class="trapezoid-fill" points="20,0 120,10 120,60 20,70"/>
+                            <polygon class="trapezoid-stroke" points="20,0 120,10 120,60 20,70" fill="none" stroke-width="2"/>
+                        </svg>
+                        <span class="label">Push</span>
+                    </button>
                 </div>
             </div>
-            <div id="warningBox" class="warning-box" style="display:none;"></div>
         </div>
-    </div>
-</div>
 
-<!-- ── AKKORDEON ── -->
-<div class="layout-section" id="accordion-layout">
-    <div class="accordion-flex">
-        <div class="bass-side">
+        <div class="section">
             <div class="lay-title">Bass – <span id="bassDir">Push</span></div>
             <div class="bass-container" id="bass-container"></div>
             
-            <!-- ZWEITE TRAPEZE (bei Bass für schnellen Zugriff) -->
             <div class="bellows-container bellows-bottom">
                 <div class="bellows-switch bellows-switch-2" id="bellowsSwitch2">
                     <button class="bellows-btn pull" data-dir="pull">
@@ -389,20 +367,95 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 </div>
             </div>
         </div>
-        <div class="treble-wrapper">
+    </div>
+
+    <!-- COLUMN 2: TREBLE (Center on iPad) -->
+    <div class="treble-column">
+        <div class="section">
             <div class="lay-title">Diskant – <span id="trebleDir">Push (Drücken)</span> – Sicht von oben</div>
             <div class="treble-side" id="treble-container"></div>
         </div>
     </div>
+
+    <!-- COLUMN 3: JAM-BOX (Right on iPad, Sticky!) -->
+    <div class="jam-box-column">
+        <div class="section">
+            <div class="sec-hdr">Jam-Box</div>
+            <div class="chord-panel">
+                <div class="cp-label">Akkordtyp</div>
+                <div class="chip-row" id="chordTypeRow">
+                    <button class="chip active" data-ctype="">Dur</button>
+                    <button class="chip" data-ctype="m">Moll</button>
+                    <button class="chip" data-ctype="dim">dim</button>
+                    <button class="chip" data-ctype="aug">aug</button>
+                    <button class="chip" data-ctype="sus2">sus2</button>
+                    <button class="chip" data-ctype="sus4">sus4</button>
+                    <button class="chip" data-ctype="7">7</button>
+                    <button class="chip" data-ctype="maj7">maj7</button>
+                    <button class="chip" data-ctype="m7">m7</button>
+                    <button class="chip" data-ctype="dim7">dim7</button>
+                    <button class="chip" data-ctype="m7b5">ø</button>
+                    <button class="chip" data-ctype="6">6</button>
+                    <button class="chip" data-ctype="m6">m6</button>
+                </div>
+
+                <div class="cp-label">Modale Skalen</div>
+                <div class="chip-row" id="scaleRow">
+                    <button class="chip" data-scale="ionian">Ionisch (Dur)</button>
+                    <button class="chip" data-scale="dorian">Dorisch</button>
+                    <button class="chip" data-scale="phrygian">Phrygisch</button>
+                    <button class="chip" data-scale="lydian">Lydisch</button>
+                    <button class="chip" data-scale="mixolydian">Mixolydisch</button>
+                    <button class="chip" data-scale="aeolian">Äolisch (Moll)</button>
+                </div>
+
+                <div class="cp-label">Grundton</div>
+                <div class="root-grid" id="rootGrid"></div>
+
+                <div class="audio-section">
+                    <div class="play-controls">
+                        <button class="play-btn" id="playBtn">▶️ Play</button>
+                        <button class="stop-btn" id="stopBtn" disabled>⏹️ Stop</button>
+                    </div>
+                    
+                    <div class="audio-controls">
+                        <label>Klang:</label>
+                        <select id="toneType">
+                            <option value="warm">Akkordeon-like</option>
+                            <option value="pure">Rein (Sinus)</option>
+                            <option value="bright">Hell</option>
+                            <option value="soft">Weich</option>
+                        </select>
+
+                        <label>Tempo:</label>
+                        <input type="range" id="arpeggioTempo" min="0.2" max="1.0" step="0.1" value="0.5">
+                        <div class="slider-value"><span id="tempoLabel">0.5</span>s pro Ton</div>
+
+                        <div class="checkbox-row">
+                            <label>
+                                <input type="checkbox" id="autoPlay" checked>
+                                Auto-Play
+                            </label>
+                            <label>
+                                <input type="checkbox" id="loopMode">
+                                Loop ∞
+                            </label>
+                        </div>
+                    </div>
+                    <div id="warningBox" class="warning-box" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- ── LEGENDE ── -->
+<!-- LEGEND (hidden on iPad) -->
 <div class="legend">
     <div class="lg-title">Legende</div>
     <div class="lg-row"><div class="lg-sw pearl"></div>Taste – nicht aktiv (Perlmutt)</div>
     <div class="lg-row"><div class="lg-sw act"></div>Taste – aktiv (Akkordton)</div>
-    <div class="lg-row"><div class="lg-sw root"></div>Grundton des Akkords (dunkles Grau + blau)</div>
-    <div class="lg-row"><div class="lg-sw scale"></div>Skalenton (bei modalen Skalen)</div>
+    <div class="lg-row"><div class="lg-sw root"></div>Grundton des Akkords (blau)</div>
+    <div class="lg-row"><div class="lg-sw scale"></div>Skalenton (modale Skalen)</div>
 </div>
 
 </div>
@@ -411,37 +464,27 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 // ═══════════════════════════════════════════════════════════════════════════
 // AUDIO ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
-// Audio playback using Web Audio API.
-// Frequency calculation and envelope shaping inspired by:
-// https://github.com/chandlervdw/harmonic (MIT License) by @chandlervdw
-// Adapted for Castagnari Benny C/G diatonic button accordion visualization.
-// ═══════════════════════════════════════════════════════════════════════════
-
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let activeOscillators = [];
+let loopTimeout = null;
+let isPlaying = false;
 
 function playChord(frequencies, duration, toneType) {
     stopAll();
+    isPlaying = true;
+    document.getElementById('playBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
     
     frequencies.forEach((freq, idx) => {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
         switch(toneType) {
-            case 'warm':
-                oscillator.type = 'triangle';
-                break;
-            case 'pure':
-                oscillator.type = 'sine';
-                break;
-            case 'bright':
-                oscillator.type = 'sawtooth';
-                break;
-            case 'soft':
-                oscillator.type = 'sine';
-                break;
-            default:
-                oscillator.type = 'triangle';
+            case 'warm': oscillator.type = 'triangle'; break;
+            case 'pure': oscillator.type = 'sine'; break;
+            case 'bright': oscillator.type = 'sawtooth'; break;
+            case 'soft': oscillator.type = 'sine'; break;
+            default: oscillator.type = 'triangle';
         }
         
         oscillator.frequency.value = freq;
@@ -462,15 +505,30 @@ function playChord(frequencies, duration, toneType) {
         oscillator.start(now);
         oscillator.stop(now + duration);
         
+        oscillator.onended = () => {
+            if(activeOscillators.length === 1) {
+                isPlaying = false;
+                document.getElementById('playBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+            }
+        };
+        
         activeOscillators.push({ oscillator, gainNode });
     });
 }
 
-function playScale(notes, tempo = 0.3) {
+function playScale(notes, tempo = 0.5) {
     stopAll();
+    isPlaying = true;
+    document.getElementById('playBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    
+    const loopEnabled = document.getElementById('loopMode').checked;
     
     notes.forEach((note, idx) => {
         setTimeout(() => {
+            if(!isPlaying) return;
+            
             const freq = noteToFrequency(note, 4);
             const tone = document.getElementById('toneType').value;
             const noteDuration = tempo * 0.8;
@@ -479,20 +537,11 @@ function playScale(notes, tempo = 0.3) {
             const gainNode = audioContext.createGain();
             
             switch(tone) {
-                case 'warm':
-                    oscillator.type = 'triangle';
-                    break;
-                case 'pure':
-                    oscillator.type = 'sine';
-                    break;
-                case 'bright':
-                    oscillator.type = 'sawtooth';
-                    break;
-                case 'soft':
-                    oscillator.type = 'sine';
-                    break;
-                default:
-                    oscillator.type = 'triangle';
+                case 'warm': oscillator.type = 'triangle'; break;
+                case 'pure': oscillator.type = 'sine'; break;
+                case 'bright': oscillator.type = 'sawtooth'; break;
+                case 'soft': oscillator.type = 'sine'; break;
+                default: oscillator.type = 'triangle';
             }
             
             oscillator.frequency.value = freq;
@@ -514,8 +563,21 @@ function playScale(notes, tempo = 0.3) {
             
             activeOscillators.push({ oscillator, gainNode });
             
-            // Visual highlight
             highlightNoteButton(note, tempo);
+            
+            if(idx === notes.length - 1) {
+                oscillator.onended = () => {
+                    if(loopEnabled && isPlaying) {
+                        loopTimeout = setTimeout(() => {
+                            if(isPlaying) playScale(notes, tempo);
+                        }, 300);
+                    } else {
+                        isPlaying = false;
+                        document.getElementById('playBtn').disabled = false;
+                        document.getElementById('stopBtn').disabled = true;
+                    }
+                };
+            }
         }, idx * tempo * 1000);
     });
 }
@@ -533,6 +595,12 @@ function highlightNoteButton(noteName, duration) {
 }
 
 function stopAll() {
+    isPlaying = false;
+    if(loopTimeout) {
+        clearTimeout(loopTimeout);
+        loopTimeout = null;
+    }
+    
     activeOscillators.forEach(({ oscillator, gainNode }) => {
         try {
             oscillator.stop();
@@ -541,6 +609,9 @@ function stopAll() {
         } catch(e) {}
     });
     activeOscillators = [];
+    
+    document.getElementById('playBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -564,12 +635,12 @@ const CHORD_FORMULAS = {
 };
 
 const SCALE_FORMULAS = {
-    ionian:    [0,2,4,5,7,9,11],    // Dur
+    ionian:    [0,2,4,5,7,9,11],
     dorian:    [0,2,3,5,7,9,10],
     phrygian:  [0,1,3,5,7,8,10],
     lydian:    [0,2,4,6,7,9,11],
     mixolydian:[0,2,4,5,7,9,10],
-    aeolian:   [0,2,3,5,7,8,10]     // Moll
+    aeolian:   [0,2,3,5,7,8,10]
 };
 
 const NOTE_TO_SEMITONE = {
@@ -614,9 +685,9 @@ const layout = {
 // STATE
 // ═══════════════════════════════════════════════════════════════════════════
 
-let dir          = 'push';  // DEFAULT: PUSH
-let chordRoot    = 'C';     // DEFAULT: C
-let chordType    = '';      // DEFAULT: Dur
+let dir          = 'push';
+let chordRoot    = 'C';
+let chordType    = '';
 let scaleType    = null;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -722,13 +793,13 @@ function renderRootGrid() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// APPLY STYLES
+// APPLY STYLES WITH MODAL HIGHLIGHTING
 // ═══════════════════════════════════════════════════════════════════════════
 
 function applyStyles() {
     if (!chordRoot) {
         document.querySelectorAll('.note-button, .bass-button').forEach(b => {
-            b.classList.remove('active','root','scale-tone');
+            b.classList.remove('active','root','scale-tone','dimmed');
         });
         return;
     }
@@ -751,20 +822,31 @@ function applyStyles() {
         document.getElementById('warningBox').style.display = 'none';
     }
     
+    // MODAL HIGHLIGHTING: Dim non-scale notes, highlight scale notes
     document.querySelectorAll('.note-button').forEach(btn => {
         const note = btn.dataset.note;
         const name = pureName(note);
         
-        btn.classList.remove('active','root','scale-tone');
+        btn.classList.remove('active','root','scale-tone','dimmed');
         
-        if(rootSet.has(name)){
-            btn.classList.add('root','active');
-        } else if(chordSet.has(name)){
-            btn.classList.add('active');
-        }
-        
-        if(scaleType && chordSet.has(name) && !rootSet.has(name)){
-            btn.classList.add('scale-tone');
+        if(scaleType) {
+            // Modal mode: dim all, highlight scale tones
+            if(chordSet.has(name)) {
+                if(rootSet.has(name)) {
+                    btn.classList.add('root','active');
+                } else {
+                    btn.classList.add('scale-tone','active');
+                }
+            } else {
+                btn.classList.add('dimmed');
+            }
+        } else {
+            // Chord mode: normal highlighting
+            if(rootSet.has(name)){
+                btn.classList.add('root','active');
+            } else if(chordSet.has(name)){
+                btn.classList.add('active');
+            }
         }
     });
     
@@ -815,12 +897,11 @@ function playCurrentChord() {
     const chordNotes = formula.map(i => SEMITONE_TO_NOTE[(base+i)%12]);
     
     if(scaleType) {
-        // Scales: play as arpeggio (ascending)
-        playScale(chordNotes, 0.3);
+        const tempo = parseFloat(document.getElementById('arpeggioTempo').value);
+        playScale(chordNotes, tempo);
     } else {
-        // Chords: play simultaneously
         const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
-        const duration = parseFloat(document.getElementById('duration').value);
+        const duration = 2.0;
         const tone = document.getElementById('toneType').value;
         playChord(frequencies, duration, tone);
     }
@@ -831,7 +912,6 @@ function switchDir(newDir) {
     document.getElementById('bassDir').textContent = newDir === 'pull' ? 'Pull' : 'Push';
     document.getElementById('trebleDir').textContent = newDir === 'pull' ? 'Pull (Ziehen)' : 'Push (Drücken)';
     
-    // Sync BOTH bellows switches
     document.querySelectorAll('.bellows-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.dir === newDir);
     });
@@ -851,7 +931,6 @@ function toggleBellowsStyle() {
 // EVENT LISTENERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// BOTH bellows switches
 document.querySelectorAll('.bellows-btn').forEach(btn => {
     btn.addEventListener('click', ()=> switchDir(btn.dataset.dir));
 });
@@ -891,9 +970,10 @@ document.querySelectorAll('.chip[data-scale]').forEach(btn => {
 });
 
 document.getElementById('playBtn').addEventListener('click', playCurrentChord);
+document.getElementById('stopBtn').addEventListener('click', stopAll);
 
-document.getElementById('duration').addEventListener('input', e => {
-    document.getElementById('durationLabel').textContent = e.target.value;
+document.getElementById('arpeggioTempo').addEventListener('input', e => {
+    document.getElementById('tempoLabel').textContent = e.target.value;
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -903,7 +983,6 @@ document.getElementById('duration').addEventListener('input', e => {
 renderRootGrid();
 renderAll();
 
-// Set default selection: C-Dur, PUSH, Auto-Play ON
 document.querySelectorAll('.root-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.root === 'C');
 });
@@ -912,7 +991,6 @@ document.querySelectorAll('.chip[data-ctype]').forEach(b => {
 });
 document.getElementById('autoPlay').checked = true;
 
-// Load bellows style preference
 const savedStyle = localStorage.getItem('bellowsStyle');
 if(savedStyle === 'minimal') {
     document.querySelectorAll('.bellows-switch').forEach(sw => {
@@ -920,7 +998,6 @@ if(savedStyle === 'minimal') {
     });
 }
 
-// Apply initial chord visualization
 applyStyles();
 </script>
 </body>
