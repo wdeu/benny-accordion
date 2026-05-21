@@ -903,13 +903,26 @@ function selectRoot(root) {
 function playCurrentChord() {
     if(!chordRoot) return;
     
+    // Stop any currently playing scales/chords
+    stopAll();
+    
     const formula = scaleType ? SCALE_FORMULAS[scaleType] : CHORD_FORMULAS[chordType];
     const base = NOTE_TO_SEMITONE[chordRoot];
     const chordNotes = formula.map(i => SEMITONE_TO_NOTE[(base+i)%12]);
     
     if(scaleType) {
+        // Sort scale notes ascending from root note
+        const rootSemitone = NOTE_TO_SEMITONE[chordRoot];
+        const sortedNotes = [...chordNotes].sort((a, b) => {
+            const aSemi = NOTE_TO_SEMITONE[a];
+            const bSemi = NOTE_TO_SEMITONE[b];
+            // Calculate distance from root (0-11)
+            const aDist = (aSemi - rootSemitone + 12) % 12;
+            const bDist = (bSemi - rootSemitone + 12) % 12;
+            return aDist - bDist;
+        });
         const tempo = parseFloat(document.getElementById('arpeggioTempo').value);
-        playScale(chordNotes, tempo);
+        playScale(sortedNotes, tempo);
     } else {
         const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
         const duration = 2.0;
