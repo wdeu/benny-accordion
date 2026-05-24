@@ -482,6 +482,8 @@ let loopTimeout = null;
 let isPlaying = false;
 
 function playChord(frequencies, duration, toneType) {
+    // Treble buttons play at octave 4 (C4 = 261.63 Hz)
+    // Bass buttons use playBassNote() with octave coupling (C2 + C3)
     stopAll();
     isPlaying = true;
     document.getElementById('playBtn').disabled = true;
@@ -720,6 +722,80 @@ function noteToFrequency(noteName, octave = 4) {
     const semitone = NOTE_TO_SEMITONE[noteName];
     const distance = (octave - 4) * 12 + semitone - 9;
     return A4 * Math.pow(2, distance / 12);
+}
+
+// Play bass note with octave coupling (L + M voices)
+function playBassNote(note, duration = 2.0) {
+    stopAll();
+    
+    const tone = document.getElementById('toneType').value;
+    
+    // Bass notes play TWO octaves simultaneously (like real Benny)
+    // Voice 1 (L): Octave 2 (Contraoktave)
+    // Voice 2 (M): Octave 3 (Mittellage)
+    const freq1 = noteToFrequency(note, 2);  // Low voice
+    const freq2 = noteToFrequency(note, 3);  // Medium voice
+    
+    [freq1, freq2].forEach((freq, idx) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        if(tone === 'benny') {
+            const bennyWave = createBennyWave(audioContext);
+            oscillator.setPeriodicWave(bennyWave);
+            oscillator.detune.value = 3 + Math.random() * 4;
+        } else {
+            switch(tone) {
+                case 'warm': oscillator.type = 'triangle'; break;
+                case 'pure': oscillator.type = 'sine'; break;
+                case 'bright': oscillator.type = 'sawtooth'; break;
+                case 'soft': oscillator.type = 'sine'; break;
+                default: oscillator.type = 'triangle';
+            }
+        }
+        
+        oscillator.frequency.value = freq;
+        
+        const now = audioContext.currentTime;
+        
+        // Bass envelope (slightly different from treble)
+        let attack, release, peakLevel, sustainLevel;
+        if(tone === 'benny') {
+            attack = 0.08;      // Slower attack for bass
+            release = 0.20;     // Longer release for bass
+            peakLevel = 0.30;   // Slightly quieter (bass is powerful!)
+            sustainLevel = 0.22;
+        } else {
+            attack = 0.08;
+            release = 0.15;
+            peakLevel = 0.25;
+            sustainLevel = 0.18;
+        }
+        
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack * 0.7);
+        gainNode.gain.linearRampToValueAtTime(sustainLevel, now + attack);
+        gainNode.gain.linearRampToValueAtTime(sustainLevel * 0.85, now + duration - release);
+        gainNode.gain.linearRampToValueAtTime(0, now + duration);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start(now);
+        oscillator.stop(now + duration);
+        
+        activeOscillators.push(oscillator);
+    });
+    
+    isPlaying = true;
+    document.getElementById('playBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    
+    setTimeout(() => {
+        isPlaying = false;
+        document.getElementById('playBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+    }, duration * 1000);
 }
 
 // Create Benny-Original custom waveform (based on spectral analysis)
@@ -968,7 +1044,8 @@ function onBassClick(note) {
     document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
     
     if(document.getElementById('autoPlay').checked) {
-        playCurrentChord();
+        // Bass buttons play with octave coupling (L + M voices)
+        playBassNote(root);
     }
 }
 
