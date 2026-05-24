@@ -432,6 +432,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                     <div class="audio-controls">
                         <label>Klang:</label>
                         <select id="toneType">
+                            <option value="benny">Benny Original</option>
                             <option value="warm">Akkordeon-like</option>
                             <option value="pure">Rein (Sinus)</option>
                             <option value="bright">Hell</option>
@@ -490,24 +491,54 @@ function playChord(frequencies, duration, toneType) {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
-        switch(toneType) {
-            case 'warm': oscillator.type = 'triangle'; break;
-            case 'pure': oscillator.type = 'sine'; break;
-            case 'bright': oscillator.type = 'sawtooth'; break;
-            case 'soft': oscillator.type = 'sine'; break;
-            default: oscillator.type = 'triangle';
+        if(toneType === 'benny') {
+            // Use custom Benny waveform
+            const bennyWave = createBennyWave(audioContext);
+            oscillator.setPeriodicWave(bennyWave);
+            // Add slight detuning for inharmonicity (3-7 cents)
+            oscillator.detune.value = 3 + Math.random() * 4;
+        } else {
+            switch(toneType) {
+                case 'warm': oscillator.type = 'triangle'; break;
+                case 'pure': oscillator.type = 'sine'; break;
+                case 'bright': oscillator.type = 'sawtooth'; break;
+                case 'soft': oscillator.type = 'sine'; break;
+                default: oscillator.type = 'triangle';
+            }
         }
         
         oscillator.frequency.value = freq;
         
         const now = audioContext.currentTime;
-        const attack = toneType === 'soft' ? 0.1 : 0.05;
-        const release = toneType === 'soft' ? 0.3 : 0.1;
-        const sustainLevel = 0.2;
+        
+        // Envelope settings based on tone type
+        let attack, release, sustainLevel, peakLevel;
+        if(toneType === 'benny') {
+            attack = 0.05;
+            release = 0.15;
+            peakLevel = 0.35;
+            sustainLevel = 0.25;
+        } else if(toneType === 'soft') {
+            attack = 0.1;
+            release = 0.3;
+            peakLevel = 0.3;
+            sustainLevel = 0.2;
+        } else {
+            attack = 0.05;
+            release = 0.1;
+            peakLevel = 0.3;
+            sustainLevel = 0.2;
+        }
         
         gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.3, now + attack);
-        gainNode.gain.linearRampToValueAtTime(sustainLevel, now + duration - release);
+        // Accordion-style attack with slight overshoot
+        if(toneType === 'benny') {
+            gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack * 0.6);
+            gainNode.gain.linearRampToValueAtTime(sustainLevel, now + attack);
+        } else {
+            gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack);
+        }
+        gainNode.gain.linearRampToValueAtTime(sustainLevel * 0.9, now + duration - release);
         gainNode.gain.linearRampToValueAtTime(0, now + duration);
         
         oscillator.connect(gainNode);
@@ -547,23 +578,45 @@ function playScale(notes, tempo = 0.5) {
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
-            switch(tone) {
-                case 'warm': oscillator.type = 'triangle'; break;
-                case 'pure': oscillator.type = 'sine'; break;
-                case 'bright': oscillator.type = 'sawtooth'; break;
-                case 'soft': oscillator.type = 'sine'; break;
-                default: oscillator.type = 'triangle';
+            if(tone === 'benny') {
+                // Use custom Benny waveform
+                const bennyWave = createBennyWave(audioContext);
+                oscillator.setPeriodicWave(bennyWave);
+                // Add slight detuning for inharmonicity
+                oscillator.detune.value = 3 + Math.random() * 4;
+            } else {
+                switch(tone) {
+                    case 'warm': oscillator.type = 'triangle'; break;
+                    case 'pure': oscillator.type = 'sine'; break;
+                    case 'bright': oscillator.type = 'sawtooth'; break;
+                    case 'soft': oscillator.type = 'sine'; break;
+                    default: oscillator.type = 'triangle';
+                }
             }
             
             oscillator.frequency.value = freq;
             
             const now = audioContext.currentTime;
-            const attack = tone === 'soft' ? 0.05 : 0.03;
-            const release = tone === 'soft' ? 0.15 : 0.08;
+            
+            // Envelope for scale playback
+            let attack, release, peakLevel;
+            if(tone === 'benny') {
+                attack = 0.04;
+                release = 0.12;
+                peakLevel = 0.32;
+            } else if(tone === 'soft') {
+                attack = 0.05;
+                release = 0.15;
+                peakLevel = 0.3;
+            } else {
+                attack = 0.03;
+                release = 0.08;
+                peakLevel = 0.3;
+            }
             
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(0.3, now + attack);
-            gainNode.gain.linearRampToValueAtTime(0.15, now + noteDuration - release);
+            gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack);
+            gainNode.gain.linearRampToValueAtTime(peakLevel * 0.7, now + noteDuration - release);
             gainNode.gain.linearRampToValueAtTime(0, now + noteDuration);
             
             oscillator.connect(gainNode);
@@ -667,6 +720,35 @@ function noteToFrequency(noteName, octave = 4) {
     const semitone = NOTE_TO_SEMITONE[noteName];
     const distance = (octave - 4) * 12 + semitone - 9;
     return A4 * Math.pow(2, distance / 12);
+}
+
+// Create Benny-Original custom waveform (based on spectral analysis)
+function createBennyWave(audioContext) {
+    // Harmonic amplitudes from real Benny Accordion analysis
+    // Harmonic structure: [DC, 1st, 2nd, 3rd, 4th, 5th, 6th, 7th, 8th, 9th, 10th]
+    const real = new Float32Array([
+        0,      // DC offset
+        1.000,  // Fundamental (0 dB)
+        0.182,  // 2nd harmonic (-14.8 dB)
+        0.259,  // 3rd harmonic (-11.7 dB) - Strong odd harmonic!
+        0.094,  // 4th harmonic (-20.5 dB)
+        0.129,  // 5th harmonic (-17.7 dB) - Strong odd harmonic!
+        0.034,  // 6th harmonic (-29.4 dB)
+        0.162,  // 7th harmonic (-15.8 dB) - Strong odd harmonic!
+        0.020,  // 8th harmonic (-34.1 dB)
+        0.016,  // 9th harmonic (-35.7 dB)
+        0.010   // 10th harmonic (-39.7 dB)
+    ]);
+    
+    // Imaginary parts (for slight phase variation = inharmonicity)
+    const imag = new Float32Array(real.length);
+    
+    // Add subtle phase shifts to harmonics 2-5 for "reed" character
+    for (let i = 2; i <= 5; i++) {
+        imag[i] = real[i] * 0.03; // Slight phase shift
+    }
+    
+    return audioContext.createPeriodicWave(real, imag, {disableNormalization: false});
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
