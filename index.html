@@ -726,8 +726,11 @@ function noteToFrequency(noteName, octave = 4) {
 
 // Get note name from interval (for calculating fifth, third, etc.)
 function getNoteFromInterval(root, semitones) {
+    // Use flats for consistency with bass button labels
     const notes = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-    const rootIdx = notes.indexOf(root.toUpperCase());
+    // Normalize enharmonic equivalents
+    const normalized = root.replace('G#', 'Ab').replace('D#', 'Eb').replace('A#', 'Bb');
+    const rootIdx = notes.indexOf(normalized.toUpperCase());
     if (rootIdx === -1) return root;
     const newIdx = (rootIdx + semitones) % 12;
     return notes[newIdx];
@@ -890,7 +893,15 @@ let scaleType    = null;
 // ═══════════════════════════════════════════════════════════════════════════
 
 function pureName(s){ return s.replace(/\s*\d+$/,'').trim(); }
-function bassToRoot(s){ const m=s.match(/^([A-G][b#]?)/); return m?m[1]:s.charAt(0).toUpperCase(); }
+function bassToRoot(s){ 
+    // Handle both uppercase and lowercase, preserving flats/sharps
+    const m=s.match(/^([A-Ga-g][b#]?)/i); 
+    if(m) {
+        // Capitalize first letter, keep flat/sharp
+        return m[1].charAt(0).toUpperCase() + m[1].slice(1);
+    }
+    return s.charAt(0).toUpperCase(); 
+}
 
 function getBennyNotes(direction) {
     const notes = new Set();
