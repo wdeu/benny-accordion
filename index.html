@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion</title>
+<title>Castagnari Benny Accordion v5.6.7</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -323,7 +323,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion</h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.7</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -432,6 +432,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                     <div class="audio-controls">
                         <label>Klang:</label>
                         <select id="toneType">
+                            <option value="benny">Benny Original</option>
                             <option value="warm">Akkordeon-like</option>
                             <option value="pure">Rein (Sinus)</option>
                             <option value="bright">Hell</option>
@@ -481,6 +482,8 @@ let loopTimeout = null;
 let isPlaying = false;
 
 function playChord(frequencies, duration, toneType) {
+    // Treble buttons play at octave 4 (C4 = 261.63 Hz)
+    // Bass buttons use playBassNote() with octave coupling (C2 + C3)
     stopAll();
     isPlaying = true;
     document.getElementById('playBtn').disabled = true;
@@ -490,24 +493,54 @@ function playChord(frequencies, duration, toneType) {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
-        switch(toneType) {
-            case 'warm': oscillator.type = 'triangle'; break;
-            case 'pure': oscillator.type = 'sine'; break;
-            case 'bright': oscillator.type = 'sawtooth'; break;
-            case 'soft': oscillator.type = 'sine'; break;
-            default: oscillator.type = 'triangle';
+        if(toneType === 'benny') {
+            // Use custom Benny waveform
+            const bennyWave = createBennyWave(audioContext);
+            oscillator.setPeriodicWave(bennyWave);
+            // Add slight detuning for inharmonicity (3-7 cents)
+            oscillator.detune.value = 3 + Math.random() * 4;
+        } else {
+            switch(toneType) {
+                case 'warm': oscillator.type = 'triangle'; break;
+                case 'pure': oscillator.type = 'sine'; break;
+                case 'bright': oscillator.type = 'sawtooth'; break;
+                case 'soft': oscillator.type = 'sine'; break;
+                default: oscillator.type = 'triangle';
+            }
         }
         
         oscillator.frequency.value = freq;
         
         const now = audioContext.currentTime;
-        const attack = toneType === 'soft' ? 0.1 : 0.05;
-        const release = toneType === 'soft' ? 0.3 : 0.1;
-        const sustainLevel = 0.2;
+        
+        // Envelope settings based on tone type
+        let attack, release, sustainLevel, peakLevel;
+        if(toneType === 'benny') {
+            attack = 0.05;
+            release = 0.15;
+            peakLevel = 0.35;
+            sustainLevel = 0.25;
+        } else if(toneType === 'soft') {
+            attack = 0.1;
+            release = 0.3;
+            peakLevel = 0.3;
+            sustainLevel = 0.2;
+        } else {
+            attack = 0.05;
+            release = 0.1;
+            peakLevel = 0.3;
+            sustainLevel = 0.2;
+        }
         
         gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.3, now + attack);
-        gainNode.gain.linearRampToValueAtTime(sustainLevel, now + duration - release);
+        // Accordion-style attack with slight overshoot
+        if(toneType === 'benny') {
+            gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack * 0.6);
+            gainNode.gain.linearRampToValueAtTime(sustainLevel, now + attack);
+        } else {
+            gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack);
+        }
+        gainNode.gain.linearRampToValueAtTime(sustainLevel * 0.9, now + duration - release);
         gainNode.gain.linearRampToValueAtTime(0, now + duration);
         
         oscillator.connect(gainNode);
@@ -547,23 +580,45 @@ function playScale(notes, tempo = 0.5) {
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
             
-            switch(tone) {
-                case 'warm': oscillator.type = 'triangle'; break;
-                case 'pure': oscillator.type = 'sine'; break;
-                case 'bright': oscillator.type = 'sawtooth'; break;
-                case 'soft': oscillator.type = 'sine'; break;
-                default: oscillator.type = 'triangle';
+            if(tone === 'benny') {
+                // Use custom Benny waveform
+                const bennyWave = createBennyWave(audioContext);
+                oscillator.setPeriodicWave(bennyWave);
+                // Add slight detuning for inharmonicity
+                oscillator.detune.value = 3 + Math.random() * 4;
+            } else {
+                switch(tone) {
+                    case 'warm': oscillator.type = 'triangle'; break;
+                    case 'pure': oscillator.type = 'sine'; break;
+                    case 'bright': oscillator.type = 'sawtooth'; break;
+                    case 'soft': oscillator.type = 'sine'; break;
+                    default: oscillator.type = 'triangle';
+                }
             }
             
             oscillator.frequency.value = freq;
             
             const now = audioContext.currentTime;
-            const attack = tone === 'soft' ? 0.05 : 0.03;
-            const release = tone === 'soft' ? 0.15 : 0.08;
+            
+            // Envelope for scale playback
+            let attack, release, peakLevel;
+            if(tone === 'benny') {
+                attack = 0.04;
+                release = 0.12;
+                peakLevel = 0.32;
+            } else if(tone === 'soft') {
+                attack = 0.05;
+                release = 0.15;
+                peakLevel = 0.3;
+            } else {
+                attack = 0.03;
+                release = 0.08;
+                peakLevel = 0.3;
+            }
             
             gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(0.3, now + attack);
-            gainNode.gain.linearRampToValueAtTime(0.15, now + noteDuration - release);
+            gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack);
+            gainNode.gain.linearRampToValueAtTime(peakLevel * 0.7, now + noteDuration - release);
             gainNode.gain.linearRampToValueAtTime(0, now + noteDuration);
             
             oscillator.connect(gainNode);
@@ -669,6 +724,146 @@ function noteToFrequency(noteName, octave = 4) {
     return A4 * Math.pow(2, distance / 12);
 }
 
+// Get note name from interval (for calculating fifth, third, etc.)
+function getNoteFromInterval(root, semitones) {
+    // Use flats for consistency with bass button labels
+    const notes = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+    // Normalize enharmonic equivalents
+    let normalized = root.replace('G#', 'Ab').replace('D#', 'Eb').replace('A#', 'Bb');
+    // Capitalize only first letter, preserve lowercase 'b' for flats
+    normalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+    const rootIdx = notes.indexOf(normalized);
+    if (rootIdx === -1) {
+        console.error('Note not found:', normalized, 'from root:', root);
+        return root;
+    }
+    const newIdx = (rootIdx + semitones) % 12;
+    return notes[newIdx];
+}
+
+// Play bass note with octave coupling (L + M voices)
+// Based on spectral analysis of real Castagnari Benny bass recording
+function playBassNote(note, isChord, duration = 2.0) {
+    stopAll();
+    
+    const tone = document.getElementById('toneType').value;
+    // 'note' is already properly capitalized from bassToRoot() (e.g., 'Ab', 'Eb')
+    // Don't uppercase it - that would break flats!
+    const root = note.charAt(0).toUpperCase() + note.slice(1);
+    const frequencies = [];
+    
+    if(!isChord) {
+        // Uppercase (C, D, E...): Root in 2 octaves
+        // Voices: L (Low) + M (Medium)
+        frequencies.push(noteToFrequency(root, 2));  // C2 (65 Hz)
+        frequencies.push(noteToFrequency(root, 3));  // C3 (131 Hz)
+        
+    } else {
+        // Lowercase (c, d, e...): Root in 3 octaves + High Fifth
+        // Analysis showed: extra octave + fifth in HIGH register!
+        
+        // Root in 3 octaves (L + M + H)
+        frequencies.push(noteToFrequency(root, 2));  // C2 (65 Hz)  - Low voice
+        frequencies.push(noteToFrequency(root, 3));  // C3 (131 Hz) - Medium voice
+        frequencies.push(noteToFrequency(root, 4));  // C4 (262 Hz) - High octave!
+        
+        // Fifth in HIGH register (not low!)
+        const fifth = getNoteFromInterval(root, 7);
+        frequencies.push(noteToFrequency(fifth, 4)); // G4 (392 Hz) - High fifth!
+    }
+    
+    frequencies.forEach((freq, idx) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        if(tone === 'benny') {
+            const bennyWave = createBennyWave(audioContext);
+            oscillator.setPeriodicWave(bennyWave);
+            oscillator.detune.value = 3 + Math.random() * 4;
+        } else {
+            switch(tone) {
+                case 'warm': oscillator.type = 'triangle'; break;
+                case 'pure': oscillator.type = 'sine'; break;
+                case 'bright': oscillator.type = 'sawtooth'; break;
+                case 'soft': oscillator.type = 'sine'; break;
+                default: oscillator.type = 'triangle';
+            }
+        }
+        
+        oscillator.frequency.value = freq;
+        
+        const now = audioContext.currentTime;
+        
+        // Bass envelope (slightly different from treble)
+        let attack, release, peakLevel, sustainLevel;
+        if(tone === 'benny') {
+            attack = 0.08;      // Slower attack for bass
+            release = 0.20;     // Longer release for bass
+            peakLevel = 0.30;   // Slightly quieter (bass is powerful!)
+            sustainLevel = 0.22;
+        } else {
+            attack = 0.08;
+            release = 0.15;
+            peakLevel = 0.25;
+            sustainLevel = 0.18;
+        }
+        
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(peakLevel, now + attack * 0.7);
+        gainNode.gain.linearRampToValueAtTime(sustainLevel, now + attack);
+        gainNode.gain.linearRampToValueAtTime(sustainLevel * 0.85, now + duration - release);
+        gainNode.gain.linearRampToValueAtTime(0, now + duration);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.start(now);
+        oscillator.stop(now + duration);
+        
+        // Push as object to match stopAll() destructuring pattern
+        activeOscillators.push({ oscillator, gainNode });
+    });
+    
+    isPlaying = true;
+    document.getElementById('playBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    
+    setTimeout(() => {
+        isPlaying = false;
+        document.getElementById('playBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+    }, duration * 1000);
+}
+
+// Create Benny-Original custom waveform (based on spectral analysis)
+function createBennyWave(audioContext) {
+    // Harmonic amplitudes from real Benny Accordion analysis
+    // Harmonic structure: [DC, 1st, 2nd, 3rd, 4th, 5th, 6th, 7th, 8th, 9th, 10th]
+    const real = new Float32Array([
+        0,      // DC offset
+        1.000,  // Fundamental (0 dB)
+        0.182,  // 2nd harmonic (-14.8 dB)
+        0.259,  // 3rd harmonic (-11.7 dB) - Strong odd harmonic!
+        0.094,  // 4th harmonic (-20.5 dB)
+        0.129,  // 5th harmonic (-17.7 dB) - Strong odd harmonic!
+        0.034,  // 6th harmonic (-29.4 dB)
+        0.162,  // 7th harmonic (-15.8 dB) - Strong odd harmonic!
+        0.020,  // 8th harmonic (-34.1 dB)
+        0.016,  // 9th harmonic (-35.7 dB)
+        0.010   // 10th harmonic (-39.7 dB)
+    ]);
+    
+    // Imaginary parts (for slight phase variation = inharmonicity)
+    const imag = new Float32Array(real.length);
+    
+    // Add subtle phase shifts to harmonics 2-5 for "reed" character
+    for (let i = 2; i <= 5; i++) {
+        imag[i] = real[i] * 0.03; // Slight phase shift
+    }
+    
+    return audioContext.createPeriodicWave(real, imag, {disableNormalization: false});
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // LAYOUT DATA
 // ═══════════════════════════════════════════════════════════════════════════
@@ -706,7 +901,22 @@ let scaleType    = null;
 // ═══════════════════════════════════════════════════════════════════════════
 
 function pureName(s){ return s.replace(/\s*\d+$/,'').trim(); }
-function bassToRoot(s){ const m=s.match(/^([A-G][b#]?)/); return m?m[1]:s.charAt(0).toUpperCase(); }
+
+// Convert internal note name to musical display format
+// 'Ab' → 'A♭', 'Bb' → 'B♭', 'Eb' → 'E♭', etc.
+function noteDisplay(s) {
+    if (!s) return s;
+    return s.replace(/b/g, '♭').replace(/#/g, '♯');
+}
+function bassToRoot(s){ 
+    // Handle both uppercase and lowercase, preserving flats/sharps
+    const m=s.match(/^([A-Ga-g][b#]?)/i); 
+    if(m) {
+        // Capitalize first letter, keep flat/sharp
+        return m[1].charAt(0).toUpperCase() + m[1].slice(1);
+    }
+    return s.charAt(0).toUpperCase(); 
+}
 
 function getBennyNotes(direction) {
     const notes = new Set();
@@ -757,7 +967,7 @@ function renderTreble() {
             btn.dataset.note = note;
             const sp = document.createElement('div');
             sp.className = 'note-name';
-            sp.textContent = note;
+            sp.textContent = noteDisplay(note);
             btn.appendChild(sp);
             div.appendChild(btn);
         });
@@ -781,7 +991,7 @@ function renderBass() {
             btn.className = 'bass-button';
             if(note !== note.toUpperCase()) btn.classList.add('is-chord');
             btn.dataset.note = note;
-            btn.textContent  = note;
+            btn.textContent  = noteDisplay(note);
             btn.addEventListener('click', ()=> onBassClick(note));
             column.appendChild(btn);
         });
@@ -797,7 +1007,7 @@ function renderRootGrid() {
         const btn = document.createElement('button');
         btn.className = 'root-btn';
         btn.dataset.root = r;
-        btn.textContent  = r;
+        btn.textContent  = noteDisplay(r);
         btn.addEventListener('click', ()=> selectRoot(r));
         grid.appendChild(btn);
     });
@@ -827,7 +1037,7 @@ function applyStyles() {
     
     if (missing.length > 0) {
         const box = document.getElementById('warningBox');
-        box.textContent = `⚠️ Nicht alle Töne auf ${dir.toUpperCase()} verfügbar: ${missing.join(', ')}. Audio spielt vollständigen Akkord.`;
+        box.textContent = `⚠️ Nicht alle Töne auf ${dir.toUpperCase()} verfügbar: ${missing.map(noteDisplay).join(', ')}. Audio spielt vollständigen Akkord.`;
         box.style.display = 'block';
     } else {
         document.getElementById('warningBox').style.display = 'none';
@@ -874,7 +1084,10 @@ function applyStyles() {
 
 function onBassClick(note) {
     const root = bassToRoot(note);
-    const isUpper = (note === note.toUpperCase());
+    // Check FIRST character only - this correctly handles flats (Ab vs ab)
+    const firstChar = note.charAt(0);
+    const isUpper = (firstChar === firstChar.toUpperCase() && firstChar !== firstChar.toLowerCase());
+    const isChord = !isUpper;  // Lowercase first char = chord (root + fifth)
     
     chordType = isUpper ? '' : 'm';
     scaleType = null;
@@ -886,7 +1099,9 @@ function onBassClick(note) {
     document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
     
     if(document.getElementById('autoPlay').checked) {
-        playCurrentChord();
+        // Uppercase (C): Root only
+        // Lowercase (c): Root + Fifth
+        playBassNote(root, isChord);
     }
 }
 
