@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion</title>
+<title>Castagnari Benny Accordion v5.6.4</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -729,9 +729,14 @@ function getNoteFromInterval(root, semitones) {
     // Use flats for consistency with bass button labels
     const notes = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
     // Normalize enharmonic equivalents
-    const normalized = root.replace('G#', 'Ab').replace('D#', 'Eb').replace('A#', 'Bb');
-    const rootIdx = notes.indexOf(normalized.toUpperCase());
-    if (rootIdx === -1) return root;
+    let normalized = root.replace('G#', 'Ab').replace('D#', 'Eb').replace('A#', 'Bb');
+    // Capitalize only first letter, preserve lowercase 'b' for flats
+    normalized = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+    const rootIdx = notes.indexOf(normalized);
+    if (rootIdx === -1) {
+        console.error('Note not found:', normalized, 'from root:', root);
+        return root;
+    }
     const newIdx = (rootIdx + semitones) % 12;
     return notes[newIdx];
 }
