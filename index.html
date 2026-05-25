@@ -724,19 +724,45 @@ function noteToFrequency(noteName, octave = 4) {
     return A4 * Math.pow(2, distance / 12);
 }
 
+// Get note name from interval (for calculating fifth, third, etc.)
+function getNoteFromInterval(root, semitones) {
+    const notes = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+    const rootIdx = notes.indexOf(root.toUpperCase());
+    if (rootIdx === -1) return root;
+    const newIdx = (rootIdx + semitones) % 12;
+    return notes[newIdx];
+}
+
 // Play bass note with octave coupling (L + M voices)
-function playBassNote(note, duration = 2.0) {
+// Based on spectral analysis of real Castagnari Benny bass recording
+function playBassNote(note, isChord, duration = 2.0) {
     stopAll();
     
     const tone = document.getElementById('toneType').value;
+    const root = note.toUpperCase();
+    const frequencies = [];
     
-    // Bass notes play TWO octaves simultaneously (like real Benny)
-    // Voice 1 (L): Octave 2 (Contraoktave)
-    // Voice 2 (M): Octave 3 (Mittellage)
-    const freq1 = noteToFrequency(note, 2);  // Low voice
-    const freq2 = noteToFrequency(note, 3);  // Medium voice
+    if(!isChord) {
+        // Uppercase (C, D, E...): Root in 2 octaves
+        // Voices: L (Low) + M (Medium)
+        frequencies.push(noteToFrequency(root, 2));  // C2 (65 Hz)
+        frequencies.push(noteToFrequency(root, 3));  // C3 (131 Hz)
+        
+    } else {
+        // Lowercase (c, d, e...): Root in 3 octaves + High Fifth
+        // Analysis showed: extra octave + fifth in HIGH register!
+        
+        // Root in 3 octaves (L + M + H)
+        frequencies.push(noteToFrequency(root, 2));  // C2 (65 Hz)  - Low voice
+        frequencies.push(noteToFrequency(root, 3));  // C3 (131 Hz) - Medium voice
+        frequencies.push(noteToFrequency(root, 4));  // C4 (262 Hz) - High octave!
+        
+        // Fifth in HIGH register (not low!)
+        const fifth = getNoteFromInterval(root, 7);
+        frequencies.push(noteToFrequency(fifth, 4)); // G4 (392 Hz) - High fifth!
+    }
     
-    [freq1, freq2].forEach((freq, idx) => {
+    frequencies.forEach((freq, idx) => {
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
@@ -1033,6 +1059,7 @@ function applyStyles() {
 function onBassClick(note) {
     const root = bassToRoot(note);
     const isUpper = (note === note.toUpperCase());
+    const isChord = !isUpper;  // Lowercase = chord (root + fifth)
     
     chordType = isUpper ? '' : 'm';
     scaleType = null;
@@ -1044,8 +1071,9 @@ function onBassClick(note) {
     document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
     
     if(document.getElementById('autoPlay').checked) {
-        // Bass buttons play with octave coupling (L + M voices)
-        playBassNote(root);
+        // Uppercase (C): Root only
+        // Lowercase (c): Root + Fifth
+        playBassNote(root, isChord);
     }
 }
 
