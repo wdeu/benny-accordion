@@ -1,7 +1,7 @@
 # 🪗 Castagnari Benny Accordion - Interactive Learning Tool
 
 [![License: Custom Non-Commercial](https://img.shields.io/badge/License-Custom%20Non--Commercial-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-5.3-brightgreen.svg)](https://github.com/wdeu/benny-accordion/releases)
+[![Version](https://img.shields.io/badge/version-5.6.3-brightgreen.svg)](https://github.com/wdeu/benny-accordion/releases)
 [![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://wdeu.github.io/benny-accordion)
 
 An interactive web application for visualizing and learning the **Castagnari Benny C/G (3-row, Heim tuning)** diatonic accordion. Perfect for students, teachers, and players exploring French traditional music, Bourrées, and modal playing.
@@ -10,7 +10,7 @@ An interactive web application for visualizing and learning the **Castagnari Ben
 
 ---
 
-## ✨ Features (v5.3)
+## ✨ Features (v5.6.3)
 
 ### 🎹 Interactive Accordion Visualization
 - **Player perspective**: See the accordion from above, exactly as you play it
@@ -26,14 +26,18 @@ An interactive web application for visualizing and learning the **Castagnari Ben
 - **Real-time highlighting**: See which buttons to press for any chord or scale
 - **Availability check**: Shows which notes are missing on current bellows direction
 
-### 🔊 Audio Playback Engine
+### 🔊 Audio Playback Engine (v5.5-5.6.3)
+- **Benny Original sound**: Synthesized tone based on FFT analysis of real Castagnari Benny
+- **Spectral accuracy**: 10 harmonics with authentic amplitude ratios
+- **Inharmonicity simulation**: Subtle detuning (3-7 cents) for organic reed character
 - **Chord mode**: Play all chord tones simultaneously
-- **Scale mode**: Arpeggio playback with visual highlighting
+- **Scale mode**: Arpeggio playback with ascending order from root note
 - **Adjustable tempo**: 0.2s - 1.0s per note (default: 0.5s)
 - **Loop mode**: Endless repetition for practice
-- **4 tone types**: Accordion-like (warm), Pure (sine), Bright (sawtooth), Soft
+- **5 tone types**: Benny Original (default), Accordion-like, Pure, Bright, Soft
 - **Auto-play**: Automatic playback when selecting chords/scales
 - **Stop button**: Immediate playback termination
+- **Authentic bass system**: Uppercase (2 octaves), lowercase (3 octaves + high fifth)
 
 ### 📱 iPad ONE Screen Layout (NEW in v5.3!)
 - **3-column grid**: Bass | Treble | Jam-Box
@@ -155,6 +159,66 @@ The **3. Reihe (Helferreihe)** is essential for:
 - **Authentic folk sound**: Characteristic tones for French traditional music
 - **Legato technique**: Smooth melodic lines without pumping
 
+
+---
+
+## 🎵 Bass System Spectral Analysis
+
+The bass system was reverse-engineered through FFT (Fast Fourier Transform) spectral analysis of real Castagnari Benny recordings to ensure authentic sound reproduction.
+
+**[→ Complete technical analysis](docs/BASS_ANALYSIS.md)**
+
+### Key Discovery: Uppercase vs Lowercase Buttons
+
+Traditional accordion literature describes bass buttons as "root + chord," but spectral analysis revealed a more sophisticated system:
+
+**Uppercase buttons (C, G, F, E...)** - Root only in 2 octaves:
+```
+C → C2 (65 Hz) + C3 (131 Hz)
+    Voice L (Low) + Voice M (Medium)
+```
+
+**Lowercase buttons (c, g, f, e...)** - Root in 3 octaves + High Fifth:
+```
+c → C2 (65 Hz) + C3 (131 Hz) + C4 (262 Hz) + G4 (392 Hz)
+    Voice L      + Voice M      + Voice H      + High Fifth
+    
+Total: 4 voices (much fuller, more brilliant sound!)
+```
+
+### Why This Matters
+
+**High fifth placement:**
+- Fifth is in HIGH register (G4 = 392 Hz), not low (G2/G3)
+- Creates brilliance without muddying the bass
+- Measured in real recording at 392 Hz peak
+
+**Extra root octave:**
+- Chord buttons add C4 (262 Hz), not just C2 + C3
+- Adds fullness without losing bass foundation
+- Spectral centroid increases ~80 Hz (deeper → fuller)
+
+**Authentic recreation:**
+- All frequencies match measured FFT peaks
+- Validated by A/B testing with real Castagnari Benny
+- Creates characteristic "brilliant yet grounded" bass sound
+
+### Measured Spectral Peaks
+
+| Button | Type | Frequencies (Hz) | Notes |
+|--------|------|------------------|-------|
+| **C** | Root | 131, 393 | C3 + harmonics |
+| **c** | Chord | 131, 262, 393 | C3 + C4 + G4 |
+| **G** | Root | 98, 197 | G2 + G3 |
+| **g** | Chord | 197, 294, 392 | G3 + D4 + G4 |
+
+See [complete bass analysis](docs/BASS_ANALYSIS.md) for:
+- Full FFT results for all 24 bass buttons
+- Detailed frequency tables (PUSH and PULL)
+- Analysis methodology and validation
+- Comparison of expected vs measured frequencies
+
+
 ---
 
 ## 🛠️ Technical Details
@@ -201,7 +265,15 @@ The **3. Reihe (Helferreihe)** is essential for:
 
 ## 🗺️ Roadmap
 
+### Completed (v5.5-5.6.3)
+- [x] Spectral analysis of real Castagnari Benny
+- [x] Custom waveform synthesis (Benny Original sound)
+- [x] Authentic bass system with octave coupling
+- [x] Auto-stop playback when changing chords
+- [x] Ascending scale playback from root note
+
 ### Planned Features (v6.0+)
+- [ ] Individual treble button playback (build chords manually)
 - [ ] Custom chord definitions
 - [ ] Save/load chord progressions
 - [ ] PDF export (fingering charts)
@@ -287,6 +359,6 @@ If this tool helps your accordion journey, consider giving it a ⭐ on GitHub!
 
 ---
 
-**Version:** 5.3  
-**Last Updated:** May 20, 2026  
+**Version:** 5.6.3  
+**Last Updated:** May 25, 2026  
 **Status:** Active Development
