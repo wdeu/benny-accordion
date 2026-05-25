@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.6.7</title>
+<title>Castagnari Benny Accordion v5.6.9</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -323,7 +323,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.7</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.9</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -667,14 +667,49 @@ function stopAll() {
         loopTimeout = null;
     }
     
-    activeOscillators.forEach(({ oscillator, gainNode }) => {
-        try {
-            oscillator.stop();
-            oscillator.disconnect();
-            gainNode.disconnect();
-        } catch(e) {}
-    });
+    // Make a copy and clear immediately to prevent re-entry issues
+    const oscillatorsToStop = [...activeOscillators];
     activeOscillators = [];
+    
+    if (!audioContext) {
+        document.getElementById('playBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        return;
+    }
+    
+    const now = audioContext.currentTime;
+    
+    // Stop each oscillator with isolated try/catch (one failure doesn't break others)
+    oscillatorsToStop.forEach((entry) => {
+        // Handle both {oscillator, gainNode} objects and raw oscillators
+        const osc = entry.oscillator || entry;
+        const gain = entry.gainNode;
+        
+        // Step 1: Cancel future scheduled gain changes
+        if (gain) {
+            try { gain.gain.cancelScheduledValues(now); } catch(e) {}
+            try { gain.gain.setValueAtTime(gain.gain.value || 0, now); } catch(e) {}
+            try { gain.gain.linearRampToValueAtTime(0, now + 0.02); } catch(e) {}
+        }
+        
+        // Step 2: Stop oscillator
+        if (osc) {
+            try { osc.stop(now + 0.03); } catch(e) {
+                // Already stopped, try immediate stop
+                try { osc.stop(); } catch(e2) {}
+            }
+        }
+        
+        // Step 3: Disconnect after short delay
+        setTimeout(() => {
+            if (osc) {
+                try { osc.disconnect(); } catch(e) {}
+            }
+            if (gain) {
+                try { gain.disconnect(); } catch(e) {}
+            }
+        }, 60);
+    });
     
     document.getElementById('playBtn').disabled = false;
     document.getElementById('stopBtn').disabled = true;
@@ -904,9 +939,15 @@ function pureName(s){ return s.replace(/\s*\d+$/,'').trim(); }
 
 // Convert internal note name to musical display format
 // 'Ab' → 'A♭', 'Bb' → 'B♭', 'Eb' → 'E♭', etc.
+// CAREFUL: Don't replace lowercase 'b' that represents the note B!
+// Only replace 'b' that comes AFTER a note letter (A-G, a-g) as flat indicator
 function noteDisplay(s) {
     if (!s) return s;
-    return s.replace(/b/g, '♭').replace(/#/g, '♯');
+    // Match: any note letter (A-G or a-g) followed by 'b'
+    // Replace ONLY the trailing 'b', not the first letter
+    return s
+        .replace(/([A-Ga-g])b/g, '$1♭')   // Flat: 'Ab'→'A♭', 'bb'→'b♭'
+        .replace(/([A-Ga-g])#/g, '$1♯');  // Sharp: 'C#'→'C♯'
 }
 function bassToRoot(s){ 
     // Handle both uppercase and lowercase, preserving flats/sharps
@@ -1091,17 +1132,26 @@ function onBassClick(note) {
     
     chordType = isUpper ? '' : 'm';
     scaleType = null;
-    selectRoot(root);
+    
+    // Update state and visuals WITHOUT auto-playing the treble chord
+    chordRoot = root;
+    document.querySelectorAll('.root-btn').forEach(b => 
+        b.classList.toggle('active', b.dataset.root === root));
+    applyStyles();
     
     document.querySelectorAll('.chip[data-ctype]').forEach(b => {
         b.classList.toggle('active', b.dataset.ctype === chordType);
     });
     document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
     
+    // Play ONLY the bass note - no treble chord!
     if(document.getElementById('autoPlay').checked) {
-        // Uppercase (C): Root only
-        // Lowercase (c): Root + Fifth
-        playBassNote(root, isChord);
+        // First ensure everything is stopped
+        stopAll();
+        // Wait for fade-out to complete before playing new note (50ms = after the 20ms fade + buffer)
+        setTimeout(() => {
+            playBassNote(root, isChord);
+        }, 50);
     }
 }
 
