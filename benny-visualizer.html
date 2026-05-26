@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.6.10</title>
+<title>Castagnari Benny Accordion v5.6.11</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -77,8 +77,8 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     .root-grid { gap: 4px; }
     .chord-panel .cp-label { margin: 8px 0 4px; }
     
-    /* Legend ausblenden auf Desktop */
-    .legend { display: none !important; }
+    /* Legend inside jam-column - keep visible */
+    /* (legend stays visible on desktop in the right column) */
 }
 
 /* Mobile: Stacked Layout */
@@ -291,9 +291,9 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .bass-button.is-chord { font-size:0.80em; }
 
 /* ──────────── LEGEND ──────────── */
-.legend { background:var(--bg-card); border-radius:12px; margin-top:20px; padding:10px 16px; }
-.legend-content { display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
-.legend-text { flex:1; min-width:240px; }
+.legend { background:var(--bg-card); border-radius:12px; margin-top:20px; padding:12px 16px; }
+.legend-content { display:flex; flex-direction:column; align-items:center; gap:16px; }
+.legend-text { width:100%; }
 .legend .lg-title { font-size:0.7em; font-weight:600; color:var(--txt2);
     text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
 .lg-row { display:flex; align-items:center; gap:9px; margin-bottom:4px; font-size:0.8em; color:var(--txt2); }
@@ -305,7 +305,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     box-shadow:0 0 8px rgba(10,132,255,.4); }
 .benny-link { display:block; flex-shrink:0; transition:transform 0.2s, opacity 0.2s; }
 .benny-link:hover { transform:scale(1.05); opacity:0.9; }
-.benny-image { width:140px; height:auto; border-radius:8px; display:block; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+.benny-image { width:100%; max-width:240px; height:auto; border-radius:8px; display:block; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
 
 /* ──────────── RESPONSIVE ──────────── */
 @media (max-width:799px) {
@@ -329,7 +329,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.10</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.11</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -462,23 +462,30 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                     </div>
                     <div id="warningBox" class="warning-box" style="display:none;"></div>
                 </div>
+                
+                <!-- LEGEND inside jam-column -->
+                <div class="legend">
+                    <div class="legend-content">
+                        <div class="legend-text">
+                            <div class="lg-title">Legende</div>
+                            <div class="lg-row"><div class="lg-sw pearl"></div>Taste – nicht aktiv (Perlmutt)</div>
+                            <div class="lg-row"><div class="lg-sw act"></div>Taste – aktiv (Akkordton)</div>
+                            <div class="lg-row"><div class="lg-sw root"></div>Grundton des Akkords (blau)</div>
+                            <div class="lg-row"><div class="lg-sw scale"></div>Skalenton (modale Skalen)</div>
+                        </div>
+                        <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny - Hersteller-Website">
+                            <img src="assets/Benny.png" alt="Castagnari Benny" class="benny-image">
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- LEGEND (hidden on iPad) -->
-<div class="legend">
-    <div class="legend-content">
-        <div class="legend-text">
-            <div class="lg-title">Legende</div>
-            <div class="lg-row"><div class="lg-sw pearl"></div>Taste – nicht aktiv (Perlmutt)</div>
-            <div class="lg-row"><div class="lg-sw act"></div>Taste – aktiv (Akkordton)</div>
-            <div class="lg-row"><div class="lg-sw root"></div>Grundton des Akkords (blau)</div>
-            <div class="lg-row"><div class="lg-sw scale"></div>Skalenton (modale Skalen)</div>
-        </div>
+
         <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny - Hersteller-Website">
-            <img src="assets/benny.png" alt="Castagnari Benny" class="benny-image">
+            <img src="assets/Benny.png" alt="Castagnari Benny" class="benny-image">
         </a>
     </div>
 </div>
