@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.7.4</title>
+<title>Castagnari Benny Accordion v5.7.6</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -204,8 +204,12 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     width:38%; height:34%; border-radius:50%; pointer-events:none;
     background:radial-gradient(ellipse, rgba(255,255,255,.52) 0%, transparent 70%); }
 
-.note-button .note-name { font-size:0.85em; font-weight:600; color:var(--p-text);
-    position:relative; z-index:1; text-align:center; line-height:1.1; }
+.note-button .note-name { font-size:1.05em; font-weight:700; color:var(--p-text);
+    position:relative; z-index:1; text-align:center; line-height:1; display:flex;
+    flex-direction:column; align-items:center; gap:1px; }
+.note-button .note-name .note-letter { font-size:1em; font-weight:700; line-height:1; }
+.note-button .note-name .note-pos { font-size:0.58em; font-weight:400;
+    color:var(--txt3); opacity:0.7; line-height:1; }
 .note-button:active { transform:scale(.93); }
 
 .note-button.active {
@@ -216,6 +220,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 0 2px 4px rgba(0,0,0,.35);
 }
 .note-button.active .note-name { color:var(--act-txt); }
+.note-button.active .note-pos { color:var(--act-txt); opacity:0.6; }
 .note-button.active::before { opacity:.15; }
 
 .note-button.root {
@@ -234,6 +239,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 0 0 8px rgba(10,132,255,.3);
 }
 .note-button.root.active .note-name { color:var(--root-txt); }
+.note-button.root.active .note-pos { color:var(--root-txt); opacity:0.6; }
 
 /* MODAL HIGHLIGHTING - NEW! */
 .note-button.dimmed {
@@ -255,6 +261,19 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 @keyframes pulse-highlight {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.08); box-shadow: 0 0 16px var(--accent); }
+}
+
+/* ──────────── PUSH INDICATOR ──────────── */
+.treble-push-indicator {
+    position:absolute; inset:0; border-radius:12px; pointer-events:none; z-index:2;
+    border:2.5px solid transparent;
+    box-shadow:none;
+    transition:border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.treble-push-indicator.active {
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(10,132,255,0.12),
+               inset 0 0 30px rgba(10,132,255,0.06);
 }
 
 /* ──────────── BASS-TASTE ──────────── */
@@ -345,7 +364,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 }
 @media (max-width:400px) {
     .note-button { width:56px; height:56px; }
-    .note-button .note-name { font-size:0.78em; }
+    .note-button .note-name { font-size:0.9em; }
     .bass-button { width:46px; height:46px; font-size:0.80em; }
     .treble-side { gap:5px; }
     .bass-container { gap:14px; }
@@ -359,7 +378,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.4</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.6</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -418,7 +437,8 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
     <!-- COLUMN 2: TREBLE (Center on iPad) -->
     <div class="treble-column">
-        <div class="section">
+        <div class="section" style="position:relative;">
+            <div class="treble-push-indicator" id="treblePushIndicator"></div>
             <div class="lay-title">Diskant – <span id="trebleDir">Push (Drücken)</span> – Sicht von oben</div>
             <div class="treble-side" id="treble-container"></div>
         </div>
@@ -1113,7 +1133,20 @@ function renderTreble() {
             btn.dataset.note = note;
             const sp = document.createElement('div');
             sp.className = 'note-name';
-            sp.textContent = noteDisplay(note);
+            // Split "g 9" into note letter and position number
+            const parts = note.trim().split(/\s+/);
+            const noteLetter = parts[0] || '';
+            const noteNum = parts[1] || '';
+            const letterSpan = document.createElement('span');
+            letterSpan.className = 'note-letter';
+            letterSpan.textContent = noteDisplay(noteLetter);
+            sp.appendChild(letterSpan);
+            if(noteNum) {
+                const posSpan = document.createElement('span');
+                posSpan.className = 'note-pos';
+                posSpan.textContent = noteNum;
+                sp.appendChild(posSpan);
+            }
             btn.appendChild(sp);
             div.appendChild(btn);
         });
@@ -1316,6 +1349,12 @@ function switchDir(newDir) {
     dir = newDir;
     document.getElementById('bassDir').textContent = newDir === 'pull' ? 'Pull' : 'Push';
     document.getElementById('trebleDir').textContent = newDir === 'pull' ? 'Pull (Ziehen)' : 'Push (Drücken)';
+    // PUSH indicator: blue border when push active
+    const ind = document.getElementById('treblePushIndicator');
+    if(ind) ind.classList.toggle('active', newDir === 'push');
+    // Update PUSH indicator
+    const pushInd = document.getElementById('treblePushIndicator');
+    if(pushInd) pushInd.classList.toggle('active', newDir === 'push');
     
     document.querySelectorAll('.bellows-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.dir === newDir);
