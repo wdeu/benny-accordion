@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.7.1</title>
+<title>Castagnari Benny Accordion v5.7.2</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -311,27 +311,30 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .heim-info-btn { background:none; border:none; cursor:pointer; font-size:1em;
     color:var(--txt2); padding:0 4px; transition:color 0.2s; vertical-align:middle; }
 .heim-info-btn:hover { color:var(--accent); }
-.heim-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center; }
-.heim-overlay.open { display:flex; }
-.heim-panel { background:#2c2c2e; border-radius:16px; padding:24px; max-width:420px;
-    width:90%; max-height:85vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
-.heim-panel h2 { font-size:1em; font-weight:700; color:#fff; margin:0 0 16px;
-    display:flex; justify-content:space-between; align-items:center; }
-.heim-panel h2 button { background:none; border:none; color:#999; font-size:1.2em;
-    cursor:pointer; padding:0; }
-.heim-panel h2 button:hover { color:#fff; }
-.heim-section { margin-bottom:16px; }
-.heim-section h3 { font-size:0.7em; font-weight:600; color:var(--accent);
-    text-transform:uppercase; letter-spacing:1px; margin:0 0 8px; }
-.heim-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:6px;
-    font-size:0.82em; color:#bbb; line-height:1.4; }
+.heim-info-btn.active { color:var(--accent); }
+
+/* Inline collapsible panel - no position:fixed! */
+.heim-panel { display:none; margin-top:10px; background:var(--bg-card);
+    border-radius:12px; padding:14px 16px; border:1px solid var(--b); }
+.heim-panel.open { display:block; }
+.heim-panel-header { display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:12px; }
+.heim-panel-header span { font-size:0.75em; font-weight:600; color:var(--accent);
+    text-transform:uppercase; letter-spacing:1px; }
+.heim-panel-header button { background:none; border:none; cursor:pointer;
+    color:var(--txt2); font-size:1em; padding:0; line-height:1; }
+.heim-panel-header button:hover { color:var(--accent); }
+.heim-section { margin-bottom:12px; }
+.heim-section h3 { font-size:0.68em; font-weight:600; color:var(--accent);
+    text-transform:uppercase; letter-spacing:1px; margin:0 0 6px; }
+.heim-row { display:flex; align-items:flex-start; gap:8px; margin-bottom:5px;
+    font-size:0.78em; color:var(--txt2); line-height:1.4; }
 .heim-row .tag { flex-shrink:0; background:#3a3a3c; border-radius:4px;
-    padding:1px 6px; font-size:0.75em; font-weight:600; color:#fff; }
+    padding:1px 5px; font-size:0.72em; font-weight:600; color:#fff; }
 .heim-row .tag.g { background:#1a5276; }
 .heim-row .tag.c { background:#1a3a4a; }
 .heim-row .tag.a { background:#4a2a5a; }
-.heim-note { font-size:0.75em; color:#888; font-style:italic; margin-top:8px; }
+.heim-note { font-size:0.72em; color:var(--txt3); font-style:italic; margin-top:6px; }
 
 /* ── SCALE RECOMMENDATION BOX ── */
 .scale-hint { margin-top:8px; padding:8px 10px; background:#1c1c1e;
@@ -362,7 +365,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.1</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.2</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -434,6 +437,44 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 Jam-Box
                 <button class="heim-info-btn" id="heimInfoBtn" title="Heim G/C System-Info">ℹ️</button>
             </div>
+
+            <!-- HEIM INFO PANEL - inline, no position:fixed -->
+            <div class="heim-panel" id="heimPanel">
+                <div class="heim-panel-header">
+                    <span>🎼 Heim G/C – Systemcharakter</span>
+                    <button onclick="toggleHeimPanel(false)">✕</button>
+                </div>
+
+                <div class="heim-section">
+                    <h3>Herkunft</h3>
+                    <div class="heim-row">Abgeleitet vom <strong>Corgeron-Layout</strong> – Unterschied: gedrücktes <strong>A</strong> in der Helferreihe. Fokus auf modale Melodien und Bal Folk.</div>
+                </div>
+
+                <div class="heim-section">
+                    <h3>Stärken nach Tonart</h3>
+                    <div class="heim-row"><span class="tag g">G-Reihe</span> G + D: vollständig auf Pull über 3 Oktaven</div>
+                    <div class="heim-row"><span class="tag c">C-Reihe</span> C + F: vollständig auf Pull über 2 Oktaven</div>
+                    <div class="heim-row"><span class="tag a">Heim</span> D ist F überlegen (Pull-Reichweite)</div>
+                </div>
+
+                <div class="heim-section">
+                    <h3>Modale Stärken</h3>
+                    <div class="heim-row"><span class="tag g">G-Reihe</span> <strong>G-Dur</strong> und <strong>G-Dorisch</strong> – ideal, voll auf Pull</div>
+                    <div class="heim-row"><span class="tag c">C-Reihe</span> <strong>C-Moll</strong> und <strong>C-Mixolydisch</strong> – stark</div>
+                    <div class="heim-row"><span class="tag a">Heim ★</span> <strong>A-Äolisch</strong> – besonders gestärkt (A in der Helferreihe!)</div>
+                    <div class="heim-row"><span class="tag a">Heim</span> <strong>D-Äolisch</strong> – für Bourrées ideal</div>
+                </div>
+
+                <div class="heim-section">
+                    <h3>Notation (v5.7)</h3>
+                    <div class="heim-row"><span class="tag g">Bass</span> <strong>Großbuchstabe</strong> (C, G…) = Akkord</div>
+                    <div class="heim-row"><span class="tag c">Bass</span> <strong>Kleinbuchstabe</strong> (c, g…) = Einzelton</div>
+                    <div class="heim-row"><span class="tag a">Diskant</span> Immer Kleinbuchstaben (c, g, bb…)</div>
+                </div>
+
+                <div class="heim-note">Chromatik: über 2 Oktaven · erfordert Balgumkehr</div>
+            </div>
+
             <div class="chord-panel">
                 <div class="cp-label">Akkordtyp</div>
                 <div class="chip-row" id="chordTypeRow">
@@ -523,55 +564,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 </div>
 
-<!-- HEIM INFO OVERLAY -->
-<div class="heim-overlay" id="heimOverlay">
-    <div class="heim-panel">
-        <h2>
-            🎼 Heim G/C – Systemcharakter
-            <button onclick="document.getElementById('heimOverlay').classList.remove('open')">✕</button>
-        </h2>
-
-        <div class="heim-section">
-            <h3>Herkunft</h3>
-            <div class="heim-row">
-                Abgeleitet vom <strong>Corgeron-Layout</strong> – Unterschied: ein gedrücktes <strong>A</strong> in der 3. Reihe (Helferreihe). Fokus auf modale osteuropäische Melodien und Bal Folk.
-            </div>
-        </div>
-
-        <div class="heim-section">
-            <h3>Stärken nach Tonart</h3>
-            <div class="heim-row"><span class="tag g">G-Reihe</span> G + D: vollständig auf Pull über 3 Oktaven spielbar</div>
-            <div class="heim-row"><span class="tag c">C-Reihe</span> C + F: vollständig auf Pull über 2 Oktaven</div>
-            <div class="heim-row"><span class="tag a">Heim</span> D ist F in diesem Layout überlegen (Pull-Reichweite)</div>
-            <div class="heim-row"><span class="tag g">G-Reihe</span> Stärkste Leistung: G, D und verwandte Modi</div>
-            <div class="heim-row"><span class="tag c">C-Reihe</span> Bestens geeignet: C, F, Moll, Mixolydisch</div>
-        </div>
-
-        <div class="heim-section">
-            <h3>Modale Stärken</h3>
-            <div class="heim-row"><span class="tag g">G-Reihe</span> <strong>G-Dur</strong> und <strong>G-Dorisch</strong> – ideal, voll auf Pull</div>
-            <div class="heim-row"><span class="tag c">C-Reihe</span> <strong>C-Moll</strong> und <strong>C-Mixolydisch</strong> – stark</div>
-            <div class="heim-row"><span class="tag a">Heim ★</span> <strong>A-Äolisch</strong> – durch Heim-Layout besonders gestärkt (das A in der Helferreihe!)</div>
-            <div class="heim-row"><span class="tag a">Heim</span> <strong>D-Äolisch</strong> – weitere Stärke, für Bourrées ideal</div>
-        </div>
-
-        <div class="heim-section">
-            <h3>Chromatik</h3>
-            <div class="heim-row">Über 2 Oktaven vollständig chromatisch – chromatische Skalen erfordern Balgumkehr.</div>
-        </div>
-
-        <div class="heim-section">
-            <h3>Bass-System</h3>
-            <div class="heim-row">Erweitertes System hauptsächlich mit Vorzeichen. Profitiert stark von einem Bassregister (Terz abschaltbar für modale Begleitung).</div>
-            <div class="heim-row"><span class="tag g">Notation</span> <strong>Großbuchstabe</strong> (C, G, F…) = Akkord · <strong>Kleinbuchstabe</strong> (c, g, f…) = Einzelton</div>
-            <div class="heim-row"><span class="tag a">Hinweis</span> Bass-Layout auf G/C-Fokus optimierbar – analog zum Diskant-Layout.</div>
-        </div>
-
-        <div class="heim-note">
-            Quelle: Analyse des Heim G/C Standard-Layouts · Castagnari Benny C/G
-        </div>
-    </div>
-</div>
+<!-- Heim overlay removed - now inline panel in jam-column -->
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
