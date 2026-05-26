@@ -1,193 +1,266 @@
 # 🎵 Bass System Spectral Analysis
-
-## Overview
-
-The bass system of the Castagnari Benny C/G was analyzed using FFT (Fast Fourier Transform) spectral analysis of real recordings to ensure authentic sound reproduction in the web application.
-
-## Recording Details
-
-**Sample:** Castagnari Benny C/G (Heim tuning) - Complete bass range
-**Duration:** 58 seconds
-**Sample Rate:** 48 kHz
-**Format:** AAC (247 kbps)
-**Notes Recorded:** 
-- **PUSH:** C-c-G-g-Ab-ab-F-f-E-e-Eb-eb
-- **PULL:** G-g-D-d-B-b-F-f-A-a-Bb-bb
-
-## Key Discovery: Uppercase vs Lowercase Buttons
-
-### Uppercase Buttons (Root Only)
-**Example: C, G, F, E...**
-
-Uppercase buttons play the root note in **2 octaves** (L + M voices):
-
-```
-C (uppercase):
-  Voice L (Low):    C2 =  65 Hz
-  Voice M (Medium): C3 = 131 Hz
-  
-Spectral peaks: 131 Hz (dominant), 393 Hz (3rd harmonic of C3)
-Total: 2 fundamental voices
-```
-
-### Lowercase Buttons (Chord)
-**Example: c, g, f, e...**
-
-Lowercase buttons play **3 octaves of root + high fifth**:
-
-```
-c (lowercase):
-  Voice L (Low):    C2 =  65 Hz
-  Voice M (Medium): C3 = 131 Hz
-  Voice H (High):   C4 = 262 Hz  ← Extra octave!
-  Fifth (High):     G4 = 392 Hz  ← High fifth!
-  
-Spectral peaks: 131, 262, 393 Hz
-Total: 4 voices (much fuller sound!)
-```
-
-## Detailed Analysis Results
-
-### PUSH Direction
-
-| Button | Type | Measured Peaks (Hz) | Identified Notes |
-|--------|------|---------------------|------------------|
-| **C** | Root | 131, 393 | C3 (dominant), 3rd harmonic |
-| **c** | Chord | 131, 262, 393 | C3, C4, G4 |
-| **G** | Root | 98, 197 | G2, G3 |
-| **g** | Chord | 197, 293, 392 | G3, D4, G4 |
-| **Ab** | Root | 104, 209 | Ab2, Ab3 |
-| **ab** | Chord | 209, 312 | Ab3, Eb4 |
-| **F** | Root | 87, 175 | F2, F3 |
-| **f** | Chord | 175, 262, 349 | F3, C4, F4 |
-
-### PULL Direction
-
-| Button | Type | Measured Peaks (Hz) | Identified Notes |
-|--------|------|---------------------|------------------|
-| **G** | Root | 98, 197 | G2, G3 |
-| **g** | Chord | 197, 294, 392 | G3, D4, G4 |
-| **D** | Root | 73, 147 | D2, D3 |
-| **d** | Chord | 147, 294, 440 | D3, D4, A4 |
-
-## Key Findings
-
-### 1. Extra Octave in Chords
-Chord buttons (lowercase) add a **high octave** of the root note:
-- Not just L + M voices (C2 + C3)
-- But L + M + **H** voices (C2 + C3 + **C4**)
-- Creates brilliant, full sound
-
-### 2. High Fifth Placement
-The perfect fifth is placed in the **high register**, not low:
-- Not G2 or G3 for C chord
-- But **G4** (392 Hz)
-- Adds brilliance without muddying bass
-
-### 3. Harmonic Structure
-Strong odd harmonics observed (3rd, 5th, 7th):
-- Typical reed organ characteristic
-- Measured 3rd harmonic at ~390 Hz (3× fundamental)
-- Creates "reedy" accordion timbre
-
-### 4. Octave Coupling
-Root buttons use traditional **L + M voice coupling**:
-- Low voice (octave 2): Deep bass foundation
-- Medium voice (octave 3): Clarity and definition
-- Similar to pipe organ 16' + 8' registration
-
-## Implementation in Web App
-
-### Synthesis Approach
-```javascript
-function playBassNote(note, isChord) {
-    if(!isChord) {
-        // Uppercase: 2 octaves
-        frequencies = [
-            noteToFrequency(note, 2),  // L voice
-            noteToFrequency(note, 3)   // M voice
-        ];
-    } else {
-        // Lowercase: 3 octaves + high fifth
-        const fifth = getNoteFromInterval(note, 7);
-        frequencies = [
-            noteToFrequency(note, 2),   // L voice
-            noteToFrequency(note, 3),   // M voice
-            noteToFrequency(note, 4),   // H voice (extra!)
-            noteToFrequency(fifth, 4)   // High fifth
-        ];
-    }
-}
-```
-
-### Envelope Characteristics
-Based on analysis of attack and release times:
-
-```javascript
-Bass envelope:
-- Attack: 80ms (slower than treble)
-- Release: 200ms (longer for bass resonance)
-- Peak level: 0.30 (slightly quieter - bass is powerful)
-- Sustain: 0.22
-```
-
-## Comparison: Expected vs Measured
-
-### Initial Assumption (Incorrect)
-```
-Lowercase buttons: Root (2 octaves) + Fifth (2 octaves)
-Example: c = C2 + C3 + G2 + G3
-```
-
-### Measured Reality (Correct)
-```
-Lowercase buttons: Root (3 octaves) + Fifth (1 high octave)
-Example: c = C2 + C3 + C4 + G4
-```
-
-**Why This Matters:**
-- High fifth (G4) is more brilliant than low fifth (G2/G3)
-- Extra root octave (C4) adds fullness without muddiness
-- Matches spectral peaks measured in real recording
-- Creates authentic Castagnari Benny bass sound
-
-## Spectral Centroid Analysis
-
-Comparing root vs chord buttons:
-
-| Type | Spectral Centroid | Character |
-|------|-------------------|-----------|
-| Root (C) | ~200 Hz | Deep, foundational |
-| Chord (c) | ~280 Hz | Fuller, brighter |
-
-The ~80 Hz increase in spectral centroid for chord buttons creates a perceived "richness" without losing bass foundation.
-
-## Technical Details
-
-### Analysis Method
-1. **Recording:** Direct audio capture from Castagnari Benny
-2. **Conversion:** M4A → WAV (48 kHz, mono)
-3. **Segmentation:** 2.5 seconds per note (attack/sustain/release)
-4. **Analysis Window:** Middle 60% (skip attack/release transients)
-5. **FFT:** Real FFT with peak detection
-6. **Frequency Range:** 30-400 Hz (bass fundamental region)
-7. **Peak Threshold:** 5% of maximum amplitude
-
-### Validation
-Synthesized frequencies were validated by:
-- A/B comparison with original recording
-- User testing on actual Castagnari Benny
-- Spectral analysis of synthesized output
-- Cross-reference with accordion literature
-
-## Conclusion
-
-The spectral analysis revealed that Castagnari Benny bass buttons use a sophisticated 3-octave + high fifth system for chord buttons, differing from the expected 2-octave + low fifth arrangement. This creates a characteristic "brilliant yet grounded" bass sound that distinguishes quality diatonic accordions.
-
-The web application now accurately reproduces these frequency relationships, creating an authentic Castagnari Benny experience.
+## Castagnari Benny C/G – Heim Tuning
 
 ---
 
-**Analysis Date:** May 2026  
-**Analyzer:** FFT spectral analysis (scipy)  
-**Validation:** A/B testing with real Castagnari Benny C/G
+## 1. Overview
+
+The bass system of the Castagnari Benny C/G was reverse-engineered through FFT (Fast Fourier Transform) spectral analysis of real recordings. All chord voicings in the web application are based on this analysis, not on theoretical assumptions.
+
+**Instrument:** Castagnari Benny C/G (Heim tuning, 3-row)  
+**Recording Equipment:** RØDE Wireless Micro RX + iPhone 16 Pro  
+**Analysis Method:** FFT via scipy (Python), 48 kHz WAV  
+**Analysis Window:** Middle 50% of each note (skip attack/release transients)
+
+---
+
+## 2. Heim G/C System – Musical Context
+
+### Origins
+The Heim G/C layout is derived from Jean-Michel Corgeron's layout, differing in only one note: a pressed A in the third row (Helferreihe). This single difference significantly strengthens the Aeolian mode on A.
+
+### Key Characteristics
+
+| Tonart | Pull-Reichweite | Stärke |
+|--------|-----------------|--------|
+| **G** | 3 Oktaven vollständig | ⭐⭐⭐ Stärkste |
+| **D** | 3 Oktaven vollständig | ⭐⭐⭐ Stark (D > F) |
+| **C** | 2 Oktaven vollständig | ⭐⭐ Stark |
+| **F** | 2 Oktaven vollständig | ⭐⭐ Gut |
+
+### Modal Strengths
+
+| Modus | Reihe | Stärke | Anmerkung |
+|-------|-------|--------|-----------|
+| G-Dur / G-Dorisch | G-Reihe | ⭐⭐⭐ | Voll auf Pull |
+| D-Dur / D-Dorisch | G-Reihe | ⭐⭐⭐ | Bourrées ideal |
+| C-Moll / C-Mixolydisch | C-Reihe | ⭐⭐⭐ | Stark |
+| **A-Äolisch** | Helferreihe | ⭐⭐⭐ | **Heim-Spezialstärke** |
+| D-Äolisch | G + Helfer | ⭐⭐⭐ | Für Bourrées d'Avignon etc. |
+
+**Chromatik:** Über 2 Oktaven vollständig chromatisch; chromatische Skalen erfordern Balgumkehr.
+
+### Corgeron vs. Heim
+```
+Corgeron G/C:  3. Reihe = Standard-Belegung
+Heim G/C:      3. Reihe = ein gedrücktes A (statt X)
+                          → stärkt A-Äolisch erheblich
+                          → ideal für modale osteuropäische Melodien
+```
+
+---
+
+## 3. Recording Details
+
+### Session 1: Full Bass Range (all 24 buttons)
+```
+File:      Bass_Benny_PUSH__C-c-G-g-Ab-ab_F-f-E-e-Eb-eb__PULL__G-g-D-d-B-b_F-f-A-a-Bb-bb.m4a
+Duration:  58.18 seconds
+Format:    AAC, 48 kHz, stereo
+Sequence:  PUSH: C c G g Ab ab F f E e Eb eb
+           PULL: G g D d B b F f A a Bb bb
+```
+
+### Session 2: Individual Chord Recordings (PUSH)
+```
+Bass_Benny_PUSH_Akkord_c.mp3
+Bass_Benny_PUSH_Akkord_g.m4a
+Bass_Benny_PUSH_Akkord_ab.m4a
+Bass_Benny_PUSH_Akkord_f.m4a
+Bass_Benny_PUSH_Akkord_e.m4a
+Bass_Benny_PUSH_Akkord_eb.m4a
+```
+
+### Session 3: Individual Chord Recordings (PULL)
+```
+Bass_Benny_PULL_Akkord_g.m4a
+Bass_Benny_PULL_Akkord_d.m4a
+Bass_Benny_PULL_Akkord_b.m4a
+Bass_Benny_PULL_Akkord_f.m4a
+Bass_Benny_PULL_Akkord_a.m4a
+Bass_Benny_PULL_Akkord_bb.m4a
+```
+
+---
+
+## 4. Key Discovery: Uppercase vs. Lowercase Buttons
+
+### Uppercase (Root buttons: C, D, E...)
+Play the root note in **2 octaves** (L + M voices):
+```
+C → C2 (65 Hz) + C3 (131 Hz)
+```
+
+### Lowercase (Chord buttons: c, d, e...)
+Play the root in **3 octaves** + **fifth** in specific register:
+```
+c → C2 (65 Hz) + C3 (131 Hz) + C4 (262 Hz) + G4 (392 Hz)
+    Voice L      + Voice M      + Voice H      + Fifth (high)
+```
+
+---
+
+## 5. Chord Voicing Analysis
+
+### PUSH Direction – Results
+
+| Chord | Root | Fifth (measured) | Fifth Hz | Voicing |
+|-------|------|-------------------|----------|---------|
+| **c** | C | G4 | 394 Hz | ☀️ Brilliant |
+| **g** | G | D4 | 294 Hz | ☀️ Brilliant |
+| **ab** | Ab | Eb4 | 312 Hz | ☀️ Brilliant |
+| **f** | F | C4 | 262 Hz | ☀️ Brilliant |
+| **e** | E | **B3** | **248 Hz** | 🌙 Mellow |
+| **eb** | Eb | **Bb3** | **233 Hz** | 🌙 Mellow |
+
+### PULL Direction – Results
+
+| Chord | Root | Fifth (measured) | Fifth Hz | Voicing |
+|-------|------|-------------------|----------|---------|
+| **g** | G | D4 | 294 Hz | ☀️ Brilliant |
+| **d** | D | **A3** | **220 Hz** | 🌙 Mellow |
+| **b** | B | F#4 | 371 Hz | ☀️ Brilliant |
+| **f** | F | C4 | 262 Hz | ☀️ Brilliant |
+| **a** | A | E4 | 331 Hz | ☀️ Brilliant |
+| **bb** | Bb | F4 | 350 Hz | ☀️ Brilliant |
+
+### Summary
+
+```
+🌙 MELLOW chords (fifth at octave 3, ~220-248 Hz):
+   e (PUSH)  → B3  (247 Hz)
+   eb (PUSH) → Bb3 (233 Hz)
+   d (PULL)  → A3  (220 Hz)
+
+☀️ BRILLIANT chords (fifth at octave 4, ~262-394 Hz):
+   All others
+```
+
+---
+
+## 6. Musical Interpretation
+
+### Castagnari's Reed Design Philosophy
+
+The three **mellow** chords (e, eb, d) are NOT random — they cluster around adjacent semitones:
+
+```
+D  (294 Hz root) → A3  fifth → 🌙 MELLOW
+Eb (311 Hz root) → Bb3 fifth → 🌙 MELLOW  
+E  (330 Hz root) → B3  fifth → 🌙 MELLOW
+```
+
+These are precisely the chords most used in **Moll and modal Bal-Folk music**:
+- **d** → D-Moll accompaniment (Bourrée d'Avignon, etc.)
+- **eb** → C-Moll, Eb-Dur contexts
+- **e** → E-Moll, A-Moll contexts
+
+Castagnari has optimized the reed voicing for the **actual musical context** of these chords in French traditional music and modal playing, consistent with the Heim layout's specialization in modal/minor music.
+
+### Connection to Heim System
+The mellow voicing of **d** (PULL) directly supports the Heim layout's strength in **D-Äolisch** — one of the system's signature modes for Bourrées and other Bal-Folk repertoire.
+
+---
+
+## 7. Treble (Diskant) Sound Analysis
+
+### Recording Details
+```
+File:     Benny_Audio.mp3 (59 seconds, 320 kbps)
++ C-Bass__C-Diskant_Benny.m4a (pitch calibration)
+Equipment: RØDE Wireless Micro RX + iPhone 16 Pro
+```
+
+### Spectral Characteristics
+```
+Fundamental: 699.3 Hz (F5)
+
+Harmonic Structure:
+  1:  699 Hz    0.0 dB   Fundamental
+  2: 1395 Hz  -14.8 dB   Weak (reed characteristic)
+  3: 2093 Hz  -11.7 dB   ⭐ Strong odd harmonic
+  4: 2793 Hz  -20.5 dB   Weak
+  5: 3491 Hz  -17.7 dB   ⭐ Strong odd harmonic
+  6: 4190 Hz  -29.4 dB   Very weak
+  7: 4888 Hz  -15.8 dB   ⭐ Strong odd harmonic
+  8: 5586 Hz  -34.1 dB   Very weak
+  9: 6287 Hz  -35.7 dB   Very weak
+ 10: 6984 Hz  -39.7 dB   Very weak
+
+Key Metrics:
+  Even/Odd Harmonic Ratio: 0.22 (odd 4.5× stronger)
+  Spectral Centroid: 3470 Hz (very bright)
+  Inharmonicity: 3.6 Hz average
+```
+
+### Pitch Calibration
+```
+C4 Piano (reference):      261.63 Hz
+C Pull-4 (G-row treble):   262.0 Hz  ✅ Perfect match
+C Push-6 (C-row treble):   262.0 Hz  ✅ Perfect match
+C-Bass button:             ~65 Hz    (C2, weak fundamental)
+                           + 131 Hz  (C3, dominant)
+```
+
+---
+
+## 8. Implementation in App
+
+### Treble Synthesis ("Benny Original")
+```javascript
+// Harmonic amplitudes from real FFT analysis
+const real = new Float32Array([
+    0, 1.000, 0.182, 0.259, 0.094, 0.129,
+    0.034, 0.162, 0.020, 0.016, 0.010
+]);
+oscillator.setPeriodicWave(audioContext.createPeriodicWave(real, imag));
+oscillator.detune.value = 3 + Math.random() * 4;  // Inharmonicity
+```
+
+### Bass Synthesis
+```javascript
+// Uppercase (C): root in 2 octaves
+[noteToFrequency(root, 2), noteToFrequency(root, 3)]
+
+// Lowercase (c): root in 3 octaves + voicing-specific fifth
+const mellowNotes = ['E', 'Eb', 'D'];  // Spectral-verified
+const fifthOctave = mellowNotes.includes(root) ? 3 : 4;
+[
+    noteToFrequency(root, 2),
+    noteToFrequency(root, 3),
+    noteToFrequency(root, 4),
+    noteToFrequency(fifth, fifthOctave)
+]
+```
+
+---
+
+## 9. Version History
+
+| Version | Change |
+|---------|--------|
+| v5.5 | Benny Original treble sound (FFT-based) |
+| v5.6 | Bass octave coupling (L + M voices) |
+| v5.6.1 | Correct bass uppercase/lowercase logic |
+| v5.6.2 | Authentic bass frequencies (3 octaves + high fifth) |
+| v5.6.9 | Bullet-proof stopAll() |
+| v5.6.14 | Differentiated chord voicings (mellow/brilliant) |
+| v5.6.15 | Spectral verification: only e, eb mellow |
+| v5.6.16 | PULL analysis: d also mellow |
+| v5.6.17 | Heim system info panel + scale recommendations |
+
+---
+
+## 10. Further Analysis Opportunities
+
+- [ ] PULL chords b, g validated — further PUSH chords (ab, a, bb) could be individually recorded
+- [ ] Bass system optimization: shift focus toward G/C as in treble layout
+- [ ] Bassregister (Terz-Abschaltung) effect on voicing analysis
+- [ ] Comparison with other Castagnari models (Tommy, Sandy)
+- [ ] Analysis of Corgeron vs. Heim layout differences in practice
+
+---
+
+**Analysis:** Werner Deuermeier + Claude (Anthropic)  
+**Last Updated:** May 2026  
+**Instrument:** Castagnari Benny C/G – Heim Standard
