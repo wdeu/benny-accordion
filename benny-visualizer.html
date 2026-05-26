@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.6.17</title>
+<title>Castagnari Benny Accordion v5.7.0</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -362,7 +362,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.17</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.0</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -564,6 +564,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
         <div class="heim-section">
             <h3>Bass-System</h3>
             <div class="heim-row">Erweitertes System hauptsächlich mit Vorzeichen. Profitiert stark von einem Bassregister (Terz abschaltbar für modale Begleitung).</div>
+            <div class="heim-row"><span class="tag g">Notation</span> <strong>Großbuchstabe</strong> (C, G, F…) = Akkord · <strong>Kleinbuchstabe</strong> (c, g, f…) = Einzelton</div>
             <div class="heim-row"><span class="tag a">Hinweis</span> Bass-Layout auf G/C-Fokus optimierbar – analog zum Diskant-Layout.</div>
         </div>
 
@@ -583,7 +584,8 @@ let loopTimeout = null;
 let isPlaying = false;
 
 function playChord(frequencies, duration, toneType) {
-    // Treble buttons play at octave 4 (C4 = 261.63 Hz)
+    // Treble buttons play at octave 4 (c4 = 261.63 Hz)
+    // Bass buttons: UPPERCASE (C) = Akkord, lowercase (c) = Einzelton
     // Bass buttons use playBassNote() with octave coupling (C2 + C3)
     stopAll();
     isPlaying = true;
@@ -900,7 +902,7 @@ function playBassNote(note, isChord, duration = 2.0) {
         // Some are "brilliant" (high fifth), some are "mellow" (low fifth)
         
         // Notes that sound MELLOW on real Benny (softer fifth in low octave):
-        const mellowNotes = ['E', 'Eb', 'D'];  // Spectral analysis: PUSH e,eb + PULL d
+        const mellowNotes = ['E', 'Eb', 'D'];  // Spectral analysis: PUSH E,Eb + PULL D (Groß=Akkord)
         const isMellow = mellowNotes.includes(root);
         
         // Root in 3 octaves (L + M + H) - consistent for all chords
@@ -1018,19 +1020,19 @@ function createBennyWave(audioContext) {
 const layout = {
     pull: {
         treble: {
-            Heim: ['C# 10','Bb 9','G# 8','G 7','C# 6','Bb 5','G# 4','G 3','C# 2','Bb 1'],
-            C:    ['D 11','B 10','A 9','F 8','D 7','B 6','A 5','F 4','D 3','B 2','G 1'],
-            G:    ['C 12','A 11','F# 10','E 9','C 8','A 7','F# 6','E 5','C 4','A 3','F# 2','E 1']
+            Heim: ['c# 10','bb 9','g# 8','g 7','c# 6','bb 5','g# 4','g 3','c# 2','bb 1'],
+            C:    ['d 11','b 10','a 9','f 8','d 7','b 6','a 5','f 4','d 3','b 2','g 1'],
+            G:    ['c 12','a 11','f# 10','e 9','c 8','a 7','f# 6','e 5','c 4','a 3','f# 2','e 1']
         },
-        bass: { col1:['G','g','D','d','B','b'], col2:['F','f','A','a','Bb','bb'] }
+        bass: { col1:['g','G','d','D','b','B'], col2:['f','F','a','A','bb','Bb'] }
     },
     push: {
         treble: {
-            Heim: ['G# 10','Eb 9','A 8','G# 7','Eb 6','A 5','G# 4','Eb 3','A 2','G# 1'],
-            C:    ['G 11','E 10','C 9','G 8','E 7','C 6','G 5','E 4','C 3','G 2','E 1'],
-            G:    ['G 12','D 11','B 10','G 9','D 8','B 7','G 6','D 5','B 4','G 3','D 2','B 1']
+            Heim: ['g# 10','eb 9','a 8','g# 7','eb 6','a 5','g# 4','eb 3','a 2','g# 1'],
+            C:    ['g 11','e 10','c 9','g 8','e 7','c 6','g 5','e 4','c 3','g 2','e 1'],
+            G:    ['g 12','d 11','b 10','g 9','d 8','b 7','g 6','d 5','b 4','g 3','d 2','b 1']
         },
-        bass: { col1:['C','c','G','g','Ab','ab'], col2:['F','f','E','e','Eb','eb'] }
+        bass: { col1:['c','C','g','G','ab','Ab'], col2:['f','F','e','E','eb','Eb'] }
     }
 };
 
@@ -1062,7 +1064,7 @@ function noteDisplay(s) {
         .replace(/([A-Ga-g])#/g, '$1♯');  // Sharp: 'C#'→'C♯'
 }
 function bassToRoot(s){ 
-    // Handle both uppercase and lowercase, preserving flats/sharps
+    // Always return uppercase root (C, G, Ab...) for internal audio/theory logic
     const m=s.match(/^([A-Ga-g][b#]?)/i); 
     if(m) {
         // Capitalize first letter, keep flat/sharp
@@ -1142,7 +1144,10 @@ function renderBass() {
         layout[dir].bass[col].forEach(note => {
             const btn = document.createElement('div');
             btn.className = 'bass-button';
-            if(note !== note.toUpperCase()) btn.classList.add('is-chord');
+            // Groß = Akkord, Klein = Einzelton (international standard)
+            const noteFirstChar = note.charAt(0);
+            const noteIsUpper = (noteFirstChar === noteFirstChar.toUpperCase() && noteFirstChar !== noteFirstChar.toLowerCase());
+            if(noteIsUpper) btn.classList.add('is-chord');
             btn.dataset.note = note;
             btn.textContent  = noteDisplay(note);
             btn.addEventListener('click', ()=> onBassClick(note));
@@ -1237,12 +1242,15 @@ function applyStyles() {
 
 function onBassClick(note) {
     const root = bassToRoot(note);
-    // Check FIRST character only - this correctly handles flats (Ab vs ab)
+    // International standard: Groß (C, G, Ab...) = Akkord, Klein (c, g, ab...) = Einzelton
     const firstChar = note.charAt(0);
     const isUpper = (firstChar === firstChar.toUpperCase() && firstChar !== firstChar.toLowerCase());
-    const isChord = !isUpper;  // Lowercase first char = chord (root + fifth)
+    const isChord = isUpper;   // UPPERCASE = chord, lowercase = single note
     
-    chordType = isUpper ? '' : 'm';
+    // Groß (Akkord) → zeige Dur-Triade im Diskant
+    // Klein (Einzelton) → zeige nur Grundton im Diskant (leere Formel)
+    chordType = isUpper ? '' : null;
+    if(!isUpper) scaleType = null;
     scaleType = null;
     
     // Update state and visuals WITHOUT auto-playing the treble chord
