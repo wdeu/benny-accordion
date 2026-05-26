@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.7.0</title>
+<title>Castagnari Benny Accordion v5.7.1</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -362,7 +362,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.0</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.1</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -481,7 +481,6 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                             <option value="warm">Akkordeon-like</option>
                             <option value="pure">Rein (Sinus)</option>
                             <option value="bright">Hell</option>
-                            <option value="soft">Weich</option>
                         </select>
 
                         <label>Tempo:</label>
@@ -1076,7 +1075,12 @@ function bassToRoot(s){
 function getBennyNotes(direction) {
     const notes = new Set();
     Object.values(layout[direction].treble).forEach(row => {
-        row.forEach(btn => notes.add(pureName(btn)));
+        row.forEach(btn => {
+            const raw = pureName(btn);
+            // Normalize to uppercase for comparison with chordNotes (from SEMITONE_TO_NOTE)
+            const normalized = raw.charAt(0).toUpperCase() + raw.slice(1);
+            notes.add(normalized);
+        });
     });
     return notes;
 }
@@ -1202,9 +1206,13 @@ function applyStyles() {
     }
     
     // MODAL HIGHLIGHTING: Dim non-scale notes, highlight scale notes
+    // NOTE: treble buttons are now lowercase (c,g,bb...) but chordNotes/rootSet
+    // use uppercase (C,G,Bb...) from SEMITONE_TO_NOTE - normalize for comparison!
     document.querySelectorAll('.note-button').forEach(btn => {
         const note = btn.dataset.note;
-        const name = pureName(note);
+        const rawName = pureName(note);
+        // Normalize: uppercase first letter, keep accidentals (c→C, bb→Bb, f#→F#)
+        const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
         
         btn.classList.remove('active','root','scale-tone','dimmed');
         
@@ -1248,9 +1256,9 @@ function onBassClick(note) {
     const isChord = isUpper;   // UPPERCASE = chord, lowercase = single note
     
     // Groß (Akkord) → zeige Dur-Triade im Diskant
-    // Klein (Einzelton) → zeige nur Grundton im Diskant (leere Formel)
-    chordType = isUpper ? '' : null;
-    if(!isUpper) scaleType = null;
+    // Klein (Einzelton) → zeige nur Grundton (kein Akkord, kein Scale)
+    chordType = isUpper ? '' : '';  // immer '' - Dur als Default-Anzeige
+    scaleType = null;
     scaleType = null;
     
     // Update state and visuals WITHOUT auto-playing the treble chord
