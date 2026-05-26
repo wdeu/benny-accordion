@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.6.13</title>
+<title>Castagnari Benny Accordion v5.6.14</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -329,7 +329,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.13</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.14</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -807,17 +807,28 @@ function playBassNote(note, isChord, duration = 2.0) {
         frequencies.push(noteToFrequency(root, 3));  // C3 (131 Hz)
         
     } else {
-        // Lowercase (c, d, e...): Root in 3 octaves + High Fifth
-        // Analysis showed: extra octave + fifth in HIGH register!
+        // Lowercase (c, d, e...): Authentic chord voicing per note
+        // Castagnari Benny uses different reed configurations per chord
+        // Some are "brilliant" (high fifth), some are "mellow" (low fifth)
         
-        // Root in 3 octaves (L + M + H)
-        frequencies.push(noteToFrequency(root, 2));  // C2 (65 Hz)  - Low voice
-        frequencies.push(noteToFrequency(root, 3));  // C3 (131 Hz) - Medium voice
-        frequencies.push(noteToFrequency(root, 4));  // C4 (262 Hz) - High octave!
+        // Notes that sound MELLOW on real Benny (softer fifth in low octave):
+        const mellowNotes = ['E', 'Eb', 'G', 'D', 'B'];
+        const isMellow = mellowNotes.includes(root);
         
-        // Fifth in HIGH register (not low!)
+        // Root in 3 octaves (L + M + H) - consistent for all chords
+        frequencies.push(noteToFrequency(root, 2));  // Low voice
+        frequencies.push(noteToFrequency(root, 3));  // Medium voice
+        frequencies.push(noteToFrequency(root, 4));  // High octave
+        
+        // Fifth: high (G4) for brilliant, low (G3) for mellow chords
         const fifth = getNoteFromInterval(root, 7);
-        frequencies.push(noteToFrequency(fifth, 4)); // G4 (392 Hz) - High fifth!
+        if(isMellow) {
+            // Mellow voicing: fifth one octave lower
+            frequencies.push(noteToFrequency(fifth, 3));
+        } else {
+            // Brilliant voicing: fifth in high register
+            frequencies.push(noteToFrequency(fifth, 4));
+        }
     }
     
     frequencies.forEach((freq, idx) => {
