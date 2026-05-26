@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.7.3</title>
+<title>Castagnari Benny Accordion v5.7.4</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -359,7 +359,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.3</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.4</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -499,7 +499,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
                 <!-- LEGEND inside jam-column -->
                 <div class="legend">
                     <!-- Legend title row with toggle -->
-                    <div class="legend-header" onclick="toggleHeimInfo()" title="Heim G/C Systeminfo anzeigen">
+                    <div class="legend-header" id="legendHeader" title="Heim G/C Systeminfo anzeigen">
                         <div class="lg-title">Legende</div>
                         <button class="legend-toggle-btn" id="legendToggleBtn">Heim-Info ▸</button>
                     </div>
@@ -1341,6 +1341,18 @@ document.querySelectorAll('.bellows-btn').forEach(btn => {
 });
 
 document.getElementById('styleToggle').addEventListener('click', toggleBellowsStyle);
+
+// ── HEIM INFO IN LEGEND ──
+function toggleHeimInfo() {
+    const expand = document.getElementById('heimExpand');
+    const btn = document.getElementById('legendToggleBtn');
+    if (!expand || !btn) return;
+    const isOpen = expand.classList.contains('open');
+    expand.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+    btn.textContent = isOpen ? 'Heim-Info ▸' : 'Heim-Info ▾';
+}
+document.getElementById('legendHeader').addEventListener('click', toggleHeimInfo);
 
 document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
     btn.addEventListener('click', ()=>{
