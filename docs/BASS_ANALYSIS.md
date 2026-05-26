@@ -85,16 +85,23 @@ Bass_Benny_PULL_Akkord_bb.m4a
 
 ## 4. Key Discovery: Uppercase vs. Lowercase Buttons
 
-### Uppercase (Root buttons: C, D, E...)
+### Notation Convention (International Standard, since v5.7.0)
+```
+UPPERCASE (C, G, Ab...) = Akkord (chord)
+lowercase (c, g, ab...) = Einzelton (single note)
+```
+This follows international music notation where uppercase = chord/major, lowercase = single note.
+
+### Lowercase (Einzelton / single note: c, d, e...)
 Play the root note in **2 octaves** (L + M voices):
 ```
-C → C2 (65 Hz) + C3 (131 Hz)
+c → C2 (65 Hz) + C3 (131 Hz)
 ```
 
-### Lowercase (Chord buttons: c, d, e...)
+### Uppercase (Akkord / chord: C, D, E...)
 Play the root in **3 octaves** + **fifth** in specific register:
 ```
-c → C2 (65 Hz) + C3 (131 Hz) + C4 (262 Hz) + G4 (392 Hz)
+C → C2 (65 Hz) + C3 (131 Hz) + C4 (262 Hz) + G4 (392 Hz)
     Voice L      + Voice M      + Voice H      + Fifth (high)
 ```
 
@@ -219,11 +226,12 @@ oscillator.detune.value = 3 + Math.random() * 4;  // Inharmonicity
 
 ### Bass Synthesis
 ```javascript
-// Uppercase (C): root in 2 octaves
+// lowercase (c, g, ab...): Einzelton – root in 2 octaves
 [noteToFrequency(root, 2), noteToFrequency(root, 3)]
 
-// Lowercase (c): root in 3 octaves + voicing-specific fifth
-const mellowNotes = ['E', 'Eb', 'D'];  // Spectral-verified
+// UPPERCASE (C, G, Ab...): Akkord – root in 3 octaves + voicing-specific fifth
+// International notation: UPPERCASE = chord, lowercase = single note
+const mellowNotes = ['E', 'Eb', 'D'];  // Spectral-verified mellow chords
 const fifthOctave = mellowNotes.includes(root) ? 3 : 4;
 [
     noteToFrequency(root, 2),
@@ -248,6 +256,7 @@ const fifthOctave = mellowNotes.includes(root) ? 3 : 4;
 | v5.6.15 | Spectral verification: only e, eb mellow |
 | v5.6.16 | PULL analysis: d also mellow |
 | v5.6.17 | Heim system info panel + scale recommendations |
+| v5.7.0  | Label inversion: UPPERCASE=Akkord, lowercase=Einzelton (international standard) |
 
 ---
 
