@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.6.15</title>
+<title>Castagnari Benny Accordion v5.6.16</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -329,7 +329,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.15</span></h1>
+    <h1><img src="assets/icon-192x192.png" alt="" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.6.16</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -812,7 +812,7 @@ function playBassNote(note, isChord, duration = 2.0) {
         // Some are "brilliant" (high fifth), some are "mellow" (low fifth)
         
         // Notes that sound MELLOW on real Benny (softer fifth in low octave):
-        const mellowNotes = ['E', 'Eb'];  // Verified by spectral analysis
+        const mellowNotes = ['E', 'Eb', 'D'];  // Spectral analysis: PUSH e,eb + PULL d
         const isMellow = mellowNotes.includes(root);
         
         // Root in 3 octaves (L + M + H) - consistent for all chords
