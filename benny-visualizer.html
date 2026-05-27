@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.1</title>
+<title>Castagnari Benny Accordion v5.8.2</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -96,12 +96,12 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 /* ──────────── BELLOWS TRAPEZOID SWITCH ──────────── */
 .bellows-container { padding:8px 12px; position:relative; }
 .bellows-container .bellows-switch:not(.minimal) { border-radius:12px; }
-.bellows-switch { display:flex; justify-content:center; align-items:center; gap:20px; 
-    height:80px; position:relative; }
+.bellows-switch { display:flex; justify-content:center; align-items:center; gap:6px; 
+    height:72px; position:relative; overflow:hidden; }
 
 .bellows-bottom { margin-top:16px; padding-top:16px; border-top:1px solid var(--sep); }
 
-.bellows-btn { position:relative; width:140px; height:70px; cursor:pointer; 
+.bellows-btn { position:relative; width:120px; height:68px; cursor:pointer; 
     border:none; background:transparent; display:flex; align-items:center; justify-content:center;
     font-size:0.85em; font-weight:600; color:var(--txt2); transition:.2s; }
 
@@ -269,7 +269,11 @@ body.playalong-mode .legend { display: none !important; }
 body.playalong-mode .lay-title { display: none !important; }
 body.playalong-mode header { display: none !important; }
 body.playalong-mode .bass-column .sec-hdr { display: none !important; }
-body.playalong-mode .bass-column { min-width: 160px; }
+body.playalong-mode .bass-column { min-width: 130px; max-width: 160px; }
+body.playalong-mode .bass-section { gap: 6px !important; }
+body.playalong-mode .bass-col { gap: 5px !important; }
+body.playalong-mode .bass-button { width: 46px !important; height: 46px !important;
+    font-size: 0.8em !important; }
 body.playalong-mode .treble-column .section {
     border: none !important; background: transparent !important;
 }
@@ -295,6 +299,43 @@ body.playalong-mode .bellows-container { display: block !important; }
 body.playalong-mode .playalong-btn {
     background: var(--accent); color: #fff; border-color: var(--accent);
 }
+
+/* ──────────── TREBLE TAP ZONES ──────────── */
+.treble-tap-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    width: 100%;
+}
+.treble-tap-zone {
+    flex: 1;
+    min-height: 200px;
+    cursor: pointer;
+    /* Invisible but tappable */
+    background: transparent;
+    border-radius: 8px;
+    transition: background 0.15s;
+    /* Visual hint on hover */
+    position: relative;
+}
+.treble-tap-zone::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+.pull-zone::after { content: '◄'; color: var(--txt3); font-size: 1.2em;
+    display: flex; align-items: center; justify-content: center; }
+.push-zone::after { content: '►'; color: var(--txt3); font-size: 1.2em;
+    display: flex; align-items: center; justify-content: center; }
+.treble-tap-zone:hover::after { opacity: 0.3; }
+.treble-tap-zone:active { background: rgba(10,132,255,0.05); }
 
 /* ──────────── TREBLE PLAYING STATE ──────────── */
 .note-button.playing {
@@ -413,7 +454,7 @@ body.playalong-mode .playalong-btn {
     .bass-container { gap:14px; }
     .root-grid { gap:4px; }
     .root-btn { min-width:34px; height:30px; font-size:0.78em; }
-    .bellows-btn { width:120px; height:60px; font-size:0.8em; }
+    .bellows-btn { width:100px; height:56px; font-size:0.8em; }
 }
 </style>
 </head>
@@ -421,7 +462,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.1</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.2</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -483,7 +524,12 @@ body.playalong-mode .playalong-btn {
         <div class="section" style="position:relative;">
             <div class="treble-push-indicator" id="treblePushIndicator"></div>
             <div class="lay-title">Diskant – <span id="trebleDir">Push (Drücken)</span> – Sicht von oben</div>
-            <div class="treble-side" id="treble-container"></div>
+            <!-- Tap zone wrapper: left=PULL, center=buttons, right=PUSH -->
+            <div class="treble-tap-wrapper">
+                <div class="treble-tap-zone pull-zone" id="pullZone" title="Pull (Ziehen)"></div>
+                <div class="treble-side" id="treble-container"></div>
+                <div class="treble-tap-zone push-zone" id="pushZone" title="Push (Drücken)"></div>
+            </div>
         </div>
     </div>
 
@@ -1576,6 +1622,20 @@ function toggleHeimInfo() {
     btn.textContent = isOpen ? 'Heim-Info ▸' : 'Heim-Info ▾';
 }
 document.getElementById('legendHeader').addEventListener('click', toggleHeimInfo);
+
+// ── TREBLE TAP ZONES: Left=PULL, Right=PUSH ──
+['pullZone', 'pushZone'].forEach(id => {
+    const zone = document.getElementById(id);
+    if (!zone) return;
+    const direction = id === 'pullZone' ? 'pull' : 'push';
+    
+    const activate = (e) => {
+        e.preventDefault();
+        switchDir(direction);
+    };
+    zone.addEventListener('click', activate);
+    zone.addEventListener('touchend', activate, { passive: false });
+});
 
 // ── PLAY-ALONG MODE ──
 let playAlongActive = false;
