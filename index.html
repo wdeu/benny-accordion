@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.2</title>
+<title>Castagnari Benny Accordion v5.8.3</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -462,7 +462,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.2</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.3</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -773,11 +773,32 @@ function playScale(notes, tempo = 0.5) {
     
     const loopEnabled = document.getElementById('loopMode').checked;
     
+    // Build ascending frequency sequence starting from a musical octave
+    // Rules: start root around octave 3, each note must be >= previous
+    const NOTE_SEMI_MAP = {'C':0,'C#':1,'D':2,'Eb':3,'E':4,'F':5,'F#':6,'G':7,'G#':8,'Ab':8,'A':9,'Bb':10,'B':11};
+    function noteFreqAscending(noteName, minFreq) {
+        const semi = NOTE_SEMI_MAP[noteName] !== undefined ? NOTE_SEMI_MAP[noteName] : 0;
+        // Find the octave that gives a frequency just above minFreq
+        for (let oct = 2; oct <= 6; oct++) {
+            const f = noteToFrequency(noteName, oct);
+            if (f >= minFreq) return f;
+        }
+        return noteToFrequency(noteName, 5);
+    }
+    
+    // Build ascending sequence: root starts at octave 3, each next note >= prev
+    let prevFreq = noteToFrequency(notes[0], 3) * 0.99; // start just below root
+    const ascendingFreqs = notes.map(note => {
+        const f = noteFreqAscending(note, prevFreq);
+        prevFreq = f;
+        return f;
+    });
+
     notes.forEach((note, idx) => {
         setTimeout(() => {
             if(!isPlaying) return;
             
-            const freq = noteToFrequency(note, 4);
+            const freq = ascendingFreqs[idx];
             const tone = document.getElementById('toneType').value;
             const noteDuration = tempo * 0.8;
             
@@ -1557,16 +1578,21 @@ function playCurrentChord() {
     if(scaleType) {
         // Sort scale notes ascending from root note
         const rootSemitone = NOTE_TO_SEMITONE[chordRoot];
+        // Sort by distance from root (ascending scale order)
         const sortedNotes = [...chordNotes].sort((a, b) => {
             const aSemi = NOTE_TO_SEMITONE[a];
             const bSemi = NOTE_TO_SEMITONE[b];
-            // Calculate distance from root (0-11)
             const aDist = (aSemi - rootSemitone + 12) % 12;
             const bDist = (bSemi - rootSemitone + 12) % 12;
             return aDist - bDist;
         });
+        // Ensure root is first
+        const rootName = SEMITONE_TO_NOTE[rootSemitone % 12];
+        const withRoot = sortedNotes.includes(rootName)
+            ? sortedNotes
+            : [rootName, ...sortedNotes];
         const tempo = parseFloat(document.getElementById('arpeggioTempo').value);
-        playScale(sortedNotes, tempo);
+        playScale(withRoot, tempo);
     } else {
         const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
         const duration = 2.0;
@@ -1667,16 +1693,23 @@ document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
 
 document.querySelectorAll('.chip[data-scale]').forEach(btn => {
     btn.addEventListener('click', ()=>{
+        // ALWAYS stop playback first - prevents scale-switching kakophonie!
+        stopAll();
+        
         const was = btn.classList.contains('active');
         document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
         scaleType = was ? null : btn.dataset.scale;
         if(!was) btn.classList.add('active');
         if(scaleType) document.querySelectorAll('.chip[data-ctype]').forEach(b => b.classList.remove('active'));
+        updateScaleHint(scaleType, chordRoot);
         if(chordRoot) {
             applyStyles();
-            if(document.getElementById('autoPlay').checked) {
-                playCurrentChord();
-            }
+            // Small delay after stopAll to ensure clean start
+            setTimeout(() => {
+                if(scaleType && document.getElementById('autoPlay').checked) {
+                    playCurrentChord();
+                }
+            }, 60);
         }
     });
 });
