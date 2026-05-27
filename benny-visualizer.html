@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.3</title>
+<title>Castagnari Benny Accordion v5.8.4</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -94,7 +94,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; justify-content:space-between; }
 
 /* ──────────── BELLOWS TRAPEZOID SWITCH ──────────── */
-.bellows-container { padding:8px 12px; position:relative; }
+.bellows-container { padding:8px 8px; position:relative; }
 .bellows-container .bellows-switch:not(.minimal) { border-radius:12px; }
 .bellows-switch { display:flex; justify-content:center; align-items:center; gap:6px; 
     height:72px; position:relative; overflow:hidden; }
@@ -269,11 +269,23 @@ body.playalong-mode .legend { display: none !important; }
 body.playalong-mode .lay-title { display: none !important; }
 body.playalong-mode header { display: none !important; }
 body.playalong-mode .bass-column .sec-hdr { display: none !important; }
-body.playalong-mode .bass-column { min-width: 130px; max-width: 160px; }
-body.playalong-mode .bass-section { gap: 6px !important; }
-body.playalong-mode .bass-col { gap: 5px !important; }
-body.playalong-mode .bass-button { width: 46px !important; height: 46px !important;
-    font-size: 0.8em !important; }
+body.playalong-mode .bass-col-label { display: none !important; }
+body.playalong-mode .lay-title { font-size: 0.65em !important; padding: 4px 8px !important; }
+body.playalong-mode .bass-column {
+    /* Center the bass section, don't push left */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+body.playalong-mode .section {
+    /* Ensure bass section fits its content */
+    width: auto !important;
+    min-width: 0 !important;
+}
+body.playalong-mode .bass-container {
+    gap: 6px !important;
+    justify-content: center !important;
+}
 body.playalong-mode .treble-column .section {
     border: none !important; background: transparent !important;
 }
@@ -361,8 +373,10 @@ body.playalong-mode .playalong-btn {
 }
 
 /* ──────────── BASS-TASTE ──────────── */
-.bass-container { display:flex; gap:20px; justify-content:center; margin-top:4px; }
-.bass-column { display:flex; flex-direction:column; gap:4px; align-items:center; }
+.bass-container { display:flex; gap:8px; justify-content:center; margin-top:4px;
+    width:100%; box-sizing:border-box; }
+.bass-column { display:flex; flex-direction:column; gap:4px; align-items:center;
+    flex-shrink:0; }
 .bass-col-label { font-size:0.66em; color:var(--txt3); font-weight:600;
     letter-spacing:0.7px; margin-bottom:2px; }
 
@@ -451,7 +465,7 @@ body.playalong-mode .playalong-btn {
     .note-button .note-name { font-size:0.9em; }
     .bass-button { width:46px; height:46px; font-size:0.80em; }
     .treble-side { gap:5px; }
-    .bass-container { gap:14px; }
+    .bass-container { gap:6px; }
     .root-grid { gap:4px; }
     .root-btn { min-width:34px; height:30px; font-size:0.78em; }
     .bellows-btn { width:100px; height:56px; font-size:0.8em; }
@@ -462,7 +476,12 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.3</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.4</span></h1>
+        <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="de">DE</button>
+            <button class="lang-btn" data-lang="it" title="Coming soon">IT</button>
+        </div>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -472,7 +491,7 @@ body.playalong-mode .playalong-btn {
         <div class="section">
             <div class="sec-hdr">
                 Balgrichtung
-                <button class="style-toggle" id="styleToggle" title="Darstellung umschalten">⚙️</button>
+                <button class="style-toggle" id="styleToggle" title="Toggle display">⚙️</button>
             </div>
             <div class="bellows-container">
                 <div class="bellows-switch" id="bellowsSwitch">
@@ -523,12 +542,12 @@ body.playalong-mode .playalong-btn {
     <div class="treble-column">
         <div class="section" style="position:relative;">
             <div class="treble-push-indicator" id="treblePushIndicator"></div>
-            <div class="lay-title">Diskant – <span id="trebleDir">Push (Drücken)</span> – Sicht von oben</div>
+            <div class="lay-title">Diskant – <span id="trebleDir">Push</span> – Sicht von oben</div>
             <!-- Tap zone wrapper: left=PULL, center=buttons, right=PUSH -->
             <div class="treble-tap-wrapper">
-                <div class="treble-tap-zone pull-zone" id="pullZone" title="Pull (Ziehen)"></div>
+                <div class="treble-tap-zone pull-zone" id="pullZone" title="Pull"></div>
                 <div class="treble-side" id="treble-container"></div>
-                <div class="treble-tap-zone push-zone" id="pushZone" title="Push (Drücken)"></div>
+                <div class="treble-tap-zone push-zone" id="pushZone" title="Push"></div>
             </div>
         </div>
     </div>
@@ -558,12 +577,12 @@ body.playalong-mode .playalong-btn {
 
                 <div class="cp-label">Modale Skalen</div>
                 <div class="chip-row" id="scaleRow">
-                    <button class="chip" data-scale="ionian">Ionisch (Dur)</button>
-                    <button class="chip" data-scale="dorian">Dorisch</button>
-                    <button class="chip" data-scale="phrygian">Phrygisch</button>
-                    <button class="chip" data-scale="lydian">Lydisch</button>
-                    <button class="chip" data-scale="mixolydian">Mixolydisch</button>
-                    <button class="chip" data-scale="aeolian">Äolisch (Moll)</button>
+                    <button class="chip" data-scale="ionian">Ionian (Major)</button>
+                    <button class="chip" data-scale="dorian">Dorian</button>
+                    <button class="chip" data-scale="phrygian">Phrygian</button>
+                    <button class="chip" data-scale="lydian">Lydian</button>
+                    <button class="chip" data-scale="mixolydian">Mixolydian</button>
+                    <button class="chip" data-scale="aeolian">Aeolian (Minor)</button>
                 </div>
 
                 <!-- SCALE RECOMMENDATION -->
@@ -579,12 +598,12 @@ body.playalong-mode .playalong-btn {
                     </div>
                     
                     <div class="audio-controls">
-                        <label>Klang:</label>
+                        <label>Tone:</label>
                         <select id="toneType">
                             <option value="benny">Benny Original</option>
-                            <option value="warm">Akkordeon-like</option>
-                            <option value="pure">Rein (Sinus)</option>
-                            <option value="bright">Hell</option>
+                            <option value="warm">Accordion-like</option>
+                            <option value="pure">Pure (Sine)</option>
+                            <option value="bright">Bright</option>
                         </select>
 
                         <label>Tempo:</label>
@@ -610,15 +629,15 @@ body.playalong-mode .playalong-btn {
                     <!-- Legend title row with toggle -->
                     <div class="legend-header" id="legendHeader" title="Heim G/C Systeminfo anzeigen">
                         <div class="lg-title">Legende</div>
-                        <button class="legend-toggle-btn" id="legendToggleBtn">Heim-Info ▸</button>
+                        <button class="legend-toggle-btn" id="legendToggleBtn">Heim Info ▸</button>
                     </div>
 
                     <!-- Always visible: legend symbols -->
                     <div class="legend-symbols">
-                        <div class="lg-row"><div class="lg-sw pearl"></div>Taste – nicht aktiv (Perlmutt)</div>
-                        <div class="lg-row"><div class="lg-sw act"></div>Taste – aktiv (Akkordton)</div>
-                        <div class="lg-row"><div class="lg-sw root"></div>Grundton des Akkords (blau)</div>
-                        <div class="lg-row"><div class="lg-sw scale"></div>Skalenton (modale Skalen)</div>
+                        <div class="lg-row"><div class="lg-sw pearl"></div>Button – inactive (Pearl)</div>
+                        <div class="lg-row"><div class="lg-sw act"></div>Button – active (chord tone)</div>
+                        <div class="lg-row"><div class="lg-sw root"></div>Root note (blue)</div>
+                        <div class="lg-row"><div class="lg-sw scale"></div>Scale tone (modal scales)</div>
                     </div>
 
                     <!-- Expandable Heim info -->
@@ -626,37 +645,37 @@ body.playalong-mode .playalong-btn {
                         <div class="heim-divider"></div>
 
                         <div class="heim-section">
-                            <h3>Herkunft</h3>
-                            <div class="heim-row">Abgeleitet vom <strong>Corgeron-Layout</strong> – Unterschied: gedrücktes <strong>A</strong> in der Helferreihe. Fokus auf modale Melodien und Bal Folk.</div>
+                            <h3>Origin</h3>
+                            <div class="heim-row">Derived from <strong>Corgeron layout</strong> – Difference: pressed <strong>A</strong> in Row 3. Focus on modal melodies and Bal Folk.</div>
                         </div>
 
                         <div class="heim-section">
-                            <h3>Stärken nach Tonart</h3>
+                            <h3>Strengths by Key</h3>
                             <div class="heim-row"><span class="tag g">G-Reihe</span> G + D: Pull über 3 Oktaven</div>
                             <div class="heim-row"><span class="tag c">C-Reihe</span> C + F: Pull über 2 Oktaven</div>
-                            <div class="heim-row"><span class="tag a">Heim</span> D ist F überlegen (Pull-Reichweite)</div>
+                            <div class="heim-row"><span class="tag a">Heim</span> D outperforms F (Pull range)</div>
                         </div>
 
                         <div class="heim-section">
-                            <h3>Modale Stärken</h3>
-                            <div class="heim-row"><span class="tag g">G-Reihe</span> <strong>G-Dur</strong> und <strong>G-Dorisch</strong> – voll auf Pull</div>
-                            <div class="heim-row"><span class="tag c">C-Reihe</span> <strong>C-Moll</strong> und <strong>C-Mixolydisch</strong></div>
-                            <div class="heim-row"><span class="tag a">Heim ★</span> <strong>A-Äolisch</strong> – durch A in der Helferreihe gestärkt</div>
-                            <div class="heim-row"><span class="tag a">Heim</span> <strong>D-Äolisch</strong> – für Bourrées ideal</div>
+                            <h3>Modal Strengths</h3>
+                            <div class="heim-row"><span class="tag g">G-Reihe</span> <strong>G-Dur</strong> und <strong>G-Dorian</strong> – fully on Pull</div>
+                            <div class="heim-row"><span class="tag c">C-Reihe</span> <strong>C-Moll</strong> und <strong>C-Mixolydian</strong></div>
+                            <div class="heim-row"><span class="tag a">Heim ★</span> <strong>A-Äolisch</strong> – durch A in Row 3 gestärkt</div>
+                            <div class="heim-row"><span class="tag a">Heim</span> <strong>D-Äolisch</strong> – ideal for Bourrées</div>
                         </div>
 
                         <div class="heim-section">
                             <h3>Notation</h3>
-                            <div class="heim-row"><span class="tag g">Bass</span> Großbuchstabe (C, G…) = Akkord</div>
-                            <div class="heim-row"><span class="tag c">Bass</span> Kleinbuchstabe (c, g…) = Einzelton</div>
-                            <div class="heim-row"><span class="tag a">Diskant</span> Immer Kleinbuchstaben (c, g, bb…)</div>
+                            <div class="heim-row"><span class="tag g">Bass</span> Uppercase (C, G…) = Akkord</div>
+                            <div class="heim-row"><span class="tag c">Bass</span> Lowercase (c, g…) = Single note</div>
+                            <div class="heim-row"><span class="tag a">Diskant</span> Immer Lowercasen (c, g, bb…)</div>
                         </div>
 
-                        <div class="heim-note">Chromatik: über 2 Oktaven · erfordert Balgumkehr</div>
+                        <div class="heim-note">Chromatic: over 2 octaves · requires bellows reversal</div>
                     </div>
 
                     <!-- Benny image always at bottom -->
-                    <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny - Hersteller-Website">
+                    <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny – Manufacturer's Website">
                         <img src="assets/icon-512.png" alt="Castagnari Benny" class="benny-image">
                     </a>
                 </div>
@@ -686,7 +705,7 @@ let isPlaying = false;
 
 function playChord(frequencies, duration, toneType) {
     // Treble buttons play at octave 4 (c4 = 261.63 Hz)
-    // Bass buttons: UPPERCASE (C) = Akkord, lowercase (c) = Einzelton
+    // Bass buttons: UPPERCASE (C) = Akkord, lowercase (c) = Single note
     // Bass buttons use playBassNote() with octave coupling (C2 + C3)
     stopAll();
     isPlaying = true;
@@ -1342,7 +1361,7 @@ function renderTreble() {
         div.className = 'row';
         const lbl = document.createElement('div');
         lbl.className = 'row-label';
-        lbl.textContent = row==='Heim'?'3. REIHE (10)':row==='C'?'C-REIHE (11)':'G-REIHE (12)';
+        lbl.textContent = row==='Heim'?'ROW 3 (10)':row==='C'?'C-ROW (11)':'G-ROW (12)';
         div.appendChild(lbl);
         layout[dir].treble[row].forEach(note => {
             const btn = document.createElement('div');
@@ -1409,7 +1428,7 @@ function renderBass() {
         layout[dir].bass[col].forEach(note => {
             const btn = document.createElement('div');
             btn.className = 'bass-button';
-            // Groß = Akkord, Klein = Einzelton (international standard)
+            // Groß = Akkord, Klein = Single note (international standard)
             const noteFirstChar = note.charAt(0);
             const noteIsUpper = (noteFirstChar === noteFirstChar.toUpperCase() && noteFirstChar !== noteFirstChar.toLowerCase());
             if(noteIsUpper) btn.classList.add('is-chord');
@@ -1470,7 +1489,7 @@ function applyStyles() {
     
     if (missing.length > 0) {
         const box = document.getElementById('warningBox');
-        box.textContent = `⚠️ Nicht alle Töne auf ${dir.toUpperCase()} verfügbar: ${missing.map(noteDisplay).join(', ')}. Audio spielt vollständigen Akkord.`;
+        box.textContent = `⚠️ Not all notes available on ${dir.toUpperCase()} direction: ${missing.map(noteDisplay).join(', ')}. Audio plays complete chord.`;
         box.style.display = 'block';
     } else {
         document.getElementById('warningBox').style.display = 'none';
@@ -1521,13 +1540,13 @@ function applyStyles() {
 
 function onBassClick(note) {
     const root = bassToRoot(note);
-    // International standard: Groß (C, G, Ab...) = Akkord, Klein (c, g, ab...) = Einzelton
+    // International standard: Groß (C, G, Ab...) = Akkord, Klein (c, g, ab...) = Single note
     const firstChar = note.charAt(0);
     const isUpper = (firstChar === firstChar.toUpperCase() && firstChar !== firstChar.toLowerCase());
     const isChord = isUpper;   // UPPERCASE = chord, lowercase = single note
     
     // Groß (Akkord) → zeige Dur-Triade im Diskant
-    // Klein (Einzelton) → zeige nur Grundton (kein Akkord, kein Scale)
+    // Klein (Single note) → zeige nur Grundton (kein Akkord, kein Scale)
     chordType = isUpper ? '' : '';  // immer '' - Dur als Default-Anzeige
     scaleType = null;
     scaleType = null;
@@ -1604,7 +1623,7 @@ function playCurrentChord() {
 function switchDir(newDir) {
     dir = newDir;
     document.getElementById('bassDir').textContent = newDir === 'pull' ? 'Pull' : 'Push';
-    document.getElementById('trebleDir').textContent = newDir === 'pull' ? 'Pull (Ziehen)' : 'Push (Drücken)';
+    document.getElementById('trebleDir').textContent = newDir === 'pull' ? 'Pull' : 'Push';
     // PUSH indicator: blue border when push active
     const ind = document.getElementById('treblePushIndicator');
     if(ind) ind.classList.toggle('active', newDir === 'push');
@@ -1637,6 +1656,81 @@ document.querySelectorAll('.bellows-btn').forEach(btn => {
 
 document.getElementById('styleToggle').addEventListener('click', toggleBellowsStyle);
 
+// ── LANGUAGE / i18n ──
+const I18N = {
+    en: {
+        bellowsDir: 'BELLOWS DIRECTION',
+        treblePush: "Treble – Push – Player's View",
+        treblePull: "Treble – Pull – Player's View",
+        chordType: 'CHORD TYPE',
+        modalScales: 'MODAL SCALES',
+        root: 'ROOT',
+        tone: 'Tone:',
+        legend: 'LEGEND',
+        playAlong: '🎹 Play-Along',
+        back: '✕ Back',
+        heimInfo: 'Heim Info',
+    },
+    de: {
+        bellowsDir: 'BALGRICHTUNG',
+        treblePush: 'Diskant – Push (Drücken) – Sicht von oben',
+        treblePull: 'Diskant – Pull (Ziehen) – Sicht von oben',
+        chordType: 'AKKORDTYP',
+        modalScales: 'MODALE SKALEN',
+        root: 'GRUNDTON',
+        tone: 'Klang:',
+        legend: 'LEGENDE',
+        playAlong: '🎹 Play-Along',
+        back: '✕ Zurück',
+        heimInfo: 'Heim-Info',
+    },
+    it: {
+        bellowsDir: 'DIREZIONE MANTICE',
+        treblePush: 'Canto – Spingere – Vista giocatore',
+        treblePull: 'Canto – Tirare – Vista giocatore',
+        chordType: 'TIPO ACCORDO',
+        modalScales: 'SCALE MODALI',
+        root: 'FONDAMENTALE',
+        tone: 'Suono:',
+        legend: 'LEGENDA',
+        playAlong: '🎹 Play-Along',
+        back: '✕ Indietro',
+        heimInfo: 'Info Heim',
+    }
+};
+
+let currentLang = 'en';
+
+function applyLanguage(lang) {
+    currentLang = lang;
+    const t = I18N[lang] || I18N.en;
+    
+    // Update dynamic text elements
+    const trebleDir = document.getElementById('trebleDir');
+    if (trebleDir) {
+        trebleDir.textContent = dir === 'push' ? 
+            t.treblePush.replace('Treble – Push – ', '').replace('Diskant – Push (Drücken) – ','').replace('Canto – Spingere – ','') : 
+            t.treblePull.replace('Treble – Pull – ','').replace('Diskant – Pull (Ziehen) – ','').replace('Canto – Tirare – ','');
+    }
+    
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    
+    localStorage.setItem('benny-lang', lang);
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.dataset.lang === 'it') return; // coming soon
+        applyLanguage(btn.dataset.lang);
+    });
+});
+
+// Restore language preference
+const savedLang = localStorage.getItem('benny-lang');
+if (savedLang && I18N[savedLang]) applyLanguage(savedLang);
+
 // ── HEIM INFO IN LEGEND ──
 function toggleHeimInfo() {
     const expand = document.getElementById('heimExpand');
@@ -1645,7 +1739,7 @@ function toggleHeimInfo() {
     const isOpen = expand.classList.contains('open');
     expand.classList.toggle('open', !isOpen);
     btn.classList.toggle('open', !isOpen);
-    btn.textContent = isOpen ? 'Heim-Info ▸' : 'Heim-Info ▾';
+    btn.textContent = isOpen ? 'Heim Info ▸' : 'Heim Info ▾';
 }
 document.getElementById('legendHeader').addEventListener('click', toggleHeimInfo);
 
@@ -1669,7 +1763,7 @@ document.getElementById('playalongBtn').addEventListener('click', () => {
     playAlongActive = !playAlongActive;
     document.body.classList.toggle('playalong-mode', playAlongActive);
     document.getElementById('playalongBtn').textContent = 
-        playAlongActive ? '✕ Zurück' : '🎹 Play-Along';
+        playAlongActive ? '✕ Back' : '🎹 Play-Along';
     // Stop all playing notes when switching
     stopAll();
     stopAllTreble();
