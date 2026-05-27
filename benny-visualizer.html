@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.7.6</title>
+<title>Castagnari Benny Accordion v5.8.0</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -263,6 +263,16 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     50% { transform: scale(1.08); box-shadow: 0 0 16px var(--accent); }
 }
 
+/* ──────────── TREBLE PLAYING STATE ──────────── */
+.note-button.playing {
+    background: radial-gradient(circle at 40% 35%,
+        rgba(10,132,255,0.35) 0%, rgba(10,132,255,0.15) 60%, transparent 100%),
+        linear-gradient(160deg, var(--p0), var(--p2));
+    border: 2px solid var(--accent) !important;
+    box-shadow: 0 0 10px rgba(10,132,255,0.4), var(--btn-shadow);
+    transform: scale(0.93);
+}
+
 /* ──────────── PUSH INDICATOR ──────────── */
 .treble-push-indicator {
     position:absolute; inset:0; border-radius:12px; pointer-events:none; z-index:2;
@@ -378,7 +388,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.7.6</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.0</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -585,7 +595,8 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 // AUDIO ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let activeOscillators = [];
+let activeOscillators = [];       // Bass + Jam-Box
+let trebleOscillators = {};        // Diskant: {buttonId: {osc, gain}}
 let loopTimeout = null;
 let isPlaying = false;
 
@@ -859,6 +870,37 @@ const NOTE_TO_SEMITONE = {
 };
 
 const SEMITONE_TO_NOTE = ['C','C#','D','Eb','E','F','F#','G','G#','A','Bb','B'];
+
+// Complete button→pitch mapping for all 66 treble buttons
+// Anchor: Pull G-row pos 4 = C4 (261.6 Hz) - verified by piano photo
+// 3. Reihe has non-ascending order - that's Heim design, not an error!
+const BUTTON_OCTAVES = {
+    'pull_G':    { 1:'E3',  2:'F#3', 3:'A3',  4:'C4',  5:'E4',  6:'F#4',
+                   7:'A4',  8:'C5',  9:'E5',  10:'F#5',11:'A5', 12:'C6'  },
+    'pull_C':    { 1:'G3',  2:'B3',  3:'D4',  4:'F4',  5:'A4',  6:'B4',
+                   7:'D5',  8:'F5',  9:'A5',  10:'B5', 11:'D6'           },
+    'pull_Heim': { 1:'Bb3', 2:'C#4', 3:'G3',  4:'G#3', 5:'Bb4', 6:'C#5',
+                   7:'G4',  8:'G#4', 9:'Bb5', 10:'C#6'                   },
+    'push_G':    { 1:'B2',  2:'D3',  3:'G3',  4:'B3',  5:'D4',  6:'G4',
+                   7:'B4',  8:'D5',  9:'G5',  10:'B5', 11:'D6', 12:'G6'  },
+    'push_C':    { 1:'E3',  2:'G3',  3:'C4',  4:'E4',  5:'G4',  6:'C5',
+                   7:'E5',  8:'G5',  9:'C6',  10:'E6', 11:'G6'           },
+    'push_Heim': { 1:'G#3', 2:'A3',  3:'Eb4', 4:'G#4', 5:'A4',  6:'Eb5',
+                   7:'G#5', 8:'A5',  9:'Eb6', 10:'G#6'                   },
+};
+
+// Get frequency for a treble button
+function trebleButtonFreq(direction, row, pos) {
+    const key = direction + '_' + row;
+    const pitch = BUTTON_OCTAVES[key] && BUTTON_OCTAVES[key][pos];
+    if (!pitch) return null;
+    // Parse "C4", "F#3", "Bb5", "G#4" etc.
+    const match = pitch.match(/^([A-G][#b]?)(\d)$/);
+    if (!match) return null;
+    const noteName = match[1];
+    const octave = parseInt(match[2]);
+    return noteToFrequency(noteName, octave);
+}
 const ROOTS = ['C','D','E','F','G','A','Bb','Ab','Eb'];
 
 function noteToFrequency(noteName, octave = 4) {
@@ -883,6 +925,76 @@ function getNoteFromInterval(root, semitones) {
     }
     const newIdx = (rootIdx + semitones) % 12;
     return notes[newIdx];
+}
+
+// ── TREBLE SINGLE BUTTON PLAYBACK ──
+function startTrebleNote(buttonId, freq) {
+    if (!freq || !audioContext) return;
+
+    // Resume audio context if suspended (iOS requirement)
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    // If already playing this button, stop first
+    if (trebleOscillators[buttonId]) stopTrebleNote(buttonId, true);
+
+    const tone = document.getElementById('toneType').value;
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    // Use Benny Original waveform
+    if (tone === 'benny') {
+        oscillator.setPeriodicWave(createBennyWave(audioContext));
+        oscillator.detune.value = 2 + Math.random() * 3;
+    } else {
+        switch(tone) {
+            case 'warm':   oscillator.type = 'triangle'; break;
+            case 'bright': oscillator.type = 'sawtooth'; break;
+            default:       oscillator.type = 'sine';
+        }
+    }
+
+    oscillator.frequency.value = freq;
+
+    // Treble envelope: faster attack/release than bass
+    const now = audioContext.currentTime;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(0.28, now + 0.03);  // 30ms attack
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start(now);
+
+    trebleOscillators[buttonId] = { oscillator, gainNode };
+
+    // Visual feedback
+    const btn = document.querySelector(`.note-button[data-btn-id="${buttonId}"]`);
+    if (btn) btn.classList.add('playing');
+}
+
+function stopTrebleNote(buttonId, immediate = false) {
+    const entry = trebleOscillators[buttonId];
+    if (!entry) return;
+
+    const { oscillator, gainNode } = entry;
+    const now = audioContext.currentTime;
+    const releaseTime = immediate ? 0.01 : 0.12;
+
+    try {
+        gainNode.gain.cancelScheduledValues(now);
+        gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+        gainNode.gain.linearRampToValueAtTime(0, now + releaseTime);
+        oscillator.stop(now + releaseTime + 0.01);
+    } catch(e) {}
+
+    delete trebleOscillators[buttonId];
+
+    // Remove visual feedback
+    const btn = document.querySelector(`.note-button[data-btn-id="${buttonId}"]`);
+    if (btn) btn.classList.remove('playing');
+}
+
+function stopAllTreble() {
+    Object.keys(trebleOscillators).forEach(id => stopTrebleNote(id, true));
 }
 
 // Play bass note with octave coupling (L + M voices)
@@ -1148,6 +1260,30 @@ function renderTreble() {
                 sp.appendChild(posSpan);
             }
             btn.appendChild(sp);
+
+            // ── TREBLE BUTTON: ID + SOUND EVENTS ──
+            // Parse row and position for octave lookup
+            const btnPos = parseInt(noteNum) || 0;
+            const btnRow = row;  // 'G', 'C', or 'Heim'
+            const btnId = dir + '_' + btnRow + '_' + btnPos;
+            btn.setAttribute('data-btn-id', btnId);
+
+            const playTreble = () => {
+                const f = trebleButtonFreq(dir, btnRow, btnPos);
+                if (f) startTrebleNote(btnId, f);
+            };
+            const stopTreble = () => stopTrebleNote(btnId);
+
+            // Desktop mouse
+            btn.addEventListener('mousedown', e => { e.preventDefault(); playTreble(); });
+            btn.addEventListener('mouseup', stopTreble);
+            btn.addEventListener('mouseleave', stopTreble);
+
+            // iOS / Touch
+            btn.addEventListener('touchstart', e => { e.preventDefault(); playTreble(); }, { passive: false });
+            btn.addEventListener('touchend',   e => { e.preventDefault(); stopTreble(); }, { passive: false });
+            btn.addEventListener('touchcancel', stopTreble, { passive: true });
+
             div.appendChild(btn);
         });
         cont.appendChild(div);
