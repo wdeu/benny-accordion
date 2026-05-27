@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.0</title>
+<title>Castagnari Benny Accordion v5.8.1</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -263,6 +263,39 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     50% { transform: scale(1.08); box-shadow: 0 0 16px var(--accent); }
 }
 
+/* ──────────── PLAY-ALONG MODE ──────────── */
+body.playalong-mode .jam-box-column { display: none !important; }
+body.playalong-mode .legend { display: none !important; }
+body.playalong-mode .lay-title { display: none !important; }
+body.playalong-mode header { display: none !important; }
+body.playalong-mode .bass-column .sec-hdr { display: none !important; }
+body.playalong-mode .bass-column { min-width: 160px; }
+body.playalong-mode .treble-column .section {
+    border: none !important; background: transparent !important;
+}
+body.playalong-mode .main-grid {
+    gap: 8px;
+    padding: 8px;
+    height: 100vh;
+    align-items: stretch;
+}
+/* Keep bellows switches visible in play-along */
+body.playalong-mode .bellows-container { display: block !important; }
+
+/* Play-along toggle button */
+.playalong-btn {
+    position: fixed; bottom: 16px; right: 16px; z-index: 100;
+    background: var(--bg-card); border: 1px solid var(--b);
+    border-radius: 20px; padding: 8px 14px;
+    font-size: 0.78em; font-weight: 600; color: var(--txt2);
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.playalong-btn:hover { color: var(--accent); border-color: var(--accent); }
+body.playalong-mode .playalong-btn {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+}
+
 /* ──────────── TREBLE PLAYING STATE ──────────── */
 .note-button.playing {
     background: radial-gradient(circle at 40% 35%,
@@ -388,7 +421,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.1</span></h1>
     <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
 </header>
 
@@ -587,6 +620,11 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 </div>
 
 </div>
+
+<!-- PLAY-ALONG TOGGLE -->
+<button class="playalong-btn" id="playalongBtn" title="Play-Along Modus: nur Buttons + Richtung">
+    🎹 Play-Along
+</button>
 
 <!-- Heim overlay removed - now inline panel in jam-column -->
 
@@ -879,8 +917,8 @@ const BUTTON_OCTAVES = {
                    7:'A4',  8:'C5',  9:'E5',  10:'F#5',11:'A5', 12:'C6'  },
     'pull_C':    { 1:'G3',  2:'B3',  3:'D4',  4:'F4',  5:'A4',  6:'B4',
                    7:'D5',  8:'F5',  9:'A5',  10:'B5', 11:'D6'           },
-    'pull_Heim': { 1:'Bb3', 2:'C#4', 3:'G3',  4:'G#3', 5:'Bb4', 6:'C#5',
-                   7:'G4',  8:'G#4', 9:'Bb5', 10:'C#6'                   },
+    'pull_Heim': { 1:'Bb3', 2:'C#4', 3:'G4',  4:'G#4', 5:'Bb4', 6:'C#5',
+                   7:'G5',  8:'G#5', 9:'Bb5', 10:'C#6'                   },
     'push_G':    { 1:'B2',  2:'D3',  3:'G3',  4:'B3',  5:'D4',  6:'G4',
                    7:'B4',  8:'D5',  9:'G5',  10:'B5', 11:'D6', 12:'G6'  },
     'push_C':    { 1:'E3',  2:'G3',  3:'C4',  4:'E4',  5:'G4',  6:'C5',
@@ -1310,7 +1348,17 @@ function renderBass() {
             if(noteIsUpper) btn.classList.add('is-chord');
             btn.dataset.note = note;
             btn.textContent  = noteDisplay(note);
+            // Click for visual + chord display
             btn.addEventListener('click', ()=> onBassClick(note));
+            // Touch-hold for sustained bass note (independent of treble!)
+            btn.addEventListener('mousedown', e => {
+                if (e.button !== 0) return;
+                onBassClick(note);
+            });
+            btn.addEventListener('touchstart', e => {
+                e.preventDefault();
+                onBassClick(note);
+            }, { passive: false });
             column.appendChild(btn);
         });
         cont.appendChild(column);
@@ -1528,6 +1576,18 @@ function toggleHeimInfo() {
     btn.textContent = isOpen ? 'Heim-Info ▸' : 'Heim-Info ▾';
 }
 document.getElementById('legendHeader').addEventListener('click', toggleHeimInfo);
+
+// ── PLAY-ALONG MODE ──
+let playAlongActive = false;
+document.getElementById('playalongBtn').addEventListener('click', () => {
+    playAlongActive = !playAlongActive;
+    document.body.classList.toggle('playalong-mode', playAlongActive);
+    document.getElementById('playalongBtn').textContent = 
+        playAlongActive ? '✕ Zurück' : '🎹 Play-Along';
+    // Stop all playing notes when switching
+    stopAll();
+    stopAllTreble();
+});
 
 document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
     btn.addEventListener('click', ()=>{
