@@ -5,7 +5,7 @@
 
 ## 1. Overview
 
-The bass system of the Castagnari Benny C/G was reverse-engineered through FFT (Fast Fourier Transform) spectral analysis of real recordings. All chord voicings in the web application are based on this analysis, not on theoretical assumptions.
+The bass system of the Castagnari Benny C/G was analyzed using FFT (Fast Fourier Transform) spectral analysis of real recordings. Chord voicings in the web application are based on this analysis.
 
 **Instrument:** Castagnari Benny C/G (Heim tuning, 3-row)  
 **Recording Equipment:** RØDE Wireless Micro RX + iPhone 16 Pro  
@@ -63,22 +63,22 @@ Sequence:  PUSH: C c G g Ab ab F f E e Eb eb
 
 ### Session 2: Individual Chord Recordings (PUSH)
 ```
-Bass_Benny_PUSH_Akkord_c.mp3
-Bass_Benny_PUSH_Akkord_g.m4a
-Bass_Benny_PUSH_Akkord_ab.m4a
-Bass_Benny_PUSH_Akkord_f.m4a
-Bass_Benny_PUSH_Akkord_e.m4a
-Bass_Benny_PUSH_Akkord_eb.m4a
+Bass_Benny_PUSH_chord_c.mp3
+Bass_Benny_PUSH_chord_g.m4a
+Bass_Benny_PUSH_chord_ab.m4a
+Bass_Benny_PUSH_chord_f.m4a
+Bass_Benny_PUSH_chord_e.m4a
+Bass_Benny_PUSH_chord_eb.m4a
 ```
 
 ### Session 3: Individual Chord Recordings (PULL)
 ```
-Bass_Benny_PULL_Akkord_g.m4a
-Bass_Benny_PULL_Akkord_d.m4a
-Bass_Benny_PULL_Akkord_b.m4a
-Bass_Benny_PULL_Akkord_f.m4a
-Bass_Benny_PULL_Akkord_a.m4a
-Bass_Benny_PULL_Akkord_bb.m4a
+Bass_Benny_PULL_chord_g.m4a
+Bass_Benny_PULL_chord_d.m4a
+Bass_Benny_PULL_chord_b.m4a
+Bass_Benny_PULL_chord_f.m4a
+Bass_Benny_PULL_chord_a.m4a
+Bass_Benny_PULL_chord_bb.m4a
 ```
 
 ---
@@ -87,18 +87,18 @@ Bass_Benny_PULL_Akkord_bb.m4a
 
 ### Notation Convention (International Standard, since v5.7.0)
 ```
-UPPERCASE (C, G, Ab...) = Akkord (chord)
-lowercase (c, g, ab...) = Einzelton (single note)
+UPPERCASE (C, G, Ab...) = chord (chord)
+lowercase (c, g, ab...) = single note (single note)
 ```
 This follows international music notation where uppercase = chord/major, lowercase = single note.
 
-### Lowercase (Einzelton / single note: c, d, e...)
+### Lowercase (Single note: c, d, e...)
 Play the root note in **2 octaves** (L + M voices):
 ```
 c → C2 (65 Hz) + C3 (131 Hz)
 ```
 
-### Uppercase (Akkord / chord: C, D, E...)
+### Uppercase (chord / chord: C, D, E...)
 Play the root in **3 octaves** + **fifth** in specific register:
 ```
 C → C2 (65 Hz) + C3 (131 Hz) + C4 (262 Hz) + G4 (392 Hz)
@@ -226,10 +226,10 @@ oscillator.detune.value = 3 + Math.random() * 4;  // Inharmonicity
 
 ### Bass Synthesis
 ```javascript
-// lowercase (c, g, ab...): Einzelton – root in 2 octaves
+// lowercase (c, g, ab...): single note – root in 2 octaves
 [noteToFrequency(root, 2), noteToFrequency(root, 3)]
 
-// UPPERCASE (C, G, Ab...): Akkord – root in 3 octaves + voicing-specific fifth
+// UPPERCASE (C, G, Ab...): chord – root in 3 octaves + voicing-specific fifth
 // International notation: UPPERCASE = chord, lowercase = single note
 const mellowNotes = ['E', 'Eb', 'D'];  // Spectral-verified mellow chords
 const fifthOctave = mellowNotes.includes(root) ? 3 : 4;
@@ -256,7 +256,9 @@ const fifthOctave = mellowNotes.includes(root) ? 3 : 4;
 | v5.6.15 | Spectral verification: only e, eb mellow |
 | v5.6.16 | PULL analysis: d also mellow |
 | v5.6.17 | Heim system info panel + scale recommendations |
-| v5.7.0  | Label inversion: UPPERCASE=Akkord, lowercase=Einzelton (international standard) |
+| v5.7.0  | Label convention: Uppercase=Chord, lowercase=Single note (international standard) |
+| v5.8.0  | Treble button playback with complete octave mapping |
+| v5.8.4  | UI anglified, i18n structure (EN/DE/IT) |
 
 ---
 
