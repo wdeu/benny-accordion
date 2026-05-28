@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.4</title>
+<title>Castagnari Benny Accordion v5.8.5</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -409,6 +409,9 @@ body.playalong-mode .playalong-btn {
 
 /* ──────────── LEGEND ──────────── */
 .legend { background:var(--bg-card); border-radius:12px; margin-top:20px; padding:12px 16px; }
+.legend-inner { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+.legend-left { flex:1; min-width:160px; }
+.legend-right { flex-shrink:0; display:flex; align-items:center; }
 .legend-header { display:flex; justify-content:space-between; align-items:center;
     cursor:pointer; margin-bottom:8px; }
 .legend-header:hover .legend-toggle-btn { color:var(--accent); }
@@ -416,7 +419,7 @@ body.playalong-mode .playalong-btn {
     color:var(--txt3); padding:2px 6px; border-radius:4px; transition:color 0.2s;
     white-space:nowrap; }
 .legend-toggle-btn.open { color:var(--accent); }
-.legend-symbols { margin-bottom:10px; }
+.legend-symbols { margin-bottom:6px; }
 .heim-expand { display:none; margin-bottom:12px; }
 .heim-expand.open { display:block; }
 .heim-divider { height:1px; background:var(--b); margin:10px 0; }
@@ -476,13 +479,13 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.4</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.5</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
             <button class="lang-btn" data-lang="it" title="Coming soon">IT</button>
         </div>
-    <p class="sub">C/G · 3-reihig · Heim · Spieler-Perspektive</p>
+    <p class="sub">C/G · 3-Row · Heim · Player's View</p>
 </header>
 
 <div class="main-grid">
@@ -542,7 +545,7 @@ body.playalong-mode .playalong-btn {
     <div class="treble-column">
         <div class="section" style="position:relative;">
             <div class="treble-push-indicator" id="treblePushIndicator"></div>
-            <div class="lay-title">Diskant – <span id="trebleDir">Push</span> – Sicht von oben</div>
+            <div class="lay-title">Treble – <span id="trebleDir">Push</span></div>
             <!-- Tap zone wrapper: left=PULL, center=buttons, right=PUSH -->
             <div class="treble-tap-wrapper">
                 <div class="treble-tap-zone pull-zone" id="pullZone" title="Pull"></div>
@@ -626,9 +629,11 @@ body.playalong-mode .playalong-btn {
                 
                 <!-- LEGEND inside jam-column -->
                 <div class="legend">
-                    <!-- Legend title row with toggle -->
-                    <div class="legend-header" id="legendHeader" title="Heim G/C Systeminfo anzeigen">
-                        <div class="lg-title">Legende</div>
+                    <div class="legend-inner">
+                    <div class="legend-left">
+                    <!-- Key title row with toggle -->
+                    <div class="legend-header" id="legendHeader" title="Heim G/C System Info">
+                        <div class="lg-title" data-i18n="legendTitle">Key</div>
                         <button class="legend-toggle-btn" id="legendToggleBtn">Heim Info ▸</button>
                     </div>
 
@@ -674,10 +679,13 @@ body.playalong-mode .playalong-btn {
                         <div class="heim-note">Chromatic: over 2 octaves · requires bellows reversal</div>
                     </div>
 
-                    <!-- Benny image always at bottom -->
-                    <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny – Manufacturer's Website">
-                        <img src="assets/icon-512.png" alt="Castagnari Benny" class="benny-image">
-                    </a>
+                    </div><!-- end legend-left -->
+                    <div class="legend-right">
+                        <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny – Manufacturer's Website">
+                            <img src="assets/icon-512.png" alt="Castagnari Benny" class="benny-image" style="width:100px; max-width:100px;">
+                        </a>
+                    </div>
+                    </div><!-- end legend-inner -->
                 </div>
             </div>
         </div>
@@ -1659,58 +1667,79 @@ document.getElementById('styleToggle').addEventListener('click', toggleBellowsSt
 // ── LANGUAGE / i18n ──
 const I18N = {
     en: {
-        bellowsDir: 'BELLOWS DIRECTION',
-        treblePush: "Treble – Push – Player's View",
-        treblePull: "Treble – Pull – Player's View",
-        chordType: 'CHORD TYPE',
-        modalScales: 'MODAL SCALES',
-        root: 'ROOT',
-        tone: 'Tone:',
-        legend: 'LEGEND',
-        playAlong: '🎹 Play-Along',
-        back: '✕ Back',
-        heimInfo: 'Heim Info',
+        bellowsDir:   'BELLOWS DIRECTION',
+        treblePush:   'Treble – Push',
+        treblePull:   'Treble – Pull',
+        chordType:    'CHORD TYPE',
+        modalScales:  'MODAL SCALES',
+        root:         'ROOT',
+        tone:         'Tone:',
+        legendTitle:  'Key',
+        playAlong:    '🎹 Play-Along',
+        back:         '✕ Back',
+        heimInfo:     'Heim Info',
     },
     de: {
-        bellowsDir: 'BALGRICHTUNG',
-        treblePush: 'Diskant – Push (Drücken) – Sicht von oben',
-        treblePull: 'Diskant – Pull (Ziehen) – Sicht von oben',
-        chordType: 'AKKORDTYP',
-        modalScales: 'MODALE SKALEN',
-        root: 'GRUNDTON',
-        tone: 'Klang:',
-        legend: 'LEGENDE',
-        playAlong: '🎹 Play-Along',
-        back: '✕ Zurück',
-        heimInfo: 'Heim-Info',
+        bellowsDir:   'BALGRICHTUNG',
+        treblePush:   'Diskant – Push',
+        treblePull:   'Diskant – Pull',
+        chordType:    'AKKORDTYP',
+        modalScales:  'MODALE SKALEN',
+        root:         'GRUNDTON',
+        tone:         'Klang:',
+        legendTitle:  'Legende',
+        playAlong:    '🎹 Play-Along',
+        back:         '✕ Zurück',
+        heimInfo:     'Heim-Info',
     },
     it: {
-        bellowsDir: 'DIREZIONE MANTICE',
-        treblePush: 'Canto – Spingere – Vista giocatore',
-        treblePull: 'Canto – Tirare – Vista giocatore',
-        chordType: 'TIPO ACCORDO',
-        modalScales: 'SCALE MODALI',
-        root: 'FONDAMENTALE',
-        tone: 'Suono:',
-        legend: 'LEGENDA',
-        playAlong: '🎹 Play-Along',
-        back: '✕ Indietro',
-        heimInfo: 'Info Heim',
+        bellowsDir:   'DIREZIONE MANTICE',
+        treblePush:   'Canto – Spingere',
+        treblePull:   'Canto – Tirare',
+        chordType:    'TIPO ACCORDO',
+        modalScales:  'SCALE MODALI',
+        root:         'FONDAMENTALE',
+        tone:         'Suono:',
+        legendTitle:  'Legenda',
+        playAlong:    '🎹 Play-Along',
+        back:         '✕ Indietro',
+        heimInfo:     'Info Heim',
     }
 };
 
 let currentLang = 'en';
 
+// Map of element IDs to i18n keys for static labels
+const I18N_ELEMENTS = {
+    'bellowsDirLabel':  'bellowsDir',
+    'chordTypeLabel':   'chordType',
+    'modalScalesLabel': 'modalScales',
+    'rootLabel':        'root',
+    'toneLabel':        'tone',
+    'legendTitle':      'legendTitle',
+};
+
 function applyLanguage(lang) {
     currentLang = lang;
     const t = I18N[lang] || I18N.en;
     
-    // Update dynamic text elements
-    const trebleDir = document.getElementById('trebleDir');
-    if (trebleDir) {
-        trebleDir.textContent = dir === 'push' ? 
-            t.treblePush.replace('Treble – Push – ', '').replace('Diskant – Push (Drücken) – ','').replace('Canto – Spingere – ','') : 
-            t.treblePull.replace('Treble – Pull – ','').replace('Diskant – Pull (Ziehen) – ','').replace('Canto – Tirare – ','');
+    // Update elements by data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (t[key]) el.textContent = t[key];
+    });
+    
+    // Play-Along button
+    const paBtn = document.getElementById('playalongBtn');
+    if (paBtn && !document.body.classList.contains('playalong-mode')) {
+        paBtn.textContent = t.playAlong || '🎹 Play-Along';
+    }
+    
+    // Heim Info toggle button
+    const legendBtn = document.getElementById('legendToggleBtn');
+    if (legendBtn) {
+        const isOpen = document.getElementById('heimExpand')?.classList.contains('open');
+        legendBtn.textContent = (t.heimInfo || 'Heim Info') + (isOpen ? ' ▾' : ' ▸');
     }
     
     document.querySelectorAll('.lang-btn').forEach(b => {
