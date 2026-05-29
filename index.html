@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.6</title>
+<title>Castagnari Benny Accordion v5.8.7</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -531,11 +531,12 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.6</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.7</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
-            <button class="lang-btn" data-lang="it" title="Coming soon">IT</button>
+            <button class="lang-btn" data-lang="fr">FR</button>
+            <button class="lang-btn" data-lang="it">IT</button>
         </div>
     <p class="sub">C/G · 3-Row · Heim · Player's View</p>
 </header>
@@ -545,7 +546,7 @@ body.playalong-mode .playalong-btn {
     <div class="bass-column">
         <div class="section">
             <div class="sec-hdr">
-                Balgrichtung
+                <span data-i18n="bellowsDir">BELLOWS DIRECTION</span>
                 <button class="style-toggle" id="styleToggle" title="Toggle display">⚙️</button>
             </div>
             <div class="bellows-container">
@@ -613,7 +614,7 @@ body.playalong-mode .playalong-btn {
             <div class="sec-hdr">Jam-Box</div>
 
             <div class="chord-panel">
-                <div class="cp-label">Akkordtyp</div>
+                <div class="cp-label"><span data-i18n="chordType">CHORD TYPE</span></div>
                 <div class="chip-row" id="chordTypeRow">
                     <button class="chip active" data-ctype="">Dur</button>
                     <button class="chip" data-ctype="m">Moll</button>
@@ -630,7 +631,7 @@ body.playalong-mode .playalong-btn {
                     <button class="chip" data-ctype="m6">m6</button>
                 </div>
 
-                <div class="cp-label">Modale Skalen</div>
+                <div class="cp-label"><span data-i18n="modalScales">MODAL SCALES</span></div>
                 <div class="chip-row" id="scaleRow">
                     <button class="chip" data-scale="ionian">Ionian (Major)</button>
                     <button class="chip" data-scale="dorian">Dorian</button>
@@ -643,7 +644,7 @@ body.playalong-mode .playalong-btn {
                 <!-- SCALE RECOMMENDATION -->
                 <div class="scale-hint" id="scaleHint"></div>
 
-                <div class="cp-label">Grundton</div>
+                <div class="cp-label"><span data-i18n="root">ROOT</span></div>
                 <div class="root-grid" id="rootGrid"></div>
 
                 <div class="audio-section">
@@ -1742,40 +1743,105 @@ const I18N = {
         bellowsDir:   'BELLOWS DIRECTION',
         treblePush:   'Treble – Push',
         treblePull:   'Treble – Pull',
+        bassPush:     'Bass – Push',
+        bassPull:     'Bass – Pull',
         chordType:    'CHORD TYPE',
         modalScales:  'MODAL SCALES',
         root:         'ROOT',
         tone:         'Tone:',
         legendTitle:  'Key',
+        infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
         back:         '✕ Back',
         heimInfo:     'Heim Info',
+        col1:         'Col 1',
+        col2:         'Col 2',
+        scaleHints: {
+            ionian:     '💡 <strong>Ionian (Major):</strong> G-Row ideal · G + D fully on Pull (3 oct.) · C + F on Pull (2 oct.)',
+            dorian:     '💡 <strong>Dorian:</strong> G-Row ideal · G-Dorian and D-Dorian strong on Pull · typical for Bourrées',
+            phrygian:   '💡 <strong>Phrygian:</strong> C-Row + Row 3 · Push-oriented · Row 3 needed for semitone steps',
+            lydian:     '💡 <strong>Lydian:</strong> G-Row + Row 3 for ♯4 · brilliant in G-Lydian · Row 3 essential for F♯',
+            mixolydian: '💡 <strong>Mixolydian:</strong> C-Row ideal · C-Mixolydian strong · G-Mixolydian also good on Pull',
+            aeolian:    '💡 <strong>Aeolian (Minor):</strong> Heim strength ★ · A-Aeolian especially enhanced by Heim layout · D-Aeolian ideal for Bourrées',
+        }
     },
     de: {
-        bellowsDir:   'BALGRICHTUNG',
+        bellowsDir:   'BALG',
         treblePush:   'Diskant – Push',
         treblePull:   'Diskant – Pull',
+        bassPush:     'Bass – Push',
+        bassPull:     'Bass – Pull',
         chordType:    'AKKORDTYP',
         modalScales:  'MODALE SKALEN',
         root:         'GRUNDTON',
         tone:         'Klang:',
         legendTitle:  'Legende',
+        infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
         back:         '✕ Zurück',
         heimInfo:     'Heim-Info',
+        col1:         'Sp. 1',
+        col2:         'Sp. 2',
+        scaleHints: {
+            ionian:     '💡 <strong>Ionisch (Dur):</strong> G-Reihe ideal · G + D voll auf Pull (3 Okt.) · C + F auf Pull (2 Okt.)',
+            dorian:     '💡 <strong>Dorisch:</strong> G-Reihe ideal · G-Dorisch und D-Dorisch stark auf Pull · typisch für Bourrées',
+            phrygian:   '💡 <strong>Phrygisch:</strong> C-Reihe + 3. Reihe · Push-orientiert · 3. Reihe für Halbtonschritte nötig',
+            lydian:     '💡 <strong>Lydisch:</strong> G-Reihe + 3. Reihe für ♯4 · brillant in G-Lydisch · 3. Reihe für F♯ essentiell',
+            mixolydian: '💡 <strong>Mixolydisch:</strong> C-Reihe ideal · C-Mixolydisch stark · G-Mixolydisch gut auf Pull',
+            aeolian:    '💡 <strong>Äolisch (Moll):</strong> Heim-Stärke ★ · A-Äolisch durch Heim-Layout besonders gestärkt · D-Äolisch für Bourrées',
+        }
+    },
+    fr: {
+        bellowsDir:   'SOUFFLET',
+        treblePush:   'Chant – Pousser',
+        treblePull:   'Chant – Tirer',
+        bassPush:     'Basse – Pousser',
+        bassPull:     'Basse – Tirer',
+        chordType:    'TYPE D'ACCORD',
+        modalScales:  'GAMMES MODALES',
+        root:         'FONDAMENTALE',
+        tone:         'Son :',
+        legendTitle:  'Légende',
+        infoTitle:    'Info',
+        playAlong:    '🎹 Play-Along',
+        back:         '✕ Retour',
+        heimInfo:     'Info Heim',
+        col1:         'Col. 1',
+        col2:         'Col. 2',
+        scaleHints: {
+            ionian:     '💡 <strong>Ionien (Majeur):</strong> Rangée G idéale · G + D pleinement en Tiré (3 oct.) · C + F en Tiré (2 oct.)',
+            dorian:     '💡 <strong>Dorien:</strong> Rangée G idéale · G-Dorien et D-Dorien forts en Tiré · typique pour les Bourrées',
+            phrygian:   '💡 <strong>Phrygien:</strong> Rangée C + Rangée 3 · orienté Poussé · Rangée 3 pour les demi-tons',
+            lydian:     '💡 <strong>Lydien:</strong> Rangée G + Rangée 3 pour ♯4 · brillant en G-Lydien',
+            mixolydian: '💡 <strong>Mixolydien:</strong> Rangée C idéale · C-Mixolydien fort · G-Mixolydien aussi bon en Tiré',
+            aeolian:    '💡 <strong>Éolien (Mineur):</strong> Force Heim ★ · La-Éolien renforcé par le layout Heim · Ré-Éolien idéal pour les Bourrées',
+        }
     },
     it: {
-        bellowsDir:   'DIREZIONE MANTICE',
+        bellowsDir:   'MANTICE',
         treblePush:   'Canto – Spingere',
         treblePull:   'Canto – Tirare',
+        bassPush:     'Basso – Spingere',
+        bassPull:     'Basso – Tirare',
         chordType:    'TIPO ACCORDO',
         modalScales:  'SCALE MODALI',
         root:         'FONDAMENTALE',
         tone:         'Suono:',
         legendTitle:  'Legenda',
+        infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
         back:         '✕ Indietro',
         heimInfo:     'Info Heim',
+        col1:         'Col. 1',
+        col2:         'Col. 2',
+        scaleHints: {
+            ionian:     '💡 <strong>Ionico (Maggiore):</strong> Fila G ideale · G + D su Tirare (3 ott.) · C + F su Tirare (2 ott.)',
+            dorian:     '💡 <strong>Dorico:</strong> Fila G ideale · G-Dorico e D-Dorico forti su Tirare · tipico per le Bourrées',
+            phrygian:   '💡 <strong>Frigio:</strong> Fila C + Fila 3 · orientato Spingere · Fila 3 per i semitoni',
+            lydian:     '💡 <strong>Lidio:</strong> Fila G + Fila 3 per ♯4 · brillante in G-Lidio',
+            mixolydian: '💡 <strong>Misolidio:</strong> Fila C ideale · C-Misolidio forte · G-Misolidio buono su Tirare',
+            aeolian:    '💡 <strong>Eolico (Minore):</strong> Forza Heim ★ · La-Eolico potenziato dal layout Heim · Re-Eolico ideale per Bourrées',
+        }
     }
 };
 
@@ -1795,35 +1861,82 @@ function applyLanguage(lang) {
     currentLang = lang;
     const t = I18N[lang] || I18N.en;
     
-    // Update elements by data-i18n attribute
+    // 1. data-i18n attributes
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.dataset.i18n;
-        if (t[key]) el.textContent = t[key];
+        if (t[key] !== undefined) el.textContent = t[key];
     });
     
-    // Play-Along button
-    const paBtn = document.getElementById('playalongBtn');
-    if (paBtn && !document.body.classList.contains('playalong-mode')) {
-        paBtn.textContent = t.playAlong || '🎹 Play-Along';
-    }
+    // 2. Bass/Treble direction labels (dynamic)
+    const bassDir = document.getElementById('bassDir');
+    if (bassDir) bassDir.textContent = dir === 'push' ? 'Push' : 'Pull';
+    const trebleDir = document.getElementById('trebleDir');
+    if (trebleDir) trebleDir.textContent = dir === 'push' ? 'Push' : 'Pull';
     
-    // Heim Info toggle button
-    const legendBtn = document.getElementById('legendToggleBtn');
-    if (legendBtn) {
+    // 3. Bellows direction label (static sec-hdr)
+    const bellowsLabel = document.querySelector('[data-i18n="bellowsDir"]');
+    if (bellowsLabel) bellowsLabel.textContent = t.bellowsDir || 'BELLOWS DIRECTION';
+    
+    // 4. Chord Type / Modal Scales / Root labels
+    const labels = {
+        'chordType': t.chordType || 'CHORD TYPE',
+        'modalScales': t.modalScales || 'MODAL SCALES',
+        'root': t.root || 'ROOT',
+        'legendTitle': t.legendTitle || 'Key',
+    };
+    Object.entries(labels).forEach(([key, val]) => {
+        document.querySelectorAll('[data-i18n="' + key + '"]').forEach(el => {
+            el.textContent = val;
+        });
+    });
+    
+    // 5. Info panel title
+    const infoTitle = document.querySelector('.legend-links-panel .lg-title');
+    if (infoTitle) infoTitle.textContent = t.infoTitle || 'Info';
+    
+    // 6. Heim toggle label
+    const heimToggle = document.querySelector('.legend-heim-toggle');
+    if (heimToggle) {
         const isOpen = document.getElementById('heimExpand')?.classList.contains('open');
-        legendBtn.textContent = (t.heimInfo || 'Heim Info') + (isOpen ? ' ▾' : ' ▸');
+        heimToggle.textContent = (t.heimInfo || 'Heim Info') + (isOpen ? ' ▾' : '');
     }
     
+    // 7. Play-Along button
+    const paBtn = document.getElementById('playalongBtn');
+    if (paBtn) paBtn.textContent = document.body.classList.contains('playalong-mode')
+        ? (t.back || '✕ Back')
+        : (t.playAlong || '🎹 Play-Along');
+    
+    // 8. Scale hints (use localized version)
+    if (t.scaleHints) {
+        Object.entries(SCALE_HINTS).forEach(([key, hint]) => {
+            if (t.scaleHints[key]) hint.text = t.scaleHints[key];
+        });
+    }
+    
+    // 9. Col labels
+    document.querySelectorAll('[data-i18n="col1"]').forEach(el => el.textContent = t.col1 || 'Col 1');
+    document.querySelectorAll('[data-i18n="col2"]').forEach(el => el.textContent = t.col2 || 'Col 2');
+    
+    // 10. Update active lang button
     document.querySelectorAll('.lang-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.lang === lang);
     });
     
+    // 11. Update IT button (no longer "coming soon")
+    document.querySelectorAll('.lang-btn').forEach(b => {
+        b.style.opacity = '';
+        b.style.cursor = '';
+    });
+    
     localStorage.setItem('benny-lang', lang);
+    
+    // 12. Re-render bass labels
+    renderBass();
 }
 
 document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (btn.dataset.lang === 'it') return; // coming soon
         applyLanguage(btn.dataset.lang);
     });
 });
