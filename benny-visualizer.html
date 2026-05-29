@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.5</title>
+<title>Castagnari Benny Accordion v5.8.6</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -290,13 +290,38 @@ body.playalong-mode .treble-column .section {
     border: none !important; background: transparent !important;
 }
 body.playalong-mode .main-grid {
-    gap: 8px;
-    padding: 8px;
+    /* ALWAYS side-by-side in play-along, even portrait! */
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    padding: 6px !important;
     height: 100vh;
     align-items: stretch;
+    overflow: hidden;
+}
+body.playalong-mode .bass-column {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: 160px !important;
+}
+body.playalong-mode .treble-column {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
 /* Keep bellows switches visible in play-along */
 body.playalong-mode .bellows-container { display: block !important; }
+/* In portrait play-along, bellows switches stack */
+body.playalong-mode .bass-column .bellows-switch {
+    flex-direction: column !important;
+    height: auto !important;
+    gap: 4px !important;
+}
+body.playalong-mode .bass-column .bellows-btn {
+    width: 100% !important;
+    height: 40px !important;
+    font-size: 0.75em !important;
+}
 
 /* Play-along toggle button */
 .playalong-btn {
@@ -409,17 +434,44 @@ body.playalong-mode .playalong-btn {
 
 /* ──────────── LEGEND ──────────── */
 .legend { background:var(--bg-card); border-radius:12px; margin-top:20px; padding:12px 16px; }
-.legend-inner { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
-.legend-left { flex:1; min-width:160px; }
-.legend-right { flex-shrink:0; display:flex; align-items:center; }
-.legend-header { display:flex; justify-content:space-between; align-items:center;
-    cursor:pointer; margin-bottom:8px; }
-.legend-header:hover .legend-toggle-btn { color:var(--accent); }
-.legend-toggle-btn { background:none; border:none; cursor:pointer; font-size:0.72em;
-    color:var(--txt3); padding:2px 6px; border-radius:4px; transition:color 0.2s;
-    white-space:nowrap; }
-.legend-toggle-btn.open { color:var(--accent); }
+
+/* Top row: two equal panels */
+.legend-panels { display:flex; gap:10px; margin-bottom:12px; }
+
+/* LEFT panel: button key */
+.legend-key-panel {
+    flex:1; background:var(--bg-secondary,#2c2c2e);
+    border-radius:8px; padding:10px 12px;
+}
+.legend-key-panel .lg-title { font-size:0.7em; font-weight:600; color:var(--txt2);
+    text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+
+/* RIGHT panel: links */
+.legend-links-panel {
+    flex:1; background:var(--bg-secondary,#2c2c2e);
+    border-radius:8px; padding:10px 12px;
+    display:flex; flex-direction:column; justify-content:space-between;
+}
+.legend-links-panel .lg-title { font-size:0.7em; font-weight:600; color:var(--txt2);
+    text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.legend-link-item { display:flex; align-items:center; gap:6px;
+    font-size:0.8em; line-height:1.6; }
+.legend-link-item a { color:var(--accent); text-decoration:none; }
+.legend-link-item a:hover { text-decoration:underline; }
+.legend-link-item .link-icon { color:var(--txt3); font-size:0.85em; }
+
+/* Heim toggle as a link-style item */
+.legend-heim-toggle { cursor:pointer; color:var(--accent);
+    font-size:0.8em; display:flex; align-items:center; gap:6px;
+    line-height:1.6; }
+.legend-heim-toggle:hover { text-decoration:underline; }
+
+/* Bottom: Benny photo centered */
+.legend-benny { display:flex; justify-content:center; margin-top:4px; }
+
+/* Old styles kept for heim expand */
 .legend-symbols { margin-bottom:6px; }
+.legend-toggle-btn { display:none; } /* hidden - replaced by link panel */
 .heim-expand { display:none; margin-bottom:12px; }
 .heim-expand.open { display:block; }
 .heim-divider { height:1px; background:var(--b); margin:10px 0; }
@@ -479,7 +531,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.5</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.6</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -629,23 +681,44 @@ body.playalong-mode .playalong-btn {
                 
                 <!-- LEGEND inside jam-column -->
                 <div class="legend">
-                    <div class="legend-inner">
-                    <div class="legend-left">
-                    <!-- Key title row with toggle -->
-                    <div class="legend-header" id="legendHeader" title="Heim G/C System Info">
-                        <div class="lg-title" data-i18n="legendTitle">Key</div>
-                        <button class="legend-toggle-btn" id="legendToggleBtn">Heim Info ▸</button>
+                    <!-- TWO PANELS: Key + Links -->
+                    <div class="legend-panels">
+
+                        <!-- LEFT: Button Key -->
+                        <div class="legend-key-panel">
+                            <div class="lg-title" data-i18n="legendTitle">Key</div>
+                            <div class="lg-row"><div class="lg-sw pearl"></div>Button – inactive</div>
+                            <div class="lg-row"><div class="lg-sw act"></div>Button – active</div>
+                            <div class="lg-row"><div class="lg-sw root"></div>Root note (blue)</div>
+                            <div class="lg-row"><div class="lg-sw scale"></div>Scale tone</div>
+                        </div>
+
+                        <!-- RIGHT: Links -->
+                        <div class="legend-links-panel">
+                            <div class="lg-title">Info</div>
+                            <div class="legend-link-item">
+                                <span class="link-icon">▸</span>
+                                <span class="legend-heim-toggle" id="legendHeader" title="Heim G/C System Info">Heim Info</span>
+                                <button class="legend-toggle-btn" id="legendToggleBtn" style="display:none;">▸</button>
+                            </div>
+                            <div class="legend-link-item">
+                                <span class="link-icon">↗</span>
+                                <a href="https://github.com/wdeu/benny-accordion#readme" target="_blank" rel="noopener">README</a>
+                            </div>
+                            <div class="legend-link-item">
+                                <span class="link-icon">↗</span>
+                                <a href="https://github.com/wdeu/benny-accordion/blob/main/docs/BASS_ANALYSIS.md" target="_blank" rel="noopener">Bass Analysis</a>
+                            </div>
+                            <div class="legend-link-item">
+                                <span class="link-icon">↗</span>
+                                <a href="https://github.com/wdeu/benny-accordion" target="_blank" rel="noopener">GitHub</a>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Always visible: legend symbols -->
-                    <div class="legend-symbols">
-                        <div class="lg-row"><div class="lg-sw pearl"></div>Button – inactive (Pearl)</div>
-                        <div class="lg-row"><div class="lg-sw act"></div>Button – active (chord tone)</div>
-                        <div class="lg-row"><div class="lg-sw root"></div>Root note (blue)</div>
-                        <div class="lg-row"><div class="lg-sw scale"></div>Scale tone (modal scales)</div>
-                    </div>
 
-                    <!-- Expandable Heim info -->
+
+                    <!-- Expandable Heim info (below panels) -->
                     <div class="heim-expand" id="heimExpand">
                         <div class="heim-divider"></div>
 
@@ -679,13 +752,12 @@ body.playalong-mode .playalong-btn {
                         <div class="heim-note">Chromatic: over 2 octaves · requires bellows reversal</div>
                     </div>
 
-                    </div><!-- end legend-left -->
-                    <div class="legend-right">
+                    <!-- BENNY PHOTO centered below -->
+                    <div class="legend-benny">
                         <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny – Manufacturer's Website">
-                            <img src="assets/icon-512.png" alt="Castagnari Benny" class="benny-image" style="width:100px; max-width:100px;">
+                            <img src="assets/icon-512.png" alt="Castagnari Benny" class="benny-image" style="width:120px; max-width:120px;">
                         </a>
                     </div>
-                    </div><!-- end legend-inner -->
                 </div>
             </div>
         </div>
