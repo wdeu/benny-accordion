@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.9</title>
+<title>Castagnari Benny Accordion v5.8.10</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -256,13 +256,21 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 }
 
 .note-button.highlight-temp {
-    animation: pulse-highlight 0.3s ease-in-out;
-    opacity: 1 !important;  /* Override dim state during playback */
+    opacity: 1 !important;
+    background: radial-gradient(circle at 40% 35%,
+        rgba(10,132,255,0.6) 0%,
+        rgba(10,132,255,0.3) 50%,
+        rgba(10,132,255,0.1) 100%) !important;
+    border: 2px solid var(--accent) !important;
+    box-shadow: 0 0 12px rgba(10,132,255,0.5) !important;
+    transform: scale(1.06) !important;
+    transition: none !important;
 }
 
 @keyframes pulse-highlight {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); box-shadow: 0 0 16px var(--accent); }
+    0% { opacity: 0.6; transform: scale(1.0); }
+    30% { opacity: 1.0; transform: scale(1.08); }
+    100% { opacity: 1.0; transform: scale(1.06); }
 }
 
 /* ──────────── PLAY-ALONG MODE ──────────── */
@@ -532,7 +540,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.9</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.10</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -599,7 +607,7 @@ body.playalong-mode .playalong-btn {
     <div class="treble-column">
         <div class="section" style="position:relative;">
             <div class="treble-push-indicator" id="treblePushIndicator"></div>
-            <div class="lay-title">Treble – <span id="trebleDir">Push</span></div>
+            <div class="lay-title">Treble – <span id="trebleDir">Push</span> <span id="playingNoteDisplay" style="color:var(--accent);font-weight:700;margin-left:8px;font-size:1.1em;letter-spacing:0.05em;"></span></div>
             <!-- Tap zone wrapper: left=PULL, center=buttons, right=PUSH -->
             <div class="treble-tap-wrapper">
                 <div class="treble-tap-zone pull-zone" id="pullZone" title="Pull"></div>
@@ -975,22 +983,36 @@ function playScale(notes, tempo = 0.5) {
 }
 
 function highlightNoteButton(noteName, duration) {
-    // Normalize noteName to uppercase for comparison
-    // (SEMITONE_TO_NOTE gives 'C','G' etc, buttons are 'c 4','g 9' etc)
-    const normalizedTarget = noteName.charAt(0).toUpperCase() + noteName.slice(1);
+    // Normalize noteName for comparison
+    // SEMITONE_TO_NOTE gives 'C','F#','G#' etc
+    // Buttons have 'c 4','f# 2','g# 1' etc
+    const norm = s => {
+        const r = s.charAt(0).toUpperCase() + s.slice(1);
+        // Enharmonic: G# = Ab, D# = Eb, A# = Bb
+        return r.replace('G#','Ab').replace('D#','Eb').replace('A#','Bb');
+    };
+    const target = norm(noteName);
     
     document.querySelectorAll('.note-button').forEach(btn => {
-        const rawNote = pureName(btn.dataset.note);
-        // Normalize button note to uppercase for comparison
-        const btnNote = rawNote.charAt(0).toUpperCase() + rawNote.slice(1);
+        const rawNote = pureName(btn.dataset.note || '');
+        if (!rawNote) return;
+        const btnNote = norm(rawNote);
         
-        if(btnNote === normalizedTarget && !btn.classList.contains('highlight-temp')) {
+        if(btnNote === target) {
+            btn.classList.remove('highlight-temp'); // reset if already active
+            void btn.offsetWidth; // force reflow to restart animation
             btn.classList.add('highlight-temp');
             setTimeout(() => {
                 btn.classList.remove('highlight-temp');
-            }, duration * 800);
+            }, Math.max(duration * 750, 200));
         }
     });
+    // Show playing note in treble header
+    const nd = document.getElementById('playingNoteDisplay');
+    if (nd) {
+        nd.textContent = target;
+        setTimeout(() => { nd.textContent = ''; }, Math.max(duration * 750, 200));
+    }
 }
 
 function stopAll() {
