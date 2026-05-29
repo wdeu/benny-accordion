@@ -5,7 +5,7 @@
 **Interactive Learning Tool · C/G · 3-reihig · Heim**
 
 [![License: Custom Non-Commercial](https://img.shields.io/badge/License-Custom%20Non--Commercial-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-5.7.6-brightgreen.svg)](https://github.com/wdeu/benny-accordion/releases)
+[![Version](https://img.shields.io/badge/version-5.8.7-brightgreen.svg)](https://github.com/wdeu/benny-accordion/releases)
 [![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://wdeu.github.io/benny-accordion)
 
 An interactive web application for visualizing and learning the **Castagnari Benny C/G (3-row, Heim tuning)** diatonic accordion. Perfect for students, teachers, and players exploring French traditional music, Bourrées, and modal playing.
@@ -14,7 +14,7 @@ An interactive web application for visualizing and learning the **Castagnari Ben
 
 ---
 
-## ✨ Features (v5.7.6)
+## ✨ Features (v5.8.7)
 
 ### 🪗 Interactive Accordion Visualization
 - **Player perspective**: See the accordion from above, exactly as you play it
@@ -43,13 +43,23 @@ An interactive web application for visualizing and learning the **Castagnari Ben
 - **Stop button**: Immediate playback termination
 - **Authentic bass voicings**: Spektral-analysiert · Mellow (E, Eb, D) vs Brilliant
 
-### 🎨 Visual Improvements (v5.7)
-- **International notation**: Uppercase (C, G...) = Akkord · lowercase (c, g...) = Einzelton
+### 🎨 Visual Improvements (v5.7–5.8)
+- **International notation**: Uppercase (C, G...) = Chord · lowercase (c, g...) = Single note
 - **Button display**: Note name large and bold, position number small and gray
 - **PUSH indicator**: Blue border around treble area when in Push direction
 - **Musical symbols**: ♭ and ♯ throughout (A♭ instead of Ab, C♯ instead of C#)
+- **4 languages**: EN / DE / FR / IT (switchable in the app header)
 - **Heim-Info**: Expandable system info in legend (Corgeron, modal strengths, notation)
 - **Scale hints**: Contextual Heim-layout recommendations when selecting scales
+
+### 🎹 Treble Button Playback (v5.8)
+- **Individual treble notes**: Every button produces its correct pitch when tapped
+- **Touch-sensitive**: Hold for sustained note, release to stop
+- **Chord stacking**: Tap multiple treble buttons simultaneously (e.g. c + e♭ + g = C minor!)
+- **Bass + treble combined**: Left hand bass, right hand treble – like playing the real instrument
+- **Complete octave mapping**: All 66 treble buttons correctly mapped (verified against piano reference)
+- **Play-Along mode**: Strips UI to buttons only – lay iPad flat and play! 🎹
+- **Tap zones**: Tap the empty space left/right of treble buttons to switch Pull/Push instantly
 
 ### 📱 iPad ONE Screen Layout (v5.3+)
 - **3-column grid**: Bass | Treble | Jam-Box
@@ -98,7 +108,15 @@ An interactive web application for visualizing and learning the **Castagnari Ben
 ### Option 1: Online (Easiest)
 Visit **[wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)**
 
-### Option 2: iPhone/iPad Home Screen
+### Option 2: Play-Along (iPad)
+1. Open the app on iPad in landscape mode
+2. Tap **🎹 Play-Along** (bottom right)
+3. Lay the iPad flat on a table
+4. Left hand plays bass buttons, right hand plays treble
+5. Tap left/right of treble area to switch Pull/Push instantly
+6. Tap **✕ Back** to return to full UI
+
+### Option 3: iPhone/iPad Home Screen
 1. Open in Safari: [wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)
 2. Tap Share button (square with arrow)
 3. Scroll to "Add to Home Screen"
@@ -130,7 +148,7 @@ open index.html
 5. **Play audio** (optional): Press ▶️ Play button
 
 ### Modal Jamming Workflow (NEW!)
-1. Select a **modal scale** (e.g., "Dorisch")
+1. Select a **modal scale** (e.g., "Dorian")
 2. Choose **root note** (e.g., "D")
 3. Select **Benny Original** tone for authentic sound
 4. Set **tempo** slower (0.7s recommended for practice)
@@ -140,10 +158,10 @@ open index.html
 7. **Play along** on your accordion!
 8. Press **⏹️ Stop** when done
 
-### Bass Triads (Quick Mode)
-1. Click any **bass button** (e.g., "C" or "c")
-2. Uppercase = Major triad (C-E-G)
-3. Lowercase = Minor triad (C-Eb-G)
+### Bass Buttons
+1. Click any **chord button** (uppercase, e.g. "C") → plays C chord voicing
+2. Click any **single note button** (lowercase, e.g. "c") → plays single bass note
+3. Treble shows the chord pattern for reference
 4. See chord tones highlighted on treble side
 
 ### iPad Landscape Mode
@@ -166,7 +184,7 @@ This tool embodies a **pull-dominant bellows strategy** (75-80% PULL movements) 
 5. **Energy from tension**: Musical energy comes from bellows pressure, not direction changes
 
 ### Why the Helper Row Matters
-The **3. Reihe (Helferreihe)** is essential for:
+The **Row 3 (Heim row)** is essential for:
 - **Modal playing**: Access to F (Dorian character), Bb (minor pieces)
 - **Bellows economy**: Reduces forced direction changes
 - **Authentic folk sound**: Characteristic tones for French traditional music
@@ -278,7 +296,7 @@ See [complete bass analysis](docs/BASS_ANALYSIS.md) for:
 
 ## 🗺️ Roadmap
 
-### Completed (v5.5–5.7.6)
+### Completed (v5.5–5.8.4)
 - [x] Spectral analysis of real Castagnari Benny (treble + all bass buttons)
 - [x] Custom waveform synthesis (Benny Original sound)
 - [x] Authentic bass voicings (Mellow: E, Eb, D · Brilliant: all others)
@@ -290,11 +308,11 @@ See [complete bass analysis](docs/BASS_ANALYSIS.md) for:
 - [x] Musical symbols ♭ ♯ throughout
 - [x] Raycast auto-deploy script (self-updating)
 
-### Next (v5.8)
-- [ ] Individual treble button playback (single note on click)
-- [ ] Chord stacking: c + eb + g = C-Moll in treble
-- [ ] Touch-sensitive duration (hold = sustain)
-- [ ] Bass + treble combined (full Benny experience!)
+### Next (v5.9)
+- [ ] Melody recording & playback
+- [ ] Italian UI (i18n already prepared in v5.8.4)
+- [ ] Castagnari partnership integration
+- [ ] More accordion models (D/G, G/D)
 
 ### Later (v6.0+)
 - [ ] Custom chord definitions
@@ -359,8 +377,8 @@ Open to collaboration with:
 ## 🙏 Acknowledgments
 
 - **Castagnari s.r.l.**: For building exceptional diatonic accordions since 1914
-- **The Bal Folk community**: For preserving French traditional music
-- **Accordion teachers**: Jean Blanchard, Marc Perrone, Riccardo Tesi, Gilles Chabenat, Patrick Bouffard, and many others whose pedagogical insights informed this tool
+- **The Bal Folk community**: For preserving French traditional music and its modal repertoire
+- **The composers and players** of the Bourrée, Scottish, and Bal Folk traditions – many thanks to Remi Geffroy, Anne Niepold, Norbert Pignol & Stéphane Milleret, Jean-Michel Bencetti (Musescore), and many others
 
 ---
 
@@ -382,6 +400,6 @@ If this tool helps your accordion journey, consider giving it a ⭐ on GitHub!
 
 ---
 
-**Version:** 5.7.6  
-**Last Updated:** May 26, 2026  
+**Version:** 5.8.7  
+**Last Updated:** May 27, 2026  
 **Status:** Active Development

@@ -1847,6 +1847,16 @@ const I18N = {
 
 let currentLang = 'en';
 
+// SCALE_HINTS: base from EN, updated by applyLanguage
+const SCALE_HINTS = {
+    ionian:     { text: I18N.en.scaleHints.ionian,     keys: ['G','D','C','F'] },
+    dorian:     { text: I18N.en.scaleHints.dorian,     keys: ['G','D'] },
+    phrygian:   { text: I18N.en.scaleHints.phrygian,   keys: ['E','A'] },
+    lydian:     { text: I18N.en.scaleHints.lydian,     keys: ['G','C'] },
+    mixolydian: { text: I18N.en.scaleHints.mixolydian, keys: ['G','C'] },
+    aeolian:    { text: I18N.en.scaleHints.aeolian,    keys: ['A','D','E'] },
+};
+
 // Map of element IDs to i18n keys for static labels
 const I18N_ELEMENTS = {
     'bellowsDirLabel':  'bellowsDir',
