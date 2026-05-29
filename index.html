@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.7</title>
+<title>Castagnari Benny Accordion v5.8.8</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -47,7 +47,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 @media (min-width: 1024px) {
     .main-grid {
         display: grid;
-        grid-template-columns: 280px 1fr 340px;
+        grid-template-columns: 220px 1fr 300px;
         gap: 20px;
         align-items: start;
     }
@@ -178,7 +178,8 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 .lay-title { font-size:0.7em; font-weight:600; color:var(--txt2); text-transform:uppercase;
     letter-spacing:1px; padding:10px 2px 6px; text-align:center; }
 
-.treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start; }
+.treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start;
+    flex:1; width:100%; }
 .row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:70px; }
 
 .row:nth-child(1) { margin-top: 0; }
@@ -343,16 +344,15 @@ body.playalong-mode .playalong-btn {
     align-items: flex-start;
     gap: 0;
     width: 100%;
+    justify-content: center;
 }
 .treble-tap-zone {
-    flex: 1;
+    flex: 0 0 32px;  /* Fixed narrow width - just enough to tap */
     min-height: 200px;
     cursor: pointer;
-    /* Invisible but tappable */
     background: transparent;
     border-radius: 8px;
     transition: background 0.15s;
-    /* Visual hint on hover */
     position: relative;
 }
 .treble-tap-zone::after {
@@ -531,7 +531,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.7</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.8</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -1132,6 +1132,95 @@ function getNoteFromInterval(root, semitones) {
     return notes[newIdx];
 }
 
+// ── SUSTAINED BASS (hold = sustain, release = fade) ──
+let activeBassOscillators = {};  // {noteKey: {osc, gain}} for sustained bass
+
+function startSustainedBass(note, isChord) {
+    if (!audioContext) return;
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    const root = (function bassRootLocal(s) {
+        const m = s.match(/^([A-Ga-g][b#]?)/i);
+        return m ? m[1].charAt(0).toUpperCase() + m[1].slice(1) : s.charAt(0).toUpperCase();
+    })(note);
+
+    const noteKey = root + (isChord ? '_chord' : '_single');
+    // Stop previous if re-triggered
+    if (activeBassOscillators[noteKey]) stopSustainedBass(noteKey, true);
+
+    const tone = document.getElementById('toneType').value;
+    const mellowNotes = ['E', 'Eb', 'D'];
+    const isMellow = mellowNotes.includes(root);
+
+    // Build frequencies (same as playBassNote)
+    const freqs = [];
+    const getNoteFreq = (n, oct) => {
+        const A4 = 440;
+        const sem = {'C':0,'C#':1,'D':2,'Eb':3,'E':4,'F':5,'F#':6,'G':7,'G#':8,'Ab':8,'A':9,'Bb':10,'B':11};
+        const n2 = n.charAt(0).toUpperCase() + n.slice(1);
+        const s = sem[n2] !== undefined ? sem[n2] : 0;
+        return A4 * Math.pow(2, ((oct-4)*12 + s - 9)/12);
+    };
+    const getNoteFromInt = (r, semitones) => {
+        const notes = ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+        const idx = notes.indexOf(r.charAt(0).toUpperCase() + r.slice(1));
+        if (idx === -1) return r;
+        return notes[(idx + semitones) % 12];
+    };
+
+    freqs.push(getNoteFreq(root, 2));
+    freqs.push(getNoteFreq(root, 3));
+    if (isChord) {
+        freqs.push(getNoteFreq(root, 4));
+        const fifth = getNoteFromInt(root, 7);
+        freqs.push(getNoteFreq(fifth, isMellow ? 3 : 4));
+    }
+
+    const now = audioContext.currentTime;
+    const oscs = [];
+
+    freqs.forEach(freq => {
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        if (tone === 'benny') {
+            osc.setPeriodicWave(createBennyWave(audioContext));
+            osc.detune.value = 3 + Math.random() * 4;
+        } else {
+            osc.type = tone === 'warm' ? 'triangle' : tone === 'bright' ? 'sawtooth' : 'sine';
+        }
+        osc.frequency.value = freq;
+
+        // Attack
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.25, now + 0.08);
+
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start(now);
+        oscs.push({ oscillator: osc, gainNode: gain });
+        activeOscillators.push({ oscillator: osc, gainNode: gain });
+    });
+
+    activeBassOscillators[noteKey] = oscs;
+}
+
+function stopSustainedBass(noteKey, immediate = false) {
+    const oscs = activeBassOscillators[noteKey];
+    if (!oscs) return;
+    const now = audioContext ? audioContext.currentTime : 0;
+    const rel = immediate ? 0.02 : 0.18;
+    oscs.forEach(({ oscillator, gainNode }) => {
+        try {
+            gainNode.gain.cancelScheduledValues(now);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+            gainNode.gain.linearRampToValueAtTime(0, now + rel);
+            oscillator.stop(now + rel + 0.01);
+        } catch(e) {}
+    });
+    delete activeBassOscillators[noteKey];
+}
+
 // ── TREBLE SINGLE BUTTON PLAYBACK ──
 function startTrebleNote(buttonId, freq) {
     if (!freq || !audioContext) return;
@@ -1515,17 +1604,38 @@ function renderBass() {
             if(noteIsUpper) btn.classList.add('is-chord');
             btn.dataset.note = note;
             btn.textContent  = noteDisplay(note);
-            // Click for visual + chord display
-            btn.addEventListener('click', ()=> onBassClick(note));
-            // Touch-hold for sustained bass note (independent of treble!)
-            btn.addEventListener('mousedown', e => {
-                if (e.button !== 0) return;
-                onBassClick(note);
-            });
-            btn.addEventListener('touchstart', e => {
+            // Visual + chord display on click
+            btn.addEventListener('click', () => onBassClick(note));
+
+            // Sustained play: sound lasts as long as finger is held
+            const bassStart = (e) => {
                 e.preventDefault();
-                onBassClick(note);
-            }, { passive: false });
+                const root = (function(s){
+                    const m=s.match(/^([A-Ga-g][b#]?)/i);
+                    return m?m[1].charAt(0).toUpperCase()+m[1].slice(1):s.charAt(0).toUpperCase();
+                })(note);
+                const firstChar = note.charAt(0);
+                const isUpper = (firstChar===firstChar.toUpperCase() && firstChar!==firstChar.toLowerCase());
+                const isChord = isUpper;
+                const noteKey = root + (isChord?'_chord':'_single');
+                onBassClick(note);  // visual update
+                startSustainedBass(note, isChord);
+                btn.classList.add('playing');
+                // Store key for release
+                btn.dataset.bassKey = noteKey;
+            };
+            const bassStop = () => {
+                const key = btn.dataset.bassKey;
+                if (key) stopSustainedBass(key);
+                btn.classList.remove('playing');
+            };
+
+            btn.addEventListener('mousedown', e => { if(e.button===0) bassStart(e); });
+            btn.addEventListener('mouseup', bassStop);
+            btn.addEventListener('mouseleave', bassStop);
+            btn.addEventListener('touchstart', bassStart, { passive: false });
+            btn.addEventListener('touchend', e => { e.preventDefault(); bassStop(); }, { passive: false });
+            btn.addEventListener('touchcancel', bassStop, { passive: true });
             column.appendChild(btn);
         });
         cont.appendChild(column);
@@ -1644,13 +1754,11 @@ function onBassClick(note) {
     document.querySelectorAll('.chip[data-scale]').forEach(b => b.classList.remove('active'));
     
     // Play ONLY the bass note - no treble chord!
+    // Audio triggered by touch/mouse events (sustained), not here
+    // Only trigger from Jam-Box play button via playBassNote
     if(document.getElementById('autoPlay').checked) {
-        // First ensure everything is stopped
-        stopAll();
-        // Wait for fade-out to complete before playing new note (50ms = after the 20ms fade + buffer)
-        setTimeout(() => {
-            playBassNote(root, isChord);
-        }, 50);
+        // Only auto-play when triggered from jam-box (not from touch hold)
+        // Touch events handle their own audio via startSustainedBass
     }
 }
 
