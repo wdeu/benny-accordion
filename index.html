@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.11</title>
+<title>Castagnari Benny Accordion v5.8.12</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -540,7 +540,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.11</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.12</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -1830,6 +1830,7 @@ function playCurrentChord() {
             ? sortedNotes
             : [rootName, ...sortedNotes];
         const tempo = parseFloat(document.getElementById('arpeggioTempo').value);
+        flashChordChip(tempo * withRoot.length);
         playScale(withRoot, tempo);
     } else {
         const frequencies = chordNotes.map(n => noteToFrequency(n, 4));
@@ -2104,6 +2105,18 @@ function toggleHeimInfo() {
     btn.textContent = isOpen ? 'Heim Info ▸' : 'Heim Info ▾';
 }
 document.getElementById('legendHeader').addEventListener('click', toggleHeimInfo);
+
+// ── CHORD CHIP FLASH ──
+function flashChordChip(duration = 1.5) {
+    // Find the active chord type chip and make it glow
+    const activeChip = document.querySelector('.chip[data-ctype].active, .chip[data-scale].active');
+    if (!activeChip) return;
+    
+    activeChip.classList.add('playing-chip');
+    setTimeout(() => {
+        activeChip.classList.remove('playing-chip');
+    }, Math.min(duration * 800, 1200));
+}
 
 // ── SCALE HINT ──
 function updateScaleHint(scaleType, root) {
