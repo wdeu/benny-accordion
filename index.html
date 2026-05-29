@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.10</title>
+<title>Castagnari Benny Accordion v5.8.11</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -540,7 +540,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.10</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.11</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -2104,6 +2104,25 @@ function toggleHeimInfo() {
     btn.textContent = isOpen ? 'Heim Info ▸' : 'Heim Info ▾';
 }
 document.getElementById('legendHeader').addEventListener('click', toggleHeimInfo);
+
+// ── SCALE HINT ──
+function updateScaleHint(scaleType, root) {
+    const box = document.getElementById('scaleHint');
+    if (!box) return;
+    if (!scaleType || !SCALE_HINTS[scaleType]) {
+        box.classList.remove('visible');
+        return;
+    }
+    const hint = SCALE_HINTS[scaleType];
+    let text = hint.text;
+    // Highlight if current root is a strong key for this scale
+    if (root && hint.keys && hint.keys.includes(root)) {
+        const t = I18N[currentLang] || I18N.en;
+        text += ` · <strong style="color:#4cd964">✓ ${root} ${t.isHeimStrength || 'is a Heim strength!'}</strong>`;
+    }
+    box.innerHTML = text;
+    box.classList.add('visible');
+}
 
 // ── TREBLE TAP ZONES: Left=PULL, Right=PUSH ──
 ['pullZone', 'pushZone'].forEach(id => {
