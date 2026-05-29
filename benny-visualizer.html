@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.8</title>
+<title>Castagnari Benny Accordion v5.8.9</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -257,6 +257,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 .note-button.highlight-temp {
     animation: pulse-highlight 0.3s ease-in-out;
+    opacity: 1 !important;  /* Override dim state during playback */
 }
 
 @keyframes pulse-highlight {
@@ -531,7 +532,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.8</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.9</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -974,9 +975,16 @@ function playScale(notes, tempo = 0.5) {
 }
 
 function highlightNoteButton(noteName, duration) {
+    // Normalize noteName to uppercase for comparison
+    // (SEMITONE_TO_NOTE gives 'C','G' etc, buttons are 'c 4','g 9' etc)
+    const normalizedTarget = noteName.charAt(0).toUpperCase() + noteName.slice(1);
+    
     document.querySelectorAll('.note-button').forEach(btn => {
-        const btnNote = pureName(btn.dataset.note);
-        if(btnNote === noteName && !btn.classList.contains('highlight-temp')) {
+        const rawNote = pureName(btn.dataset.note);
+        // Normalize button note to uppercase for comparison
+        const btnNote = rawNote.charAt(0).toUpperCase() + rawNote.slice(1);
+        
+        if(btnNote === normalizedTarget && !btn.classList.contains('highlight-temp')) {
             btn.classList.add('highlight-temp');
             setTimeout(() => {
                 btn.classList.remove('highlight-temp');
