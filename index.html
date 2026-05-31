@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.11.0</title>
-<meta name="version" content="5.11.0">
+<title>Castagnari Benny Accordion v5.12.0</title>
+<meta name="version" content="5.12.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -657,7 +657,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.11.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.12.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -717,9 +717,6 @@ body.playalong-mode .playalong-btn {
                     <input type="range" id="songTempo" min="40" max="200" step="2" value="80">
                     <span class="val" id="songTempoVal">80 bpm</span>
                 </div>
-                <label class="song-kuer-row" title="Kür: Balgwechsel selbst ausführen (Zone antippen), bevor die Note zählt">
-                    <input type="checkbox" id="songKuer"> Balg-Geste abverlangen (Kür)
-                </label>
                 <label class="song-kuer-row" id="songMicRow" title="Wait-Modus: Abspielkopf rückt vor, wenn das Mikro den richtigen Melodieton hört (am echten Benny). Standard: aus.">
                     <input type="checkbox" id="songMic"> 🎤 Zuhören (echtes Instrument)
                 </label>
@@ -2599,17 +2596,9 @@ function songStep() {
     };
 
     if (needSwitch) {
-        const kuer = document.getElementById('songKuer').checked;
         demandBellows(ev.dir);
-        if (kuer && songMode === 'wait') {
-            // Kür: wait for the student to switch the bellows themselves
-            songAwaitBellows = true;
-            setSongStatus('Balg wechseln → ' + ev.dir.toUpperCase());
-            return;   // proceedToNote() called from switchDir hook when dir matches
-        } else {
-            switchDir(ev.dir);          // auto-switch (re-renders treble)
-            setTimeout(proceedToNote, 30);
-        }
+        switchDir(ev.dir);          // auto-switch (re-renders treble)
+        setTimeout(proceedToNote, 30);
     } else {
         proceedToNote();
     }
@@ -2709,17 +2698,6 @@ function micDisable() {
     micAnalyser = null; micBuf = null; micStableMidi = null; micStableCount = 0;
 }
 
-// Hook into bellows switching for the Kür gate
-const _songSwitchDir = switchDir;
-switchDir = function(newDir) {
-    _songSwitchDir(newDir);
-    if (songAwaitBellows && newDir === song.events[songIdx].dir) {
-        songAwaitBellows = false;
-        const ev = song.events[songIdx];
-        clearSongTarget(); lightTarget(ev); songWaiting = true;
-        setSongStatus('Spiele  ' + ev.name + '  (' + ev.dir.toUpperCase() + ')');
-    }
-};
 
 function songFinish() {
     songPlaying = false; songWaiting = false; songAwaitBellows = false;
@@ -2792,7 +2770,9 @@ document.getElementById('songFileInput').addEventListener('change', async e => {
         } else if (lower.endsWith('.xml') || lower.endsWith('.musicxml')) {
             await importMusicXML(await f.text(), f.name);
         } else if (lower.endsWith('.mid') || lower.endsWith('.midi')) {
-            setSongStatus('MIDI-Import (Fallback) folgt als nächster Baustein.');
+            setSongStatus('Lese MIDI ' + f.name + ' …');
+            const parsed = parseMIDI(new Uint8Array(await f.arrayBuffer()));
+            importMIDI(parsed, f.name);
         } else {
             setSongStatus('Unbekanntes Format: ' + f.name);
         }
@@ -2850,6 +2830,95 @@ async function unzipMxl(buf) {
         scorePath = Object.keys(entries).find(k => !k.startsWith('META-INF') && k.endsWith('.xml'));
     if (!scorePath) throw new Error('keine score.xml im MXL');
     return await inflate(entries[scorePath]);
+}
+
+// ── MIDI parachute: raw .mid has no chord symbols → guess chord per measure ──
+function parseMIDI(u8) {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let p = 0;
+    const str = n => { let s=''; for (let i=0;i<n;i++) s+=String.fromCharCode(u8[p++]); return s; };
+    if (str(4) !== 'MThd') throw new Error('kein MIDI (MThd fehlt)');
+    const hlen = dv.getUint32(p); p += 4;
+    const format = dv.getUint16(p); p += 2;
+    const ntrks = dv.getUint16(p); p += 2;
+    const division = dv.getUint16(p); p += 2;
+    p += (hlen - 6);
+    let tempo = 500000;
+    const notes = [];
+    for (let t = 0; t < ntrks; t++) {
+        if (str(4) !== 'MTrk') break;
+        const tlen = dv.getUint32(p); p += 4;
+        const tEnd = p + tlen;
+        let tick = 0, running = 0; const on = {};
+        while (p < tEnd) {
+            let d = 0, b; do { b = u8[p++]; d = (d<<7)|(b&0x7f); } while (b & 0x80);
+            tick += d;
+            let status = u8[p];
+            if (status & 0x80) p++; else status = running;
+            running = status;
+            const type = status & 0xF0;
+            if (status === 0xFF) {
+                const meta = u8[p++]; let mlen=0, mb; do { mb=u8[p++]; mlen=(mlen<<7)|(mb&0x7f); } while (mb & 0x80);
+                if (meta === 0x51 && mlen === 3) tempo = (u8[p]<<16)|(u8[p+1]<<8)|u8[p+2];
+                p += mlen;
+            } else if (status === 0xF0 || status === 0xF7) {
+                let slen=0, sb; do { sb=u8[p++]; slen=(slen<<7)|(sb&0x7f); } while (sb & 0x80);
+                p += slen;
+            } else if (type === 0x90) {
+                const note=u8[p++], vel=u8[p++];
+                if (vel>0) on[note]=tick;
+                else if (on[note]!=null){ notes.push({midi:note,startTick:on[note],durTick:tick-on[note]}); delete on[note]; }
+            } else if (type === 0x80) {
+                const note=u8[p++]; p++;
+                if (on[note]!=null){ notes.push({midi:note,startTick:on[note],durTick:tick-on[note]}); delete on[note]; }
+            } else if (type === 0xC0 || type === 0xD0) { p += 1; }
+            else { p += 2; }
+        }
+        p = tEnd;
+    }
+    notes.sort((a,b)=> a.startTick-b.startTick || a.midi-b.midi);
+    return { format, division: division || 480, tempo, notes };
+}
+
+function importMIDI(parsed, fileName) {
+    const { division, tempo, notes } = parsed;
+    if (!notes.length) throw new Error('keine Noten im MIDI');
+    let bpm = Math.round(60000000 / tempo); bpm = Math.max(40, Math.min(200, bpm));
+
+    // group simultaneous notes; melody = top note, bass candidate = lowest
+    const byTick = {};
+    for (const n of notes) (byTick[n.startTick] = byTick[n.startTick] || []).push(n);
+    const ticks = Object.keys(byTick).map(Number).sort((a,b)=>a-b);
+
+    const measTicks = 4 * division;   // assume 4/4 (raw MIDI rarely carries usable meter for this)
+    const chordOf = startTick => {
+        const mStart = Math.floor(startTick/measTicks)*measTicks;
+        const tally = new Array(12).fill(0);
+        for (const n of notes) if (n.startTick>=mStart && n.startTick<mStart+measTicks) tally[((n.midi%12)+12)%12]++;
+        let best=0, bestScore=-1;
+        for (let r=0;r<12;r++){ const sc = tally[r]*2 + tally[(r+4)%12] + tally[(r+3)%12] + tally[(r+7)%12];
+            if (sc>bestScore){bestScore=sc;best=r;} }
+        return SEMITONE_TO_NOTE[best];
+    };
+
+    const events = []; let prevEnd = 0;
+    for (const tk of ticks) {
+        const group = byTick[tk].slice().sort((a,b)=>a.midi-b.midi);
+        const top = group[group.length-1], low = group[0];
+        if (tk > prevEnd + (division*0.1)) events.push({ rest:true, beats:(tk-prevEnd)/division });
+        const name = SEMITONE_TO_NOTE[((top.midi%12)+12)%12] + (Math.floor(top.midi/12)-1);
+        const ev = { name, beats: Math.max(top.durTick/division, 0.25), chord: chordOf(tk) };
+        // bass from the lowest simultaneous note, if it's clearly below the melody
+        if (group.length > 1 && low.midi <= top.midi - 5) ev.bassRoot = SEMITONE_TO_NOTE[((low.midi%12)+12)%12];
+        events.push(ev);
+        prevEnd = tk + top.durTick;
+    }
+
+    const melodic = events.filter(e=>!e.rest).length;
+    if (!melodic) throw new Error('keine spielbaren Noten im MIDI');
+    const title = fileName.replace(/\.(mid|midi)$/i, '');
+    loadSongData({ name: title, bpm, events });
+    setSongStatus(melodic + ' Noten · MIDI · Akkorde geschätzt · ' + bpm + ' bpm');
 }
 
 // ── Parse MusicXML → loadSongData. Melody = first part, voice 1; chord drives direction. ──
