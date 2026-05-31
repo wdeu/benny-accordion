@@ -2271,34 +2271,48 @@ let fitActive = false;
 
 function applyFitScale() {
     const container = document.getElementById('treble-container');
+    const bass = document.getElementById('bass-container');
     if (!container) return;
-    
+
     if (!fitActive || !playAlongActive) {
         container.style.transform = '';
         container.style.transformOrigin = '';
+        container.style.width = '';
+        container.style.height = '';
+        if (bass) { bass.style.transform=''; bass.style.transformOrigin=''; bass.style.width=''; bass.style.height=''; }
         return;
     }
-    
-    // Available height: viewport minus bass column header, bellows, fit button
-    // Available width: viewport minus bass column (~140px)
-    const availH = window.innerHeight - 32;  // some padding
-    const availW = window.innerWidth - 160;   // bass column width
-    
-    // Natural size of treble container
+
+    const availH = window.innerHeight - 32;
+    const availW = window.innerWidth - 160;   // reserve the bass column
+
     const naturalW = container.scrollWidth;
     const naturalH = container.scrollHeight;
-    
-    // Scale to fit both dimensions
+
     const scaleW = availW / naturalW;
     const scaleH = availH / naturalH;
-    const scale = Math.min(scaleW, scaleH, 1.0);  // never enlarge
-    
+    const MAX = 2.6;                          // allow enlargement (desktop), capped
+    const scale = Math.min(scaleW, scaleH, MAX);
+
     container.style.transformOrigin = 'top left';
     container.style.transform = `scale(${scale.toFixed(3)})`;
-    // Shrink the container's layout footprint too
     container.style.width = naturalW + 'px';
     container.style.height = (naturalH * scale) + 'px';
     container.style.overflow = 'visible';
+
+    // Bass: grow together ONLY when enlarging (desktop). On iPad/iPhone the
+    // shrink path (scale<=1) is left exactly as before — bass untouched.
+    if (bass) {
+        bass.style.transform = ''; bass.style.width = ''; bass.style.height = '';  // measure natural
+        if (scale > 1.02) {
+            const bw = bass.scrollWidth, bh = bass.scrollHeight;
+            bass.style.transformOrigin = 'top left';
+            bass.style.transform = `scale(${scale.toFixed(3)})`;
+            bass.style.width = bw + 'px';
+            bass.style.height = (bh * scale) + 'px';
+            bass.style.overflow = 'visible';
+        }
+    }
 }
 
 document.getElementById('fitToggleBtn').addEventListener('click', () => {
@@ -2320,7 +2334,15 @@ document.getElementById('playalongBtn').addEventListener('click', () => {
     const t = I18N[currentLang] || I18N.en;
     document.getElementById('playalongBtn').textContent = 
         playAlongActive ? (t.back || '✕ Back') : (t.playAlong || '🎹 Play-Along');
-    
+
+    if (playAlongActive) {
+        // Fit-to-screen ON by default — saves a tap. User can switch it off
+        // afterwards to see larger buttons.
+        fitActive = true;
+        document.body.classList.add('playalong-fit');
+        document.getElementById('fitToggleBtn').textContent = '⊠ Fit: On';
+    }
+
     // Reset fit when leaving play-along
     if (!playAlongActive && fitActive) {
         fitActive = false;
@@ -2331,6 +2353,8 @@ document.getElementById('playalongBtn').addEventListener('click', () => {
             container.style.height = '';
             container.style.width = '';
         }
+        const bassC = document.getElementById('bass-container');
+        if (bassC) { bassC.style.transform=''; bassC.style.height=''; bassC.style.width=''; }
         document.getElementById('fitToggleBtn').textContent = '⊡ Fit Screen';
     }
     
@@ -2440,7 +2464,8 @@ function songResolve(ev) {
     const forced = !ev.dir && want != null && inWant.length === 0;
     const pick = [...pool].sort((a,b)=>ROW_PRIORITY[a.row]-ROW_PRIORITY[b.row])[0];
     return { btnId: pick.dir+'_'+pick.row+'_'+pick.pos, dir: pick.dir, row: pick.row,
-             pos: pick.pos, name: ev.name, forced };
+             pos: pick.pos, name: ev.name, forced,
+             beats: (ev.beats != null ? ev.beats : 1), chord: ev.chord };
 }
 
 // ── Hand-written demo: Bourrée d'Avignon, A-Teil (from the user's own analysis) ──
