@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.10.0</title>
-<meta name="version" content="5.10.0">
+<title>Castagnari Benny Accordion v5.11.0</title>
+<meta name="version" content="5.11.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -657,7 +657,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.10.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.11.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -719,6 +719,9 @@ body.playalong-mode .playalong-btn {
                 </div>
                 <label class="song-kuer-row" title="Kür: Balgwechsel selbst ausführen (Zone antippen), bevor die Note zählt">
                     <input type="checkbox" id="songKuer"> Balg-Geste abverlangen (Kür)
+                </label>
+                <label class="song-kuer-row" id="songMicRow" title="Wait-Modus: Abspielkopf rückt vor, wenn das Mikro den richtigen Melodieton hört (am echten Benny). Standard: aus.">
+                    <input type="checkbox" id="songMic"> 🎤 Zuhören (echtes Instrument)
                 </label>
                 <div class="song-status" id="songStatus"></div>
             </div>
@@ -2612,19 +2615,98 @@ function songStep() {
     }
 }
 
-// Called by the delegated treble listener when a button is pressed
+// Shared "correct note played" advance — used by both tap and mic listening.
+function songAdvanceCorrect(btnId) {
+    songWaiting = false;
+    const btn = document.querySelector('.note-button[data-btn-id="'+btnId+'"]');
+    if (btn) { btn.classList.remove('waiting'); btn.classList.add('song-correct'); }
+    setTimeout(()=>{ songIdx++; songStep(); }, 140);
+}
+
+// Called by the delegated treble listener when a button is pressed (tap input)
 function songHitTest(btnId) {
     if (!songPlaying) return;
     if (songMode === 'wait' && songWaiting && !songAwaitBellows) {
         const ev = song.events[songIdx];
-        if (btnId === ev.btnId) {
-            songWaiting = false;
-            const btn = document.querySelector('.note-button[data-btn-id="'+btnId+'"]');
-            if (btn) { btn.classList.remove('waiting'); btn.classList.add('song-correct'); }
-            setTimeout(()=>{ songIdx++; songStep(); }, 140);
-        }
+        if (btnId === ev.btnId) songAdvanceCorrect(btnId);
         // wrong button → just sounds (its own handler), no advance, no penalty
     }
+}
+
+// ── Mic "listen" input: advance Wait when the right melody PITCH is heard ──
+// Off by default. Confirms the note (pitch), not the specific button/bellows.
+let micStream = null, micAnalyser = null, micBuf = null, micRAF = null, micActive = false;
+
+function noteNameToMidi(name) {
+    const m = name.match(/^([A-G][b#]?)(\d)$/); if (!m) return null;
+    const SEMI = {C:0,'C#':1,D:2,Eb:3,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,Ab:8,A:9,Bb:10,'A#':10,B:11};
+    return (parseInt(m[2]) + 1) * 12 + SEMI[m[1]];
+}
+function micDetectPitch(buf, sampleRate) {
+    const SIZE = buf.length;
+    let rms = 0; for (let i=0;i<SIZE;i++) rms += buf[i]*buf[i];
+    rms = Math.sqrt(rms/SIZE);
+    if (rms < 0.01) return -1;
+    let r1=0,r2=SIZE-1,thres=0.2;
+    for (let i=0;i<SIZE/2;i++) if (Math.abs(buf[i])<thres){r1=i;break;}
+    for (let i=1;i<SIZE/2;i++) if (Math.abs(buf[SIZE-i])<thres){r2=SIZE-i;break;}
+    const b=buf.slice(r1,r2), n=b.length;
+    const c=new Array(n).fill(0);
+    for (let lag=0;lag<n;lag++) for (let i=0;i<n-lag;i++) c[lag]+=b[i]*b[i+lag];
+    let d=0; while (d<n-1 && c[d]>c[d+1]) d++;
+    let maxval=-1,maxpos=-1;
+    for (let i=d;i<n;i++) if (c[i]>maxval){maxval=c[i];maxpos=i;}
+    let T0=maxpos;
+    if (T0>0 && T0<n-1){ const x1=c[T0-1],x2=c[T0],x3=c[T0+1];
+        const a=(x1+x3-2*x2)/2, bb=(x3-x1)/2; if (a) T0=T0-bb/(2*a); }
+    return T0>0 ? sampleRate/T0 : -1;
+}
+let micStableMidi = null, micStableCount = 0;
+function micLoop() {
+    if (!micActive) return;
+    micRAF = requestAnimationFrame(micLoop);
+    if (!(songPlaying && songMode === 'wait' && songWaiting && !songAwaitBellows)) { micStableCount = 0; return; }
+    micAnalyser.getFloatTimeDomainData(micBuf);
+    const freq = micDetectPitch(micBuf, audioContext.sampleRate);
+    if (freq <= 0) { micStableCount = 0; return; }
+    const heardMidi = Math.round(69 + 12 * Math.log2(freq / 440));
+    // Require the pitch to hold for a few frames so transients don't trigger
+    if (heardMidi === micStableMidi) micStableCount++; else { micStableMidi = heardMidi; micStableCount = 1; }
+    if (micStableCount < 2) return;
+    const targetMidi = noteNameToMidi(song.events[songIdx].name);
+    // Accept the exact note OR an octave away (reeds/coupling), pitch-class match
+    if (targetMidi != null && ((heardMidi % 12) === (targetMidi % 12))) {
+        micStableCount = 0; micStableMidi = null;
+        songAdvanceCorrect(song.events[songIdx].btnId);
+    }
+}
+async function micEnable() {
+    if (micActive) return true;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setSongStatus('Mikro nicht verfügbar — Tippen bleibt aktiv'); return false;
+    }
+    try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: {
+            echoCancellation:false, noiseSuppression:false, autoGainControl:false } });
+        if (audioContext.state === 'suspended') await audioContext.resume();
+        const src = audioContext.createMediaStreamSource(micStream);
+        micAnalyser = audioContext.createAnalyser();
+        micAnalyser.fftSize = 2048;
+        micBuf = new Float32Array(micAnalyser.fftSize);
+        src.connect(micAnalyser);            // analyser only, NOT to destination (no feedback)
+        micActive = true;
+        micLoop();
+        setSongStatus('🎤 Zuhören aktiv — spiele die Melodie am Benny');
+        return true;
+    } catch (e) {
+        setSongStatus('Mikro-Erlaubnis verweigert — Tippen bleibt aktiv'); return false;
+    }
+}
+function micDisable() {
+    micActive = false;
+    if (micRAF) cancelAnimationFrame(micRAF), micRAF = null;
+    if (micStream) { micStream.getTracks().forEach(t=>t.stop()); micStream = null; }
+    micAnalyser = null; micBuf = null; micStableMidi = null; micStableCount = 0;
 }
 
 // Hook into bellows switching for the Kür gate
@@ -2671,15 +2753,31 @@ document.getElementById('songBackBtn').addEventListener('click', songRestart);
 document.getElementById('songTempo').addEventListener('input', e => {
     document.getElementById('songTempoVal').textContent = e.target.value + ' bpm';
 });
+function updateMicRowVisibility() {
+    const row = document.getElementById('songMicRow');
+    if (row) row.style.display = (songMode === 'wait') ? 'flex' : 'none';
+}
 document.querySelectorAll('.song-mode-btn').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('.song-mode-btn').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     songMode = b.dataset.mode;
     if (songTimer) { clearTimeout(songTimer); songTimer = null; }
     setSongStatus('Modus: ' + songMode);
+    updateMicRowVisibility();
     // re-arm the current note in the new mode if we're mid-play
     if (songPlaying) { songWaiting = false; songAwaitBellows = false; songStep(); }
 }));
+// Mic "Zuhören" toggle — off by default, only meaningful in Wait, auto-falls back to tap
+document.getElementById('songMic').addEventListener('change', async e => {
+    if (e.target.checked) {
+        const ok = await micEnable();
+        if (!ok) e.target.checked = false;     // permission denied / unavailable → revert to tap
+    } else {
+        micDisable();
+        setSongStatus('🎤 aus — Tippen aktiv');
+    }
+});
+updateMicRowVisibility();   // hidden initially (default mode is watch)
 document.getElementById('songLoadBtn').addEventListener('click', () =>
     document.getElementById('songFileInput').click());
 document.getElementById('songFileInput').addEventListener('change', async e => {
