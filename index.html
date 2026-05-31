@@ -730,7 +730,7 @@ body.playalong-mode .playalong-btn {
                 </div>
                 <div class="song-ctl-row">
                     <label>Tempo</label>
-                    <input type="range" id="songTempo" min="40" max="160" step="2" value="80">
+                    <input type="range" id="songTempo" min="40" max="200" step="2" value="80">
                     <span class="val" id="songTempoVal">80 bpm</span>
                 </div>
                 <label class="song-kuer-row" title="Kür: Balgwechsel selbst ausführen (Zone antippen), bevor die Note zählt">
@@ -2497,13 +2497,17 @@ let songWaiting = false;    // Wait mode: holding for the student's finger
 let songAwaitBellows = false;  // Kür: holding for the student's bellows switch
 
 function loadSongData(data) {
-    const resolved = data.events.map(songResolve).filter(Boolean);
+    const resolved = data.events
+        .map(ev => ev.rest ? { rest:true, beats: ev.beats } : songResolve(ev))
+        .filter(Boolean)
+        .map((r, i, arr) => r);   // keep order incl. rests
     song = { name: data.name, bpm: data.bpm || 80, events: resolved };
     songIdx = 0;
     document.getElementById('songFileName').textContent = data.name;
     document.getElementById('songTempo').value = song.bpm;
     document.getElementById('songTempoVal').textContent = song.bpm + ' bpm';
-    setSongStatus(resolved.length + ' Noten geladen');
+    const playable = resolved.filter(r => !r.rest).length;
+    setSongStatus(playable + ' Noten geladen');
 }
 
 function setSongStatus(t){ const s=document.getElementById('songStatus'); if(s) s.textContent=t||''; }
@@ -2537,6 +2541,15 @@ function demandBellows(toDir) {
 function songStep() {
     if (!song || songIdx >= song.events.length) { songFinish(); return; }
     const ev = song.events[songIdx];
+
+    // Rest: no target, no audio. Watch/Flow wait the gap; Wait skips it quickly.
+    if (ev.rest) {
+        clearSongTarget();
+        const restMs = (songMode === 'wait') ? 120 : ev.beats * songBeatMs();
+        songTimer = setTimeout(() => { songIdx++; songStep(); }, restMs);
+        return;
+    }
+
     const needSwitch = (dir !== ev.dir);
 
     const proceedToNote = () => {
@@ -2644,11 +2657,131 @@ document.querySelectorAll('.song-mode-btn').forEach(b => b.addEventListener('cli
 }));
 document.getElementById('songLoadBtn').addEventListener('click', () =>
     document.getElementById('songFileInput').click());
-document.getElementById('songFileInput').addEventListener('change', e => {
-    // MusicXML / MIDI import wired next; for now keep the demo loaded
-    const f = e.target.files[0];
-    if (f) setSongStatus('Import folgt — Demo bleibt aktiv: ' + f.name);
+document.getElementById('songFileInput').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    songStop();
+    const lower = f.name.toLowerCase();
+    try {
+        if (lower.endsWith('.mxl')) {
+            setSongStatus('Entpacke ' + f.name + ' …');
+            const xml = await unzipMxl(await f.arrayBuffer());
+            await importMusicXML(xml, f.name);
+        } else if (lower.endsWith('.xml') || lower.endsWith('.musicxml')) {
+            await importMusicXML(await f.text(), f.name);
+        } else if (lower.endsWith('.mid') || lower.endsWith('.midi')) {
+            setSongStatus('MIDI-Import (Fallback) folgt als nächster Baustein.');
+        } else {
+            setSongStatus('Unbekanntes Format: ' + f.name);
+        }
+    } catch (err) {
+        console.error(err);
+        setSongStatus('Import fehlgeschlagen: ' + (err.message || err));
+    }
+    e.target.value = '';   // allow re-loading the same file
 });
+
+// ── MXL = ZIP(DEFLATE). Library-free unzip via the native DecompressionStream. ──
+async function unzipMxl(buf) {
+    const dv = new DataView(buf), u8 = new Uint8Array(buf);
+    // find End-Of-Central-Directory (signature 0x06054b50), scan from the end
+    let eocd = -1;
+    for (let i = u8.length - 22; i >= 0; i--) { if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; } }
+    if (eocd < 0) throw new Error('kein gültiges MXL (ZIP) gefunden');
+    const cdOffset = dv.getUint32(eocd + 16, true);
+    const nEntries = dv.getUint16(eocd + 10, true);
+    const entries = {};
+    let p = cdOffset;
+    for (let n = 0; n < nEntries; n++) {
+        if (dv.getUint32(p, true) !== 0x02014b50) break;
+        const method = dv.getUint16(p + 10, true);
+        const compSize = dv.getUint32(p + 20, true);
+        const nameLen = dv.getUint16(p + 28, true);
+        const extraLen = dv.getUint16(p + 30, true);
+        const commentLen = dv.getUint16(p + 32, true);
+        const lho = dv.getUint32(p + 42, true);
+        const name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nameLen));
+        // local header: 30 + nameLen + extraLen → data
+        const lNameLen = dv.getUint16(lho + 26, true);
+        const lExtraLen = dv.getUint16(lho + 28, true);
+        const dataStart = lho + 30 + lNameLen + lExtraLen;
+        entries[name] = { method, dataStart, compSize };
+        p += 46 + nameLen + extraLen + commentLen;
+    }
+    // pick the root score file via META-INF/container.xml, else first non-META .xml
+    const inflate = async (ent) => {
+        const slice = u8.subarray(ent.dataStart, ent.dataStart + ent.compSize);
+        if (ent.method === 0) return new TextDecoder().decode(slice);  // stored
+        if (typeof DecompressionStream === 'undefined')
+            throw new Error('Browser zu alt zum Entpacken — exportiere als unkomprimiertes .musicxml');
+        const ds = new DecompressionStream('deflate-raw');
+        const stream = new Blob([slice]).stream().pipeThrough(ds);
+        return await new Response(stream).text();
+    };
+    let scorePath = null;
+    if (entries['META-INF/container.xml']) {
+        const cont = await inflate(entries['META-INF/container.xml']);
+        const m = cont.match(/full-path="([^"]+)"/);
+        if (m) scorePath = m[1];
+    }
+    if (!scorePath || !entries[scorePath])
+        scorePath = Object.keys(entries).find(k => !k.startsWith('META-INF') && k.endsWith('.xml'));
+    if (!scorePath) throw new Error('keine score.xml im MXL');
+    return await inflate(entries[scorePath]);
+}
+
+// ── Parse MusicXML → loadSongData. Melody = first part, voice 1; chord drives direction. ──
+const STEP_SEMI = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+async function importMusicXML(xmlText, fileName) {
+    const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+    if (doc.querySelector('parsererror')) throw new Error('XML nicht lesbar');
+    const part = doc.querySelector('part');
+    if (!part) throw new Error('keine <part> in der Partitur');
+
+    const title = (doc.querySelector('work-title')?.textContent
+                || doc.querySelector('movement-title')?.textContent
+                || fileName.replace(/\.(mxl|xml|musicxml)$/i, '')).trim();
+
+    let divisions = 1, tempo = null, curChord = '?';
+    const events = [];
+    const measures = part.querySelectorAll('measure');
+    measures.forEach(meas => {
+        const dv = meas.querySelector('attributes > divisions');
+        if (dv) divisions = +dv.textContent || divisions;
+        const snd = meas.querySelector('sound[tempo]');
+        if (snd && !tempo) tempo = +snd.getAttribute('tempo');
+
+        // walk children in document order: harmony + note
+        meas.childNodes.forEach(node => {
+            if (node.nodeType !== 1) return;
+            if (node.tagName === 'harmony') {
+                const rs = node.querySelector('root-step')?.textContent;
+                const ra = node.querySelector('root-alter')?.textContent;
+                if (rs) curChord = rs + (ra ? (+ra < 0 ? 'b' : '#') : '');
+            } else if (node.tagName === 'note') {
+                const voice = node.querySelector('voice')?.textContent || '1';
+                if (voice !== '1') return;                       // melody voice only
+                const dur = +(node.querySelector('duration')?.textContent || 0);
+                const beats = dur / divisions;
+                if (node.querySelector('rest')) { if (beats > 0) events.push({ rest:true, beats }); return; }
+                if (node.querySelector('chord')) return;          // stacked → keep top line only
+                const step = node.querySelector('pitch > step')?.textContent;
+                if (!step) return;
+                const oct = +node.querySelector('pitch > octave').textContent;
+                const alt = +(node.querySelector('pitch > alter')?.textContent || 0);
+                const midi = (oct + 1) * 12 + STEP_SEMI[step] + alt;
+                const name = SEMITONE_TO_NOTE[((midi % 12) + 12) % 12] + (Math.floor(midi / 12) - 1);
+                events.push({ name, chord: curChord, beats });
+            }
+        });
+    });
+
+    const melodic = events.filter(e => !e.rest).length;
+    if (!melodic) throw new Error('keine spielbaren Noten gefunden');
+    let bpm = tempo ? Math.round(tempo) : 80;
+    bpm = Math.max(40, Math.min(200, bpm));
+    loadSongData({ name: title, bpm, events });
+    setSongStatus(melodic + ' Noten · ' + measures.length + ' Takte · ' + bpm + ' bpm');
+}
 
 // Delegated listener: survives treble re-renders, feeds the Wait-mode hit test
 document.getElementById('treble-container').addEventListener('mousedown', e => {
