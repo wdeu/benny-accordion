@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.12</title>
+<title>Castagnari Benny Accordion v5.8.13</title>
 <meta name="version" content="5.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
@@ -273,6 +273,77 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     100% { opacity: 1.0; transform: scale(1.06); }
 }
 
+/* ──────────── SONG PLAY-HEAD (follow-the-lights) ──────────── */
+/* The note to play NOW — strong, unmissable green-blue target */
+.note-button.song-target {
+    opacity: 1 !important;
+    background: radial-gradient(circle at 40% 35%,
+        rgba(48,209,88,0.85) 0%,
+        rgba(48,209,88,0.45) 55%,
+        rgba(10,132,255,0.18) 100%) !important;
+    border: 3px solid #30d158 !important;
+    box-shadow: 0 0 18px rgba(48,209,88,0.7), 0 0 6px rgba(48,209,88,0.9) !important;
+    transform: scale(1.10) !important;
+    transition: none !important;
+    z-index: 5;
+}
+/* Waiting for the student's finger (Wait mode) — gentle breathing */
+.note-button.song-target.waiting { animation: song-breathe 1.1s ease-in-out infinite; }
+@keyframes song-breathe {
+    0%,100% { box-shadow: 0 0 12px rgba(48,209,88,0.5); transform: scale(1.06); }
+    50%     { box-shadow: 0 0 22px rgba(48,209,88,0.95); transform: scale(1.12); }
+}
+/* Correct hit confirmation */
+.note-button.song-correct {
+    background: radial-gradient(circle at 40% 35%, #30d158 0%, #28a745 70%) !important;
+    border-color: #30d158 !important;
+    box-shadow: 0 0 24px rgba(48,209,88,0.95) !important;
+}
+
+/* Bellows-change DEMAND: blue frame already exists; add a flicker on change */
+body.bellows-demand .treble-push-indicator,
+.treble-push-indicator.demand { animation: bellows-flicker 0.16s steps(1) 4; }
+@keyframes bellows-flicker {
+    0%   { opacity: 1;   }
+    50%  { opacity: 0.15;}
+    100% { opacity: 1;   }
+}
+.bellows-btn.demand { animation: bellows-btn-flicker 0.18s steps(1) 5; }
+@keyframes bellows-btn-flicker {
+    0%,100% { background: var(--accent); color:#fff; }
+    50%     { background: #ff453a; color:#fff; }
+}
+
+/* ──────────── SONG / PLAY-MIDI PANEL ──────────── */
+.song-panel { padding: 10px 12px 12px; }
+.song-file-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.song-load-btn { flex:0 0 auto; height:34px; padding:0 12px; border-radius:8px; border:1px solid var(--sep);
+    background:var(--bg-inset); color:var(--txt); font-size:0.78em; font-weight:600; font-family:inherit;
+    cursor:pointer; transition:.12s; }
+.song-load-btn:active { opacity:.7; }
+.song-file-name { flex:1 1 auto; min-width:0; font-size:0.74em; color:var(--txt2);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.song-transport { display:flex; gap:6px; margin-bottom:10px; }
+.song-tbtn { flex:1; height:42px; border-radius:8px; border:1px solid var(--sep); background:var(--bg-inset);
+    color:var(--txt); font-size:1.1em; font-family:inherit; cursor:pointer; transition:.12s; }
+.song-tbtn.primary { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700; }
+.song-tbtn:active { opacity:.8; transform:scale(.97); }
+.song-tbtn:disabled { opacity:.4; cursor:not-allowed; }
+.song-mode-row { display:flex; gap:0; margin-bottom:10px; background:var(--bg-inset); border-radius:8px; padding:3px; }
+.song-mode-btn { flex:1; height:30px; border:none; background:transparent; color:var(--txt2);
+    font-size:0.76em; font-weight:600; font-family:inherit; cursor:pointer; border-radius:6px; transition:.12s; }
+.song-mode-btn.active { background:var(--bg-card); color:var(--txt); box-shadow:0 1px 3px rgba(0,0,0,.4); }
+.song-ctl-row { display:grid; grid-template-columns:auto 1fr auto; gap:8px 10px; align-items:center; margin-bottom:8px; }
+.song-ctl-row label { font-size:0.76em; color:var(--txt2); }
+.song-ctl-row input[type="range"] { width:100%; }
+.song-ctl-row .val { font-size:0.72em; color:var(--txt3); min-width:42px; text-align:right; }
+.song-kuer-row { display:flex; align-items:center; gap:8px; font-size:0.76em; color:var(--txt2); cursor:pointer; margin-top:4px; }
+.song-kuer-row input { width:18px; height:18px; cursor:pointer; }
+.song-status { font-size:0.72em; color:var(--txt3); margin-top:8px; min-height:1.1em; text-align:center; }
+/* Hide bulky controls but keep panel usable in play-along too */
+body.playalong-mode .song-mode-row,
+body.playalong-mode .song-ctl-row { } /* keep visible: needed while practising */
+
 /* ──────────── PLAY-ALONG MODE ──────────── */
 body.playalong-mode .jam-box-column { display: none !important; }
 body.playalong-mode .legend { display: none !important; }
@@ -298,6 +369,36 @@ body.playalong-mode .bass-container {
 }
 body.playalong-mode .treble-column .section {
     border: none !important; background: transparent !important;
+}
+
+/* FIT mode: scale treble to viewport height */
+body.playalong-fit #treble-container {
+    transform-origin: top center;
+    /* Scale set dynamically via JS */
+}
+
+/* Fit toggle button - under bass trapezoids */
+.fit-toggle-btn {
+    display: none;  /* hidden normally */
+    width: 100%;
+    margin-top: 8px;
+    padding: 6px 0;
+    background: var(--bg-card);
+    border: 1px solid var(--b);
+    border-radius: 8px;
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--txt2);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+}
+.fit-toggle-btn:hover { color: var(--accent); border-color: var(--accent); }
+body.playalong-mode .fit-toggle-btn { display: block; }  /* visible in play-along */
+body.playalong-fit .fit-toggle-btn {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
 }
 body.playalong-mode .main-grid {
     /* ALWAYS side-by-side in play-along, even portrait! */
@@ -540,7 +641,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.12</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.13</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -599,6 +700,37 @@ body.playalong-mode .playalong-btn {
                         <span class="label">Push</span>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- SONG / PLAY-MIDI PANEL -->
+        <div class="section">
+            <div class="sec-hdr"><span>▶ PLAY-ALONG SONG</span></div>
+            <div class="song-panel">
+                <div class="song-file-row">
+                    <button class="song-load-btn" id="songLoadBtn">📂 Load</button>
+                    <input type="file" id="songFileInput" accept=".mxl,.xml,.musicxml,.mid,.midi" style="display:none">
+                    <span class="song-file-name" id="songFileName">Bourrée d'Avignon — A (Demo)</span>
+                </div>
+                <div class="song-transport">
+                    <button class="song-tbtn" id="songBackBtn" title="Zum Anfang">⏮</button>
+                    <button class="song-tbtn primary" id="songPlayBtn" title="Play / Pause">▶</button>
+                    <button class="song-tbtn" id="songStopBtn" title="Stop">⏹</button>
+                </div>
+                <div class="song-mode-row" id="songModeRow">
+                    <button class="song-mode-btn active" data-mode="watch" title="Vorspielen">Watch</button>
+                    <button class="song-mode-btn" data-mode="wait" title="Auf deinen Finger warten">Wait</button>
+                    <button class="song-mode-btn" data-mode="flow" title="Uhr läuft mit">Flow</button>
+                </div>
+                <div class="song-ctl-row">
+                    <label>Tempo</label>
+                    <input type="range" id="songTempo" min="40" max="160" step="2" value="80">
+                    <span class="val" id="songTempoVal">80 bpm</span>
+                </div>
+                <label class="song-kuer-row" title="Kür: Balgwechsel selbst ausführen (Zone antippen), bevor die Note zählt">
+                    <input type="checkbox" id="songKuer"> Balg-Geste abverlangen (Kür)
+                </label>
+                <div class="song-status" id="songStatus"></div>
             </div>
         </div>
     </div>
@@ -2153,14 +2285,80 @@ function updateScaleHint(scaleType, root) {
 
 // ── PLAY-ALONG MODE ──
 let playAlongActive = false;
+let fitActive = false;
+
+function applyFitScale() {
+    const container = document.getElementById('treble-container');
+    if (!container) return;
+    
+    if (!fitActive || !playAlongActive) {
+        container.style.transform = '';
+        container.style.transformOrigin = '';
+        return;
+    }
+    
+    // Available height: viewport minus bass column header, bellows, fit button
+    // Available width: viewport minus bass column (~140px)
+    const availH = window.innerHeight - 32;  // some padding
+    const availW = window.innerWidth - 160;   // bass column width
+    
+    // Natural size of treble container
+    const naturalW = container.scrollWidth;
+    const naturalH = container.scrollHeight;
+    
+    // Scale to fit both dimensions
+    const scaleW = availW / naturalW;
+    const scaleH = availH / naturalH;
+    const scale = Math.min(scaleW, scaleH, 1.0);  // never enlarge
+    
+    container.style.transformOrigin = 'top left';
+    container.style.transform = `scale(${scale.toFixed(3)})`;
+    // Shrink the container's layout footprint too
+    container.style.width = naturalW + 'px';
+    container.style.height = (naturalH * scale) + 'px';
+    container.style.overflow = 'visible';
+}
+
+document.getElementById('fitToggleBtn').addEventListener('click', () => {
+    fitActive = !fitActive;
+    document.body.classList.toggle('playalong-fit', fitActive);
+    const btn = document.getElementById('fitToggleBtn');
+    btn.textContent = fitActive ? '⊠ Fit: On' : '⊡ Fit Screen';
+    applyFitScale();
+});
+
+// Re-apply on orientation change
+window.addEventListener('resize', () => {
+    if (fitActive && playAlongActive) applyFitScale();
+});
+
 document.getElementById('playalongBtn').addEventListener('click', () => {
     playAlongActive = !playAlongActive;
     document.body.classList.toggle('playalong-mode', playAlongActive);
+    const t = I18N[currentLang] || I18N.en;
     document.getElementById('playalongBtn').textContent = 
-        playAlongActive ? '✕ Back' : '🎹 Play-Along';
-    // Stop all playing notes when switching
+        playAlongActive ? (t.back || '✕ Back') : (t.playAlong || '🎹 Play-Along');
+    
+    // Reset fit when leaving play-along
+    if (!playAlongActive && fitActive) {
+        fitActive = false;
+        document.body.classList.remove('playalong-fit');
+        const container = document.getElementById('treble-container');
+        if (container) {
+            container.style.transform = '';
+            container.style.height = '';
+            container.style.width = '';
+        }
+        document.getElementById('fitToggleBtn').textContent = '⊡ Fit Screen';
+    }
+    
     stopAll();
     stopAllTreble();
+    
+    // Apply fit scale after DOM settles
+    if (playAlongActive && fitActive) {
+        setTimeout(applyFitScale, 100);
+    }
 });
 
 document.querySelectorAll('.chip[data-ctype]').forEach(btn => {
@@ -2210,9 +2408,255 @@ document.getElementById('arpeggioTempo').addEventListener('input', e => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SONG ENGINE  ·  resolver + play-head (Watch / Wait / Flow)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Inverse map: pitch ('C5') → [{dir,row,pos}, ...]  (built from BUTTON_OCTAVES) ──
+const SONG_INV = (() => {
+    const inv = {};
+    for (const key in BUTTON_OCTAVES) {
+        const [d, r] = key.split('_');
+        for (const pos in BUTTON_OCTAVES[key]) {
+            const p = BUTTON_OCTAVES[key][pos];
+            (inv[p] = inv[p] || []).push({ dir: d, row: r, pos: +pos });
+        }
+    }
+    return inv;
+})();
+
+// ── Left-hand chord availability (from layout.bass) — F & G are both-direction ──
+const PUSH_CHORDS = new Set(['C','G','Ab','F','E','Eb']);
+const PULL_CHORDS = new Set(['G','D','B','F','A','Bb']);
+const ROW_PRIORITY = { G: 0, C: 1, Heim: 2 };   // default: cross-row, lowest first
+const songPref = { sensFa: 'pull', sensSol: 'push' };  // matches the user's strategy
+
+function songNormRoot(s) {
+    let m = (s || '').match(/^([A-G])([#b]?)/);
+    if (!m) return s;
+    let root = m[1] + (m[2] || '');
+    const flat = { 'Db':'C#','Gb':'F#','Cb':'B','Fb':'E' };
+    if (flat[root]) root = flat[root];
+    const sharp = { 'A#':'Bb','D#':'Eb','G#':'Ab' };
+    if (sharp[root]) root = sharp[root];
+    return root;
+}
+function songChordDir(chord) {
+    const r = songNormRoot(chord);
+    const canPush = PUSH_CHORDS.has(r), canPull = PULL_CHORDS.has(r);
+    if (canPush && canPull) { if (r==='F') return songPref.sensFa; if (r==='G') return songPref.sensSol; return 'pull'; }
+    if (canPull) return 'pull';
+    if (canPush) return 'push';
+    return null;
+}
+// Resolve one event → {btnId, dir, row, pos, name, forced} or null
+function songResolve(ev) {
+    const cands = SONG_INV[ev.name];
+    if (!cands) return null;
+    let want = ev.dir || songChordDir(ev.chord);     // explicit dir overrides chord
+    const inWant = want ? cands.filter(c => c.dir === want) : [];
+    const pool = inWant.length ? inWant : cands;
+    const forced = !ev.dir && want != null && inWant.length === 0;
+    const pick = [...pool].sort((a,b)=>ROW_PRIORITY[a.row]-ROW_PRIORITY[b.row])[0];
+    return { btnId: pick.dir+'_'+pick.row+'_'+pick.pos, dir: pick.dir, row: pick.row,
+             pos: pick.pos, name: ev.name, forced };
+}
+
+// ── Hand-written demo: Bourrée d'Avignon, A-Teil (from the user's own analysis) ──
+// beats = relative length; chord drives bellows unless dir is explicit (push accents)
+const DEMO_SONG = {
+    name: "Bourrée d'Avignon — A (Demo)",
+    bpm: 80,
+    events: [
+        // A1 — PULL durchgehend (chord Dm)
+        {name:'D4',chord:'Dm',beats:1},{name:'F4',chord:'Dm',beats:1},
+        {name:'A4',chord:'Dm',beats:1},{name:'G4',chord:'Dm',beats:1},
+        {name:'F4',chord:'Dm',beats:1},{name:'E4',chord:'Dm',beats:1},
+        {name:'D4',chord:'Dm',beats:2},
+        // A2 — PULL line, then two PUSH accents (explicit dir → forced demo)
+        {name:'D4',chord:'Dm',beats:1},{name:'F4',chord:'Dm',beats:1},
+        {name:'A4',chord:'Dm',beats:1},{name:'C5',chord:'Dm',beats:1},
+        {name:'A4',chord:'Dm',beats:1},{name:'G4',chord:'Dm',beats:1},
+        {name:'F4',chord:'Dm',beats:1},
+        {name:'D4',dir:'push',beats:1},{name:'A4',dir:'push',beats:1},
+    ]
+};
+
+// ── Player state ──
+let song = null;            // {name, bpm, events:[resolved...]}
+let songIdx = 0;
+let songPlaying = false;
+let songMode = 'watch';     // 'watch' | 'wait' | 'flow'
+let songTimer = null;
+let songWaiting = false;    // Wait mode: holding for the student's finger
+let songAwaitBellows = false;  // Kür: holding for the student's bellows switch
+
+function loadSongData(data) {
+    const resolved = data.events.map(songResolve).filter(Boolean);
+    song = { name: data.name, bpm: data.bpm || 80, events: resolved };
+    songIdx = 0;
+    document.getElementById('songFileName').textContent = data.name;
+    document.getElementById('songTempo').value = song.bpm;
+    document.getElementById('songTempoVal').textContent = song.bpm + ' bpm';
+    setSongStatus(resolved.length + ' Noten geladen');
+}
+
+function setSongStatus(t){ const s=document.getElementById('songStatus'); if(s) s.textContent=t||''; }
+function songBeatMs(){ return 60000 / (parseInt(document.getElementById('songTempo').value)||80); }
+
+function clearSongTarget() {
+    document.querySelectorAll('.note-button.song-target,.note-button.song-correct')
+        .forEach(b => b.classList.remove('song-target','waiting','song-correct'));
+}
+
+// Light the target button for the current event (after ensuring direction)
+function lightTarget(ev) {
+    const btn = document.querySelector('.note-button[data-btn-id="'+ev.btnId+'"]');
+    if (!btn) return;
+    btn.classList.add('song-target');
+    if (songMode === 'wait') btn.classList.add('waiting');
+}
+
+// Signal a bellows-change demand (blue frame flicker + bellows-button flicker)
+function demandBellows(toDir) {
+    const ind = document.getElementById('treblePushIndicator');
+    if (ind) { ind.classList.remove('demand'); void ind.offsetWidth; ind.classList.add('demand');
+        setTimeout(()=>ind.classList.remove('demand'), 700); }
+    document.querySelectorAll('.bellows-btn[data-dir="'+toDir+'"]').forEach(b=>{
+        b.classList.remove('demand'); void b.offsetWidth; b.classList.add('demand');
+        setTimeout(()=>b.classList.remove('demand'), 900);
+    });
+}
+
+// Advance to event songIdx and act per mode
+function songStep() {
+    if (!song || songIdx >= song.events.length) { songFinish(); return; }
+    const ev = song.events[songIdx];
+    const needSwitch = (dir !== ev.dir);
+
+    const proceedToNote = () => {
+        clearSongTarget();
+        lightTarget(ev);
+        const dur = ev.beats * songBeatMs();
+        if (songMode === 'wait') {
+            // Hold for the student's finger; no guide audio
+            songWaiting = true;
+            setSongStatus('Spiele  ' + ev.name + '  (' + ev.dir.toUpperCase() + ')');
+        } else {
+            // Watch / Flow: play the guide note, then advance on the clock
+            const f = trebleButtonFreq(ev.dir, ev.row, ev.pos);
+            if (f && songMode === 'watch') { startTrebleNote('song_'+ev.btnId, f);
+                setTimeout(()=>stopTrebleNote('song_'+ev.btnId), Math.max(dur-40,60)); }
+            setSongStatus((songMode==='flow'?'Flow · ':'Watch · ') + ev.name + ' (' + ev.dir.toUpperCase() + ')');
+            songTimer = setTimeout(() => { songIdx++; songStep(); }, dur);
+        }
+    };
+
+    if (needSwitch) {
+        const kuer = document.getElementById('songKuer').checked;
+        demandBellows(ev.dir);
+        if (kuer && songMode === 'wait') {
+            // Kür: wait for the student to switch the bellows themselves
+            songAwaitBellows = true;
+            setSongStatus('Balg wechseln → ' + ev.dir.toUpperCase());
+            return;   // proceedToNote() called from switchDir hook when dir matches
+        } else {
+            switchDir(ev.dir);          // auto-switch (re-renders treble)
+            setTimeout(proceedToNote, 30);
+        }
+    } else {
+        proceedToNote();
+    }
+}
+
+// Called by the delegated treble listener when a button is pressed
+function songHitTest(btnId) {
+    if (!songPlaying) return;
+    if (songMode === 'wait' && songWaiting && !songAwaitBellows) {
+        const ev = song.events[songIdx];
+        if (btnId === ev.btnId) {
+            songWaiting = false;
+            const btn = document.querySelector('.note-button[data-btn-id="'+btnId+'"]');
+            if (btn) { btn.classList.remove('waiting'); btn.classList.add('song-correct'); }
+            setTimeout(()=>{ songIdx++; songStep(); }, 140);
+        }
+        // wrong button → just sounds (its own handler), no advance, no penalty
+    }
+}
+
+// Hook into bellows switching for the Kür gate
+const _songSwitchDir = switchDir;
+switchDir = function(newDir) {
+    _songSwitchDir(newDir);
+    if (songAwaitBellows && newDir === song.events[songIdx].dir) {
+        songAwaitBellows = false;
+        const ev = song.events[songIdx];
+        clearSongTarget(); lightTarget(ev); songWaiting = true;
+        setSongStatus('Spiele  ' + ev.name + '  (' + ev.dir.toUpperCase() + ')');
+    }
+};
+
+function songFinish() {
+    songPlaying = false; songWaiting = false; songAwaitBellows = false;
+    if (songTimer) { clearTimeout(songTimer); songTimer = null; }
+    clearSongTarget();
+    document.getElementById('songPlayBtn').textContent = '▶';
+    setSongStatus(song ? 'Fertig — ⏮ für Anfang' : '');
+}
+
+function songPlay() {
+    if (!song) return;
+    if (songPlaying) { songPause(); return; }
+    if (songIdx >= song.events.length) songIdx = 0;
+    songPlaying = true;
+    document.getElementById('songPlayBtn').textContent = '⏸';
+    songStep();
+}
+function songPause() {
+    songPlaying = false; songWaiting = false;
+    if (songTimer) { clearTimeout(songTimer); songTimer = null; }
+    document.getElementById('songPlayBtn').textContent = '▶';
+    setSongStatus('Pause');
+}
+function songStop() { songPlaying=false; songIdx=0; songFinish(); setSongStatus(song?'Bereit':''); }
+function songRestart() { songStop(); songIdx=0; if(song) setSongStatus('Bereit'); }
+
+// ── Wiring ──
+document.getElementById('songPlayBtn').addEventListener('click', songPlay);
+document.getElementById('songStopBtn').addEventListener('click', songStop);
+document.getElementById('songBackBtn').addEventListener('click', songRestart);
+document.getElementById('songTempo').addEventListener('input', e => {
+    document.getElementById('songTempoVal').textContent = e.target.value + ' bpm';
+});
+document.querySelectorAll('.song-mode-btn').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.song-mode-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    songMode = b.dataset.mode;
+    if (songTimer) { clearTimeout(songTimer); songTimer = null; }
+    setSongStatus('Modus: ' + songMode);
+    // re-arm the current note in the new mode if we're mid-play
+    if (songPlaying) { songWaiting = false; songAwaitBellows = false; songStep(); }
+}));
+document.getElementById('songLoadBtn').addEventListener('click', () =>
+    document.getElementById('songFileInput').click());
+document.getElementById('songFileInput').addEventListener('change', e => {
+    // MusicXML / MIDI import wired next; for now keep the demo loaded
+    const f = e.target.files[0];
+    if (f) setSongStatus('Import folgt — Demo bleibt aktiv: ' + f.name);
+});
+
+// Delegated listener: survives treble re-renders, feeds the Wait-mode hit test
+document.getElementById('treble-container').addEventListener('mousedown', e => {
+    const b = e.target.closest('.note-button[data-btn-id]'); if (b) songHitTest(b.dataset.btnId);
+}, true);
+document.getElementById('treble-container').addEventListener('touchstart', e => {
+    const b = e.target.closest('.note-button[data-btn-id]'); if (b) songHitTest(b.dataset.btnId);
+}, true);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
+loadSongData(DEMO_SONG);
 renderRootGrid();
 renderAll();
 
