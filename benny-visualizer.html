@@ -340,9 +340,16 @@ body.bellows-demand .treble-push-indicator,
 .song-kuer-row { display:flex; align-items:center; gap:8px; font-size:0.76em; color:var(--txt2); cursor:pointer; margin-top:4px; }
 .song-kuer-row input { width:18px; height:18px; cursor:pointer; }
 .song-status { font-size:0.72em; color:var(--txt3); margin-top:8px; min-height:1.1em; text-align:center; }
-/* Hide bulky controls but keep panel usable in play-along too */
-body.playalong-mode .song-mode-row,
-body.playalong-mode .song-ctl-row { } /* keep visible: needed while practising */
+/* In Play-Along: collapse the song panel to the essentials (transport + mode),
+   so bass + treble fit side by side again on iPhone portrait. */
+body.playalong-mode .song-file-row,
+body.playalong-mode .song-ctl-row,
+body.playalong-mode .song-kuer-row,
+body.playalong-mode .song-status { display: none !important; }
+body.playalong-mode .song-panel { padding: 6px 4px 0 !important; }
+body.playalong-mode .song-transport { margin-bottom: 6px !important; }
+body.playalong-mode .song-transport .song-tbtn { height: 34px; font-size: 0.95em; }
+body.playalong-mode .song-mode-row { margin-bottom: 0 !important; }
 
 /* ──────────── PLAY-ALONG MODE ──────────── */
 body.playalong-mode .jam-box-column { display: none !important; }
@@ -701,9 +708,8 @@ body.playalong-mode .playalong-btn {
                     </button>
                 </div>
             </div>
+            <button class="fit-toggle-btn" id="fitToggleBtn">⊡ Fit Screen</button>
         </div>
-
-        <!-- SONG / PLAY-MIDI PANEL -->
         <div class="section">
             <div class="sec-hdr"><span>▶ PLAY-ALONG SONG</span></div>
             <div class="song-panel">
