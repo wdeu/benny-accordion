@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.9.0</title>
-<meta name="version" content="5.9.0">
+<title>Castagnari Benny Accordion v5.10.0</title>
+<meta name="version" content="5.10.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -298,6 +298,15 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
     background: radial-gradient(circle at 40% 35%, #30d158 0%, #28a745 70%) !important;
     border-color: #30d158 !important;
     box-shadow: 0 0 24px rgba(48,209,88,0.95) !important;
+}
+
+/* Bass button lit by the play-head (shares the bellows with the melody note) */
+.bass-button.song-bass {
+    background: radial-gradient(circle at 40% 35%,
+        rgba(48,209,88,0.8) 0%, rgba(48,209,88,0.4) 60%, rgba(10,132,255,0.15) 100%) !important;
+    border: 2px solid #30d158 !important;
+    box-shadow: 0 0 14px rgba(48,209,88,0.65) !important;
+    color: #0b3d18 !important;
 }
 
 /* Bellows-change DEMAND: blue frame already exists; add a flicker on change */
@@ -648,7 +657,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.9.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.10.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -2463,9 +2472,15 @@ function songResolve(ev) {
     const pool = inWant.length ? inWant : cands;
     const forced = !ev.dir && want != null && inWant.length === 0;
     const pick = [...pool].sort((a,b)=>ROW_PRIORITY[a.row]-ROW_PRIORITY[b.row])[0];
-    return { btnId: pick.dir+'_'+pick.row+'_'+pick.pos, dir: pick.dir, row: pick.row,
+    const r = { btnId: pick.dir+'_'+pick.row+'_'+pick.pos, dir: pick.dir, row: pick.row,
              pos: pick.pos, name: ev.name, forced,
              beats: (ev.beats != null ? ev.beats : 1), chord: ev.chord };
+    // Bass shares the bellows: resolve the bass button in the SAME direction.
+    if (ev.bassRoot) {
+        const b = resolveBassButton(ev.bassRoot, pick.dir);
+        if (b) { r.bassNote = b.label; r.bassIsChord = b.isChord; r.bassRoot = ev.bassRoot; }
+    }
+    return r;
 }
 
 // ── Hand-written demo: Bourrée d'Avignon, A-Teil (from the user's own analysis) ──
@@ -2517,6 +2532,8 @@ function songBeatMs(){ return 60000 / (parseInt(document.getElementById('songTem
 function clearSongTarget() {
     document.querySelectorAll('.note-button.song-target,.note-button.song-correct')
         .forEach(b => b.classList.remove('song-target','waiting','song-correct'));
+    document.querySelectorAll('.bass-button.song-bass')
+        .forEach(b => b.classList.remove('song-bass'));
 }
 
 // Light the target button for the current event (after ensuring direction)
@@ -2556,6 +2573,13 @@ function songStep() {
     const proceedToNote = () => {
         clearSongTarget();
         lightTarget(ev);
+        // Bass shares the bellows; light (and in Watch, sound) it with the melody note
+        if (ev.bassNote) {
+            const bb = document.querySelector('.bass-button[data-note="'+ev.bassNote+'"]');
+            if (bb) bb.classList.add('song-bass');
+            if (songMode === 'watch' && typeof playBassNote === 'function')
+                playBassNote(ev.bassNote, !!ev.bassIsChord, Math.max(ev.beats * songBeatMs() / 1000, 0.2));
+        }
         const dur = ev.beats * songBeatMs();
         if (songMode === 'wait') {
             // Hold for the student's finger; no guide audio
@@ -2732,26 +2756,59 @@ async function unzipMxl(buf) {
 
 // ── Parse MusicXML → loadSongData. Melody = first part, voice 1; chord drives direction. ──
 const STEP_SEMI = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+
+// Resolve a bass ROOT (e.g. 'A','Bb') to a bass button label in a given direction.
+// Prefers the single bass note (lowercase = "Boden") over the chord button.
+function resolveBassButton(root, direction) {
+    const r = songNormRoot(root);
+    const cols = layout[direction].bass;
+    let chordHit = null;
+    for (const colName of ['col1','col2']) {
+        for (const label of cols[colName]) {
+            const lr = label.charAt(0).toUpperCase() + label.slice(1).toLowerCase(); // 'bb'->'Bb'
+            if (songNormRoot(lr) === r) {
+                const isChord = label[0] === label[0].toUpperCase();
+                if (!isChord) return { label, isChord:false };  // prefer single bass note
+                if (!chordHit) chordHit = { label, isChord:true };
+            }
+        }
+    }
+    return chordHit;   // fall back to the chord button if no single exists
+}
+
 async function importMusicXML(xmlText, fileName) {
     const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
     if (doc.querySelector('parsererror')) throw new Error('XML nicht lesbar');
-    const part = doc.querySelector('part');
-    if (!part) throw new Error('keine <part> in der Partitur');
+    const parts = [...doc.querySelectorAll('part')];
+    if (!parts.length) throw new Error('keine <part> in der Partitur');
 
     const title = (doc.querySelector('work-title')?.textContent
                 || doc.querySelector('movement-title')?.textContent
                 || fileName.replace(/\.(mxl|xml|musicxml)$/i, '')).trim();
 
+    const isTabPart = p => p.querySelector('staff-details > staff-lines')?.textContent === '1';
+    const partMeasures = parts.map(p => [...p.querySelectorAll('measure')]);
+
+    // melody part = first part with pitched staff-1 notes that isn't a 1-line tab staff
+    let melodyIdx = 0;
+    for (let p = 0; p < parts.length; p++) {
+        if (parts[p].querySelector('note > pitch') && !isTabPart(parts[p])) { melodyIdx = p; break; }
+    }
+
     let divisions = 1, tempo = null, curChord = '?';
     const events = [];
-    const measures = part.querySelectorAll('measure');
-    measures.forEach(meas => {
+    const measureFirstIdx = [];   // index in events[] of each measure's first element
+    const measureChord = [];      // chord active at each measure's start
+    const nMeas = partMeasures[melodyIdx].length;
+
+    // ── melody (staff 1 of the melody part) ──
+    partMeasures[melodyIdx].forEach((meas, mi) => {
         const dv = meas.querySelector('attributes > divisions');
         if (dv) divisions = +dv.textContent || divisions;
         const snd = meas.querySelector('sound[tempo]');
         if (snd && !tempo) tempo = +snd.getAttribute('tempo');
+        measureFirstIdx[mi] = events.length;
 
-        // walk children in document order: harmony + note
         meas.childNodes.forEach(node => {
             if (node.nodeType !== 1) return;
             if (node.tagName === 'harmony') {
@@ -2759,12 +2816,11 @@ async function importMusicXML(xmlText, fileName) {
                 const ra = node.querySelector('root-alter')?.textContent;
                 if (rs) curChord = rs + (ra ? (+ra < 0 ? 'b' : '#') : '');
             } else if (node.tagName === 'note') {
-                const voice = node.querySelector('voice')?.textContent || '1';
-                if (voice !== '1') return;                       // melody voice only
+                if (node.querySelector('staff')?.textContent === '2') return;  // melody = staff 1
                 const dur = +(node.querySelector('duration')?.textContent || 0);
                 const beats = dur / divisions;
                 if (node.querySelector('rest')) { if (beats > 0) events.push({ rest:true, beats }); return; }
-                if (node.querySelector('chord')) return;          // stacked → keep top line only
+                if (node.querySelector('chord')) return;        // top line of a chord stack
                 const step = node.querySelector('pitch > step')?.textContent;
                 if (!step) return;
                 const oct = +node.querySelector('pitch > octave').textContent;
@@ -2774,14 +2830,45 @@ async function importMusicXML(xmlText, fileName) {
                 events.push({ name, chord: curChord, beats });
             }
         });
+        if (measureChord[mi] === undefined) measureChord[mi] = curChord;
     });
+
+    // ── per-measure bass root: PLAN A (lowest accompaniment note) else PLAN B (harmony) ──
+    let usedPlanA = false;
+    for (let mi = 0; mi < nMeas; mi++) {
+        let lowMidi = Infinity, lowName = null;
+        for (let p = 0; p < parts.length; p++) {
+            const meas = partMeasures[p][mi];
+            if (!meas || isTabPart(parts[p])) continue;
+            meas.querySelectorAll('note').forEach(node => {
+                const staff = node.querySelector('staff')?.textContent;
+                const isAccomp = (staff === '2') || (p !== melodyIdx);
+                if (!isAccomp || node.querySelector('rest') || !node.querySelector('pitch')) return;
+                const step = node.querySelector('pitch > step').textContent;
+                const oct = +node.querySelector('pitch > octave').textContent;
+                const alt = +(node.querySelector('pitch > alter')?.textContent || 0);
+                const midi = (oct + 1) * 12 + STEP_SEMI[step] + alt;
+                if (midi < lowMidi) { lowMidi = midi; lowName = SEMITONE_TO_NOTE[((midi % 12) + 12) % 12]; }
+            });
+        }
+        let root = null;
+        if (lowName) { root = lowName; usedPlanA = true; }
+        else if (measureChord[mi] && measureChord[mi] !== '?') root = measureChord[mi];
+        // attach to the measure's first melodic event
+        if (root != null) {
+            for (let i = measureFirstIdx[mi]; i < events.length; i++) {
+                if (!events[i].rest) { events[i].bassRoot = root; break; }
+            }
+        }
+    }
 
     const melodic = events.filter(e => !e.rest).length;
     if (!melodic) throw new Error('keine spielbaren Noten gefunden');
     let bpm = tempo ? Math.round(tempo) : 80;
     bpm = Math.max(40, Math.min(200, bpm));
     loadSongData({ name: title, bpm, events });
-    setSongStatus(melodic + ' Noten · ' + measures.length + ' Takte · ' + bpm + ' bpm');
+    setSongStatus(melodic + ' Noten · ' + nMeas + ' Takte · Bass: '
+        + (usedPlanA ? 'Notenzeile' : 'Akkorde') + ' · ' + bpm + ' bpm');
 }
 
 // Delegated listener: survives treble re-renders, feeds the Wait-mode hit test
