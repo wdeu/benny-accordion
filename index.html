@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.8.13</title>
-<meta name="version" content="5.4">
+<title>Castagnari Benny Accordion v5.9.0</title>
+<meta name="version" content="5.9.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -648,7 +648,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.8.13</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.9.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -661,31 +661,6 @@ body.playalong-mode .playalong-btn {
 <div class="main-grid">
     <!-- COLUMN 1: BASS (Left on iPad) -->
     <div class="bass-column">
-        <div class="section">
-            <div class="sec-hdr">
-                <span data-i18n="bellowsDir">BELLOWS DIRECTION</span>
-                <button class="style-toggle" id="styleToggle" title="Toggle display">⚙️</button>
-            </div>
-            <div class="bellows-container">
-                <div class="bellows-switch" id="bellowsSwitch">
-                    <button class="bellows-btn pull" data-dir="pull">
-                        <svg viewBox="0 0 140 70" preserveAspectRatio="none">
-                            <polygon class="trapezoid-fill" points="20,10 120,0 120,70 20,60"/>
-                            <polygon class="trapezoid-stroke" points="20,10 120,0 120,70 20,60" fill="none" stroke-width="2"/>
-                        </svg>
-                        <span class="label">Pull</span>
-                    </button>
-                    <button class="bellows-btn push active" data-dir="push">
-                        <svg viewBox="0 0 140 70" preserveAspectRatio="none">
-                            <polygon class="trapezoid-fill" points="20,0 120,10 120,60 20,70"/>
-                            <polygon class="trapezoid-stroke" points="20,0 120,10 120,60 20,70" fill="none" stroke-width="2"/>
-                        </svg>
-                        <span class="label">Push</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <div class="section">
             <div class="lay-title">Bass – <span id="bassDir">Push</span></div>
             <div class="bass-container" id="bass-container"></div>
@@ -2012,7 +1987,8 @@ document.querySelectorAll('.bellows-btn').forEach(btn => {
     btn.addEventListener('click', ()=> switchDir(btn.dataset.dir));
 });
 
-document.getElementById('styleToggle').addEventListener('click', toggleBellowsStyle);
+const _styleToggleBtn = document.getElementById('styleToggle');
+if (_styleToggleBtn) _styleToggleBtn.addEventListener('click', toggleBellowsStyle);
 
 // ── LANGUAGE / i18n ──
 const I18N = {
