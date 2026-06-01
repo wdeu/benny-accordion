@@ -1,405 +1,96 @@
-<img src="assets/icon.svg" width="48" height="48" align="left" style="margin-right:12px; border-radius:10px;" alt="Benny Accordion Icon">
+# 🪗 Castagnari Benny Accordion — Interactive Learning Tool
 
-# Castagnari Benny Accordion
+An interactive, single-file web app for the **Castagnari Benny C/G, 3-row, Heim Standard** diatonic accordion. It visualises every button on both bellows directions, plays authentic sound, and now teaches whole pieces through a follow-the-lights **Play-Along** system that imports MusicXML and MIDI.
 
-**Interactive Learning Tool · C/G · 3-reihig · Heim**
+**Live:** https://wdeu.github.io/benny-accordion
+**Source:** https://github.com/wdeu/benny-accordion
 
-[![License: Custom Non-Commercial](https://img.shields.io/badge/License-Custom%20Non--Commercial-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-5.8.7-brightgreen.svg)](https://github.com/wdeu/benny-accordion/releases)
-[![Live Demo](https://img.shields.io/badge/demo-live-success.svg)](https://wdeu.github.io/benny-accordion)
-
-An interactive web application for visualizing and learning the **Castagnari Benny C/G (3-row, Heim tuning)** diatonic accordion. Perfect for students, teachers, and players exploring French traditional music, Bourrées, and modal playing.
-
-🔗 **[Try it live!](https://wdeu.github.io/benny-accordion)**
+Runs on any modern browser, on desktop, iPad and iPhone. No installation, no libraries, works offline after first load.
 
 ---
 
-## ✨ Features (v5.8.7)
+## What it does
 
-### 🪗 Interactive Accordion Visualization
-- **Player perspective**: See the accordion from above, exactly as you play it
-- **3-row layout**: G-row (12 buttons), C-row (11 buttons), Helper row (10 buttons)
-- **Realistic button styling**: Pearlescent buttons with subtle highlights
-- **Topographic offset**: Rows are visually offset to match the physical instrument
-- **Bass section**: 2 columns × 6 rows with chord/bass distinction
+### Button visualisation
+- All three rows shown from the **player's perspective**: G-row (12), C-row (11), Heim/helper row (10).
+- **Push and Pull** layouts, switched with one tap. A blue frame marks Push.
+- Note name large, position number small — the labels follow international convention (B, not H).
 
-### 🎵 Music Theory Tools
-- **Chord visualization**: 13 chord types (Dur, Moll, dim, aug, sus2, sus4, 7, maj7, m7, dim7, ø, 6, m6)
-- **Modal scales**: 6 church modes (Ionian/Dur, Dorian, Phrygian, Lydian, Mixolydian, Aeolian/Moll)
-- **9 root notes**: C, D, E, F, G, A, Bb, Ab, Eb (all available bass tones)
-- **Real-time highlighting**: See which buttons to press for any chord or scale
-- **Availability check**: Shows which notes are missing on current bellows direction
+### Sound
+- "Benny Original" voice derived from FFT spectral analysis of a real Castagnari Benny.
+- Bass modelled with octave coupling and spectrally-verified chord voicings.
+- Touch-sensitive treble and bass: hold to sustain, release to fade.
+- Four tone options (Benny Original, Accordion-like, Pure, Bright).
 
-### 🔊 Audio Playback Engine (v5.5–5.7.6)
-- **Benny Original sound**: Synthesized tone based on FFT analysis of real Castagnari Benny
-- **Spectral accuracy**: 10 harmonics with authentic amplitude ratios
-- **Inharmonicity simulation**: Subtle detuning (3-7 cents) for organic reed character
-- **Chord mode**: Play all chord tones simultaneously
-- **Scale mode**: Arpeggio playback ascending from root note
-- **Adjustable tempo**: 0.2s - 1.0s per note (default: 0.5s)
-- **Loop mode**: Endless repetition for practice
-- **4 tone types**: Benny Original (default), Accordion-like, Pure, Bright
-- **Auto-play**: Automatic playback when selecting chords/scales
-- **Stop button**: Immediate playback termination
-- **Authentic bass voicings**: Spektral-analysiert · Mellow (E, Eb, D) vs Brilliant
+### Jam-Box
+- 13 chord types and 6 modal scales (Ionian → Aeolian).
+- 9 root notes (C D E F G A Bb Ab Eb) matching the real bass layout.
+- Arpeggio playback with tempo and loop; treble buttons light in sync.
 
-### 🎨 Visual Improvements (v5.7–5.8)
-- **International notation**: Uppercase (C, G...) = Chord · lowercase (c, g...) = Single note
-- **Button display**: Note name large and bold, position number small and gray
-- **PUSH indicator**: Blue border around treble area when in Push direction
-- **Musical symbols**: ♭ and ♯ throughout (A♭ instead of Ab, C♯ instead of C#)
-- **4 languages**: EN / DE / FR / IT (switchable in the app header)
-- **Heim-Info**: Expandable system info in legend (Corgeron, modal strengths, notation)
-- **Scale hints**: Contextual Heim-layout recommendations when selecting scales
-
-### 🎹 Treble Button Playback (v5.8)
-- **Individual treble notes**: Every button produces its correct pitch when tapped
-- **Touch-sensitive**: Hold for sustained note, release to stop
-- **Chord stacking**: Tap multiple treble buttons simultaneously (e.g. c + e♭ + g = C minor!)
-- **Bass + treble combined**: Left hand bass, right hand treble – like playing the real instrument
-- **Complete octave mapping**: All 66 treble buttons correctly mapped (verified against piano reference)
-- **Play-Along mode**: Strips UI to buttons only – lay iPad flat and play! 🎹
-- **Tap zones**: Tap the empty space left/right of treble buttons to switch Pull/Push instantly
-
-### 📱 iPad ONE Screen Layout (v5.3+)
-- **3-column grid**: Bass | Treble | Jam-Box
-- **Sticky columns**: Jam-Box stays visible while scrolling
-- **Optimized spacing**: Compact UI for tablet landscape mode
-- **Responsive design**: Works on desktop, tablet, and mobile
-
-### 🎨 Modal Highlighting (NEW in v5.3!)
-- **Dim non-scale notes**: Non-modal buttons fade to 30% opacity
-- **Highlight scale tones**: Blue border with glow effect
-- **Root emphasis**: Root note gets extra visual weight
-- **Practice mode**: See exactly which buttons to play for modal jamming
-
-### 🎛️ Bellows Control
-- **Double trapezoid switches**: Top and bottom of interface
-- **Minimal mode toggle**: Compact segmented control alternative
-- **Visual feedback**: Active direction clearly marked
-- **Push/Pull layouts**: Complete button mappings for both directions
+### Play-Along (visual learning)
+- A reduced view: bass, treble and bellows only.
+- **Fit-to-Screen** scales the layout to the window — shrinks to fit phone/tablet, enlarges to fill a desktop window. On by default when entering Play-Along.
+- On iPhone portrait, bass and treble sit side by side with no scrolling.
 
 ---
 
-## 🎯 Use Cases
+## Song mode — learn a whole piece
 
-### For Students
-- **Learn chord shapes** on your specific accordion model
-- **Practice modal scales** with visual and audio guidance
-- **Understand bellows strategy** with pull-dominant technique
-- **Build muscle memory** by matching physical buttons to screen
+Load a score and the app drives the buttons for you: the note to play **glows green**, its bass button lights with it, and the bellows direction switches automatically with an unmissable signal (blue frame + flicker) whenever the piece changes direction.
 
-### For Teachers
-- **Demonstrate fingering** visually during lessons
-- **Explain modal theory** with interactive examples
-- **Plan practice routines** using specific chord progressions
-- **Show bellows economy** principles in context
+### Import
+- **MusicXML** (`.mxl`, `.xml`, `.musicxml`) — the accurate path. Chord symbols in the score drive the bellows direction.
+- **MIDI** (`.mid`, `.midi`) — the fallback for the many files that were never prepared in a notation editor. Since raw MIDI carries no chord symbols, the chord is **estimated per measure** from the notes and feeds the same bellows logic.
+- The melody is taken from the top line; the bass is read from a real bass staff when the arrangement has one (**Plan A**), otherwise distilled from the chord symbols (**Plan B**). The status line tells you which was used.
 
-### For Composers/Arrangers
-- **Check note availability** on Heim-tuned accordions
-- **Explore modal possibilities** for authentic folk music
-- **Verify fingering practicality** before writing arrangements
-- **Test chord voicings** specific to 3-row diatonic
+### Three practice stages
+You slide along a continuum from passive to active as muscle memory builds:
 
----
+- **Watch** — the piece plays itself: notes sound, lights move, you observe.
+- **Wait** — the play-head stops at each note and waits until you play the right one. No clock pressure, no penalty for a wrong button. This is trial-and-error practice.
+- **Flow** — the clock runs at your chosen tempo; the lights mark the beat, but you keep up yourself. This is the dance phase.
 
-## 🚀 Quick Start
+A **tempo slider** (40–200 bpm) sets the pace in Watch and Flow.
 
-### Option 1: Online (Easiest)
-Visit **[wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)**
+### 🎤 Listen mode (real instrument)
+In **Wait**, you can turn on **🎤 Listen**. The app uses the microphone to hear your real Benny and advances the play-head when it detects the correct melody pitch — so you can keep both hands on the instrument instead of tapping the screen.
 
-### Option 2: Play-Along (iPad)
-1. Open the app on iPad in landscape mode
-2. Tap **🎹 Play-Along** (bottom right)
-3. Lay the iPad flat on a table
-4. Left hand plays bass buttons, right hand plays treble
-5. Tap left/right of treble area to switch Pull/Push instantly
-6. Tap **✕ Back** to return to full UI
-
-### Option 3: iPhone/iPad Home Screen
-1. Open in Safari: [wdeu.github.io/benny-accordion](https://wdeu.github.io/benny-accordion)
-2. Tap Share button (square with arrow)
-3. Scroll to "Add to Home Screen"
-4. Tap "Add" → Now it's an app!
-
-### Option 3: Local Copy
-```bash
-# Clone the repository
-git clone https://github.com/wdeu/benny-accordion.git
-cd benny-accordion
-
-# Open in browser
-open index.html
-# or on Linux: xdg-open index.html
-```
-
-**Requirements:** Any modern browser (Chrome, Firefox, Safari, Edge)  
-**Internet:** Not required after initial load (fully offline-capable)
+- **Off by default.** Asks for microphone permission only when switched on.
+- Falls back to tapping automatically if permission is denied or unavailable — it can never lock you out.
+- Confirms the **pitch**, not the specific button or bellows; the lights still teach button and direction.
+- Audio is analysed locally and never leaves the device.
 
 ---
 
-## 🎓 How to Use
+## How to use it
 
-### Basic Workflow
-1. **Select bellows direction**: Pull or Push (trapezoid buttons)
-2. **Choose chord/scale**: Click type (e.g., "Dur", "Dorisch")
-3. **Pick root note**: Click button (e.g., "C", "D", "G")
-4. **See highlighted buttons**: Active notes light up on treble/bass
-5. **Play audio** (optional): Press ▶️ Play button
-
-### Modal Jamming Workflow (NEW!)
-1. Select a **modal scale** (e.g., "Dorian")
-2. Choose **root note** (e.g., "D")
-3. Select **Benny Original** tone for authentic sound
-4. Set **tempo** slower (0.7s recommended for practice)
-5. Enable **Loop ∞**
-6. Press **▶️ Play**
-6. **Watch**: Only scale tones highlighted (blue border)
-7. **Play along** on your accordion!
-8. Press **⏹️ Stop** when done
-
-### Bass Buttons
-1. Click any **chord button** (uppercase, e.g. "C") → plays C chord voicing
-2. Click any **single note button** (lowercase, e.g. "c") → plays single bass note
-3. Treble shows the chord pattern for reference
-4. See chord tones highlighted on treble side
-
-### iPad Landscape Mode
-- **Left column**: Bellows control + Bass (sticky)
-- **Center column**: Treble buttons (scrollable if needed)
-- **Right column**: Jam-Box controls (sticky)
-- Everything visible on ONE screen!
+1. Open the live link, or save the page to your home screen as a web app.
+2. Explore buttons in Push/Pull, or open the Jam-Box for chords and scales.
+3. For a piece: tap **📂 Load**, choose a `.mxl`/`.xml` or `.mid` file.
+4. Start in **Watch** to see it, switch to **Wait** to practise note by note, then **Flow** to bring it up to tempo.
+5. At the real instrument, enter **Wait** and enable **🎤 Listen**.
 
 ---
 
-## 🎵 Pedagogical Approach
+## Languages
 
-This tool embodies a **pull-dominant bellows strategy** (75-80% PULL movements) developed specifically for the Castagnari Benny C/G with Heim tuning:
-
-### 5 Core Bellows Rules
-1. **Pull is the "level"**: Play entire phrases on pull
-2. **Push = articulation**: Use push for accents and rhythmic cuts, not movement
-3. **Helper row = legato tool**: The 3rd row provides directional stability and modal color
-4. **Bass follows treble**: Don't force mechanical alternating bass patterns
-5. **Energy from tension**: Musical energy comes from bellows pressure, not direction changes
-
-### Why the Helper Row Matters
-The **Row 3 (Heim row)** is essential for:
-- **Modal playing**: Access to F (Dorian character), Bb (minor pieces)
-- **Bellows economy**: Reduces forced direction changes
-- **Authentic folk sound**: Characteristic tones for French traditional music
-- **Legato technique**: Smooth melodic lines without pumping
-
+Interface available in **English, German, French and Italian**. Button labels are language-independent by design, so only the surrounding UI text changes.
 
 ---
 
-## 🎵 Bass System Spectral Analysis
+## Technical notes
 
-The bass system was reverse-engineered through FFT (Fast Fourier Transform) spectral analysis of real Castagnari Benny recordings to ensure authentic sound reproduction.
-
-**[→ Complete technical analysis](docs/BASS_ANALYSIS.md)**
-
-### Key Discovery: Uppercase vs Lowercase Buttons
-
-Traditional accordion literature describes bass buttons as "root + chord," but spectral analysis revealed a more sophisticated system:
-
-**Uppercase buttons (C, G, F, E...)** - Root only in 2 octaves:
-```
-C → C2 (65 Hz) + C3 (131 Hz)
-    Voice L (Low) + Voice M (Medium)
-```
-
-**Lowercase buttons (c, g, f, e...)** - Root in 3 octaves + High Fifth:
-```
-c → C2 (65 Hz) + C3 (131 Hz) + C4 (262 Hz) + G4 (392 Hz)
-    Voice L      + Voice M      + Voice H      + High Fifth
-    
-Total: 4 voices (much fuller, more brilliant sound!)
-```
-
-### Why This Matters
-
-**High fifth placement:**
-- Fifth is in HIGH register (G4 = 392 Hz), not low (G2/G3)
-- Creates brilliance without muddying the bass
-- Measured in real recording at 392 Hz peak
-
-**Extra root octave:**
-- Chord buttons add C4 (262 Hz), not just C2 + C3
-- Adds fullness without losing bass foundation
-- Spectral centroid increases ~80 Hz (deeper → fuller)
-
-**Authentic recreation:**
-- All frequencies match measured FFT peaks
-- Validated by A/B testing with real Castagnari Benny
-- Creates characteristic "brilliant yet grounded" bass sound
-
-### Measured Spectral Peaks
-
-| Button | Type | Frequencies (Hz) | Notes |
-|--------|------|------------------|-------|
-| **C** | Root | 131, 393 | C3 + harmonics |
-| **c** | Chord | 131, 262, 393 | C3 + C4 + G4 |
-| **G** | Root | 98, 197 | G2 + G3 |
-| **g** | Chord | 197, 294, 392 | G3 + D4 + G4 |
-
-See [complete bass analysis](docs/BASS_ANALYSIS.md) for:
-- Full FFT results for all 24 bass buttons
-- Detailed frequency tables (PUSH and PULL)
-- Analysis methodology and validation
-- Comparison of expected vs measured frequencies
-
+- Single HTML file, ~135 KB, no framework and no external libraries.
+- Web Audio API for synthesis and microphone pitch detection (autocorrelation).
+- MusicXML `.mxl` unzipped in-browser via the native `DecompressionStream`; MIDI parsed directly (SMF format 0/1).
+- PWA-capable; works offline after first load.
+- The keyboard layout lives only in `BUTTON_OCTAVES` inside the HTML and is photo-verified against the instrument — it is the single source of truth.
 
 ---
 
-## 🛠️ Technical Details
+## Credits & licence
 
-### Built With
-- **Pure HTML5/CSS3/JavaScript**: No frameworks, no dependencies
-- **Web Audio API**: Real-time sound synthesis
-- **CSS Grid & Flexbox**: Responsive layout system
-- **LocalStorage**: Persistent user preferences
-- **SVG**: Scalable trapezoid controls
+Created by Werner Deuermeier for the Castagnari Benny C/G community.
+For personal and educational use. Forks and adaptations welcome with attribution; please don't sell it commercially without asking.
 
-### Browser Support
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+ (including iOS)
-- ✅ Edge 90+
-
-### File Size
-- **HTML**: ~75 KB (minified, all-in-one)
-- **No external dependencies**
-- **Offline-capable** after first load
-
-### Performance
-- **Instant load**: Single HTML file
-- **Smooth animations**: Hardware-accelerated CSS
-- **Low latency audio**: Web Audio API oscillators
-- **Mobile optimized**: Touch-friendly buttons
-
----
-
-## 📚 Related Resources
-
-### Teaching Materials
-- `Castagnari_Skill.rtf` - Complete repertoire progression (German)
-- `INSTALLATION.md` - Detailed deployment guide
-- `Benny_Tonleitern.pdf` - Scale fingering charts
-- `PUSHPULL.pdf` - Visual button layout reference
-
-### Companion Projects
-- **Raycast Extension** (TypeScript): Command-line accordion visualization
-- **Word Documents**: Detailed fingering for specific pieces (Bourrée d'Avignon, etc.)
-
----
-
-## 🗺️ Roadmap
-
-### Completed (v5.5–5.8.4)
-- [x] Spectral analysis of real Castagnari Benny (treble + all bass buttons)
-- [x] Custom waveform synthesis (Benny Original sound)
-- [x] Authentic bass voicings (Mellow: E, Eb, D · Brilliant: all others)
-- [x] International notation (uppercase = chord, lowercase = single note)
-- [x] Button display: note name large, position number small + gray
-- [x] PUSH indicator: blue border on treble area
-- [x] Heim-Info expandable in legend
-- [x] Contextual scale recommendations
-- [x] Musical symbols ♭ ♯ throughout
-- [x] Raycast auto-deploy script (self-updating)
-
-### Next (v5.9)
-- [ ] Melody recording & playback
-- [ ] Italian UI (i18n already prepared in v5.8.4)
-- [ ] Castagnari partnership integration
-- [ ] More accordion models (D/G, G/D)
-
-### Later (v6.0+)
-- [ ] Custom chord definitions
-- [ ] Save/load chord progressions
-- [ ] PDF export (fingering charts)
-- [ ] Multi-chord comparison view
-- [ ] Dark/Light theme toggle
-- [ ] Internationalization (EN/IT/FR)
-- [ ] Additional tunings (D/G, G/C)
-- [ ] MIDI output support (external keyboard)
-
-### Under Consideration
-- [ ] Practice mode with timed exercises
-- [ ] Record and playback melodies
-- [ ] Integration with Castagnari product line
-- [ ] Mobile app versions (iOS/Android)
-
----
-
-## 🤝 Contributing
-
-This project uses a **Custom Non-Commercial License**. Contributions are welcome for:
-
-- 🐛 Bug fixes
-- 📝 Documentation improvements
-- 🌍 Translations
-- 🎨 UI/UX enhancements
-- 🎵 Additional chord/scale formulas
-
-**Before contributing:**
-1. Read the [LICENSE](LICENSE) file
-2. Open an issue to discuss your idea
-3. Fork and create a pull request
-
-**Commercial use requires written permission.** See [LICENSE](LICENSE) for details.
-
----
-
-## 📧 Contact & Licensing
-
-**Author:** Werner Deuermeier  
-**GitHub:** [@wdeu](https://github.com/wdeu)  
-**Project:** [github.com/wdeu/benny-accordion](https://github.com/wdeu/benny-accordion)
-
-### Commercial Licensing
-Interested in:
-- Integration into music education products?
-- Manufacturer-branded versions?
-- Custom development for other accordion models?
-
-**Contact for commercial licensing inquiries.**
-
-### Partnership Opportunities
-Open to collaboration with:
-- 🏭 Accordion manufacturers (especially Castagnari)
-- 🎓 Music schools and conservatories
-- 📚 Educational content publishers
-- 💻 Music software companies
-
----
-
-## 🙏 Acknowledgments
-
-- **Castagnari s.r.l.**: For building exceptional diatonic accordions since 1914
-- **The Bal Folk community**: For preserving French traditional music and its modal repertoire
-- **The composers and players** of the Bourrée, Scottish, and Bal Folk traditions – many thanks to Remi Geffroy, Anne Niepold, Norbert Pignol & Stéphane Milleret, Jean-Michel Bencetti (Musescore), and many others
-
----
-
-## 📄 License
-
-**Custom Non-Commercial License**
-
-- ✅ Free for personal learning and education
-- ✅ Open source code for study
-- ❌ Commercial use requires permission
-
-See [LICENSE](LICENSE) file for complete terms.
-
----
-
-## 🌟 Star History
-
-If this tool helps your accordion journey, consider giving it a ⭐ on GitHub!
-
----
-
-**Version:** 5.8.7  
-**Last Updated:** May 27, 2026  
-**Status:** Active Development
+*Castagnari is a trademark of Fisarmoniche Castagnari s.r.l. This is an independent community project.*
