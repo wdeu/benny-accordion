@@ -1,11 +1,30 @@
-# 🪗 Castagnari Benny Accordion — Interactive Learning Tool
+# Castagnari Benny Accordion — Interactive Learning Tool
 
-An interactive, single-file web app for the **Castagnari Benny C/G, 3-row, Heim Standard** diatonic accordion. It visualises every button on both bellows directions, plays authentic sound, and now teaches whole pieces through a follow-the-lights **Play-Along** system that imports MusicXML and MIDI.
+An interactive learning tool for the **Castagnari Benny C/G, 3-row, Heim Standard** diatonic button accordion. It visualises every button on both bellows directions, plays authentic sound, and teaches whole pieces through a follow-the-lights **Play-Along** system that imports MusicXML and MIDI.
+
+<table>
+<tr>
+<td width="33%" align="center" valign="top">
+<img src="assets/hero-benny.jpg" alt="Castagnari Benny C/G" width="100%"><br>
+<sub><b>The instrument</b> — Castagnari Benny C/G</sub>
+</td>
+<td width="33%" align="center" valign="top">
+<img src="assets/hero-app.jpg" alt="The app, player's-eye layout" width="100%"><br>
+<sub>👂 <b>The app</b> — hears you play along</sub>
+</td>
+<td width="33%" align="center" valign="top">
+<img src="assets/hero-playersview.jpg" alt="Player's view of the buttons" width="100%"><br>
+<sub>🎶 <b>Player's view</b> — same buttons, same hands</sub>
+</td>
+</tr>
+</table>
+
+The app mirrors what the player sees looking down at the keyboard, so the screen and the real Benny line up button for button. Practise a tune on the screen on the train without the instrument, or at home with both hands on the Benny while the app listens and follows along.
 
 **Live:** https://wdeu.github.io/benny-accordion
 **Source:** https://github.com/wdeu/benny-accordion
 
-Runs on any modern browser, on desktop, iPad and iPhone. No installation, no libraries, works offline after first load.
+Runs in any modern browser, on desktop, iPad and iPhone. No installation, no libraries, works offline after first load.
 
 ---
 
@@ -14,7 +33,7 @@ Runs on any modern browser, on desktop, iPad and iPhone. No installation, no lib
 ### Button visualisation
 - All three rows shown from the **player's perspective**: G-row (12), C-row (11), Heim/helper row (10).
 - **Push and Pull** layouts, switched with one tap. A blue frame marks Push.
-- Note name large, position number small — the labels follow international convention (B, not H).
+- Note name large, position number small — labels follow international convention (B, not H).
 
 ### Sound
 - "Benny Original" voice derived from FFT spectral analysis of a real Castagnari Benny.

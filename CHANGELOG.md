@@ -4,6 +4,58 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ---
 
+## [5.12.0] - 2026-06-01
+
+### 🪂 Added — Roh-MIDI-Import (Fallschirm)
+- **`.mid`/`.midi`-Import** für Dateien, die nie in einem Notensatzprogramm aufbereitet wurden
+- **Akkordschätzung pro Takt** aus den Tonhöhen (Grundton+Terz+Quinte-Wertung), speist denselben Balg-Resolver
+- Melodie = oberste Stimme, Bass = tiefste gleichzeitige Note
+- Bekannte Grenze: nimmt 4/4 an; MusicXML mit echten Symbolen bleibt der genaue Weg
+
+### ❌ Removed
+- **Kür-Schalter „Balg-Geste abverlangen"** entfernt — Balg wird immer automatisch geschaltet und signalisiert
+
+## [5.11.0] - 2026-06-01
+
+### 🎤 Added — Mithören (echtes Instrument)
+- **🎤 Zuhören-Schalter im Wait-Modus** — Abspielkopf rückt vor, wenn das Mikro den richtigen Melodieton am echten Benny hört
+- Autokorrelations-Tonhöhenerkennung (RMS-Gate, Parabel-Interpolation), beide Hände bleiben am Instrument
+- **Aus per Default**, einmalige Mikro-Abfrage, automatischer Rückfall auf Tippen bei Verweigerung
+- Lokale Analyse, nichts verlässt das Gerät
+
+## [5.10.0] - 2026-06-01
+
+### 🎵 Added — Bass für geladene Stücke
+- **Plan A:** Bass aus echter Notenzeile (tiefste Begleitnote, über alle Parts/Systeme)
+- **Plan B:** Bass aus Akkordsymbolen, wenn keine Bass-Zeile vorhanden
+- Bass-Knopf leuchtet (und klingt in Watch) mit dem Melodieton, in derselben Balgrichtung
+- Melodie jetzt auf System 1 beschränkt — linke Klavierhand verunreinigt die Melodielinie nicht mehr
+
+## [5.9.0] - 2026-05-31
+
+### 🎼 Added — Play-Along Song-Modus + MusicXML-Import
+- **Abspielkopf mit Watch / Wait / Flow** — Übe-Kontinuum von „spielt sich selbst" bis „du hältst im Tempo mit"
+- **Resolver** bildet Tonhöhe + Akkord auf Knopf + Balgrichtung ab (aus `BUTTON_OCTAVES`)
+- **Auto-Balgwechsel** plus unübersehbares Signal (blauer Rahmen + Flackern)
+- **Wait-Modus** wartet auf den richtigen Knopf, keine Strafe bei Fehlgriff
+- **MusicXML-Import** (`.mxl`/`.xml`): bibliotheksfreies ZIP-Entpacken (`DecompressionStream`) + DOMParser
+- **Temposlider** 40–200 bpm
+
+### 🐛 Fixed
+- Fehlender `#fitToggleBtn` (Null-Fehler, der Play-Along in v5.8.x lahmlegte)
+- Song-Panel im Play-Along kompakt → Bass + Diskant passen im iPhone-Porträt nebeneinander
+- Obere, redundante Balgrichtungs-Anzeige entfernt (Platz gespart)
+
+## [5.3.0] - 2026-05-20
+
+### Added — iPad ONE-Screen Layout
+- **3-Spalten-Raster** (Bass | Diskant | Jam-Box), alles ohne Scrollen sichtbar
+- **Temposlider** und **Loop ∞** fürs Arpeggio, **Stop-Button**
+- **Modal-Highlighting** — nur Skalentöne leuchten
+- Icon-Set v2
+
+---
+
 ## [5.0.0] - 2026-05-16
 
 ### 🎵 Added - Audio Engine
