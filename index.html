@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.13.0</title>
-<meta name="version" content="5.13.0">
+<title>Castagnari Benny Accordion v5.14.3</title>
+<meta name="version" content="5.14.3">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -657,7 +657,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.13.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.14.3</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -700,7 +700,7 @@ body.playalong-mode .playalong-btn {
                 <div class="song-file-row">
                     <button class="song-load-btn" id="songLoadBtn">📂 Load</button>
                     <input type="file" id="songFileInput" accept=".mxl,.xml,.musicxml,.mid,.midi" style="display:none">
-                    <span class="song-file-name" id="songFileName">Bourrée d'Avignon — A (Demo)</span>
+                    <span class="song-file-name" id="songFileName">Sarabande — G. F. Händel</span>
                 </div>
                 <div class="song-transport">
                     <button class="song-tbtn" id="songBackBtn" title="Zum Anfang">⏮</button>
@@ -2550,23 +2550,31 @@ function songResolve(ev) {
     return r;
 }
 
-// ── Hand-written demo: Bourrée d'Avignon, A-Teil (from the user's own analysis) ──
-// beats = relative length; chord drives bellows unless dir is explicit (push accents)
+// ── Default demo: Sarabande (G. F. Händel), accordéon diatonique arrangement ──
+// Pre-resolved once from the MusicXML via the same resolver path (melody = staff 1,
+// per-measure bass root from chord symbols). Embedded as events so the page needs
+// no file load to show melody + bass + bellows behaviour. Source of truth for
+// fingering remains BUTTON_OCTAVES; chord drives the bellows direction.
 const DEMO_SONG = {
-    name: "Bourrée d'Avignon — A (Demo)",
-    bpm: 80,
+    name: "Sarabande — G. F. Händel",
+    bpm: 160,
     events: [
-        // A1 — PULL durchgehend (chord Dm)
-        {name:'D4',chord:'Dm',beats:1},{name:'F4',chord:'Dm',beats:1},
-        {name:'A4',chord:'Dm',beats:1},{name:'G4',chord:'Dm',beats:1},
-        {name:'F4',chord:'Dm',beats:1},{name:'E4',chord:'Dm',beats:1},
-        {name:'D4',chord:'Dm',beats:2},
-        // A2 — PULL line, then two PUSH accents (explicit dir → forced demo)
-        {name:'D4',chord:'Dm',beats:1},{name:'F4',chord:'Dm',beats:1},
-        {name:'A4',chord:'Dm',beats:1},{name:'C5',chord:'Dm',beats:1},
-        {name:'A4',chord:'Dm',beats:1},{name:'G4',chord:'Dm',beats:1},
-        {name:'F4',chord:'Dm',beats:1},
-        {name:'D4',dir:'push',beats:1},{name:'A4',dir:'push',beats:1},
+        {name:'C5',chord:'A',beats:2,bassRoot:'A'},{name:'C5',chord:'A',beats:2},{rest:1,beats:1},{name:'D5',chord:'A',beats:1},
+        {name:'B4',chord:'E',beats:2,bassRoot:'E'},{name:'B4',chord:'E',beats:2},{rest:1,beats:2},{name:'E5',chord:'C',beats:2,bassRoot:'C'},
+        {name:'E5',chord:'C',beats:2},{rest:1,beats:1},{name:'F5',chord:'C',beats:1},{name:'D5',chord:'G',beats:2,bassRoot:'G'},
+        {name:'D5',chord:'G',beats:2},{rest:1,beats:1},{name:'E5',chord:'G',beats:1},{name:'F5',chord:'D',beats:2,bassRoot:'D'},
+        {name:'F5',chord:'D',beats:2},{rest:1,beats:1},{name:'G5',chord:'D',beats:1},{name:'E5',chord:'A',beats:2,bassRoot:'A'},
+        {name:'E5',chord:'A',beats:2},{rest:1,beats:1},{name:'E5',chord:'A',beats:1},{name:'A5',chord:'F',beats:2,bassRoot:'F'},
+        {name:'A5',chord:'F',beats:2},{rest:1,beats:1},{name:'B5',chord:'F',beats:1},{name:'G#5',chord:'E',beats:2,bassRoot:'E'},
+        {name:'G#5',chord:'E',beats:2},{rest:1,beats:2},{name:'C5',chord:'A',beats:2,bassRoot:'A'},{name:'C5',chord:'A',beats:2},
+        {rest:1,beats:1},{name:'D5',chord:'A',beats:1},{name:'B4',chord:'E',beats:2,bassRoot:'E'},{name:'B4',chord:'E',beats:2},
+        {rest:1,beats:2},{name:'E5',chord:'C',beats:2,bassRoot:'C'},{name:'E5',chord:'C',beats:2},{rest:1,beats:1},
+        {name:'F5',chord:'C',beats:1},{name:'D5',chord:'G',beats:2,bassRoot:'G'},{name:'D5',chord:'G',beats:2},{rest:1,beats:1},
+        {name:'E5',chord:'G',beats:1},{name:'F5',chord:'D',beats:2,bassRoot:'D'},{name:'F5',chord:'D',beats:2},{rest:1,beats:1},
+        {name:'G5',chord:'D',beats:1},{name:'E5',chord:'A',beats:3,bassRoot:'A'},{name:'E5',chord:'A',beats:1},{name:'A5',chord:'F',beats:1},
+        {name:'G#5',chord:'F',beats:1},{name:'A5',chord:'F',beats:1,bassRoot:'F'},{name:'B5',chord:'F',beats:1},{name:'C6',chord:'E',beats:2,bassRoot:'E'},
+        {name:'B5',chord:'E',beats:1},{name:'A5',chord:'E',beats:1},{name:'A5',chord:'A',beats:2,bassRoot:'A'},{name:'A5',chord:'A',beats:2},
+        {rest:1,beats:2},
     ]
 };
 
@@ -3032,7 +3040,6 @@ async function importMusicXML(xmlText, fileName) {
     let divisions = 1, tempo = null, curChord = '?';
     const events = [];
     const measureFirstIdx = [];   // index in events[] of each measure's first element
-    const measureChord = [];      // chord active at each measure's start
     const nMeas = partMeasures[melodyIdx].length;
 
     // ── melody (staff 1 of the melody part) ──
@@ -3064,37 +3071,48 @@ async function importMusicXML(xmlText, fileName) {
                 events.push({ name, chord: curChord, beats });
             }
         });
-        if (measureChord[mi] === undefined) measureChord[mi] = curChord;
     });
 
-    // ── per-measure bass root: PLAN A (lowest accompaniment note) else PLAN B (harmony) ──
-    let usedPlanA = false;
+    // ── per-measure bass root: prefer the CHORD SYMBOL (the root the player
+    //    presses), read from the downbeat event itself (accurate when harmony
+    //    changes mid-measure). Fall back to the lowest accompaniment note only
+    //    when no chord symbol exists (e.g. piano arrangements without symbols). ──
+    let bassFromChords = false, bassFromStaff = false;
     for (let mi = 0; mi < nMeas; mi++) {
-        let lowMidi = Infinity, lowName = null;
-        for (let p = 0; p < parts.length; p++) {
-            const meas = partMeasures[p][mi];
-            if (!meas || isTabPart(parts[p])) continue;
-            meas.querySelectorAll('note').forEach(node => {
-                const staff = node.querySelector('staff')?.textContent;
-                const isAccomp = (staff === '2') || (p !== melodyIdx);
-                if (!isAccomp || node.querySelector('rest') || !node.querySelector('pitch')) return;
-                const step = node.querySelector('pitch > step').textContent;
-                const oct = +node.querySelector('pitch > octave').textContent;
-                const alt = +(node.querySelector('pitch > alter')?.textContent || 0);
-                const midi = (oct + 1) * 12 + STEP_SEMI[step] + alt;
-                if (midi < lowMidi) { lowMidi = midi; lowName = SEMITONE_TO_NOTE[((midi % 12) + 12) % 12]; }
-            });
+        // the measure's first melodic event (bass attaches here)
+        const end = (mi + 1 < nMeas) ? measureFirstIdx[mi + 1] : events.length;
+        let firstEv = null;
+        for (let i = measureFirstIdx[mi]; i < end; i++) {
+            if (!events[i].rest) { firstEv = events[i]; break; }
         }
+        if (!firstEv) continue;
+
         let root = null;
-        if (lowName) { root = lowName; usedPlanA = true; }
-        else if (measureChord[mi] && measureChord[mi] !== '?') root = measureChord[mi];
-        // attach to the measure's first melodic event
-        if (root != null) {
-            for (let i = measureFirstIdx[mi]; i < events.length; i++) {
-                if (!events[i].rest) { events[i].bassRoot = root; break; }
+        if (firstEv.chord && firstEv.chord !== '?') {
+            root = firstEv.chord;                 // 1) chord symbol at the downbeat
+            bassFromChords = true;
+        } else {
+            let lowMidi = Infinity, lowName = null;   // 2) lowest accompaniment note
+            for (let p = 0; p < parts.length; p++) {
+                const meas = partMeasures[p][mi];
+                if (!meas || isTabPart(parts[p])) continue;
+                meas.querySelectorAll('note').forEach(node => {
+                    const staff = node.querySelector('staff')?.textContent;
+                    const isAccomp = (staff === '2') || (p !== melodyIdx);
+                    if (!isAccomp || node.querySelector('rest') || !node.querySelector('pitch')) return;
+                    const step = node.querySelector('pitch > step').textContent;
+                    const oct = +node.querySelector('pitch > octave').textContent;
+                    const alt = +(node.querySelector('pitch > alter')?.textContent || 0);
+                    const midi = (oct + 1) * 12 + STEP_SEMI[step] + alt;
+                    if (midi < lowMidi) { lowMidi = midi; lowName = SEMITONE_TO_NOTE[((midi % 12) + 12) % 12]; }
+                });
             }
+            if (lowName) { root = lowName; bassFromStaff = true; }
         }
+        if (root != null) firstEv.bassRoot = root;
     }
+
+    const bassSource = bassFromChords ? 'Akkorde' : (bassFromStaff ? 'Notenzeile' : '—');
 
     const melodic = events.filter(e => !e.rest).length;
     if (!melodic) throw new Error('keine spielbaren Noten gefunden');
@@ -3102,7 +3120,7 @@ async function importMusicXML(xmlText, fileName) {
     bpm = Math.max(40, Math.min(200, bpm));
     loadSongData({ name: title, bpm, events });
     setSongStatus(melodic + ' Noten · ' + nMeas + ' Takte · Bass: '
-        + (usedPlanA ? 'Notenzeile' : 'Akkorde') + ' · ' + bpm + ' bpm');
+        + bassSource + ' · ' + bpm + ' bpm');
 }
 
 // Delegated listener: survives treble re-renders, feeds the Wait-mode hit test
