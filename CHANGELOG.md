@@ -6,6 +6,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.14.3] - 2026-06-05
+
+### 🎵 Changed — Smarter bass on import
+- For loaded pieces, the **chord symbol now drives the bass** (the root a player actually presses), read from the downbeat event itself so a mid-measure harmony change no longer lags.
+- The lowest-accompaniment-note heuristic is now only a **fallback** for scores without chord symbols.
+- Fixes a class of bug where a low melody passing tone could be mistaken for the bass.
+
+## [5.14.0] - 2026-06-01
+
+### 🎼 Added — Sarabande as the default piece
+- The app now opens with **Handel's Sarabande** pre-loaded (melody + per-measure bass), so a first glance shows melody, bass and bellows behaviour without loading a file.
+- Replaces the melody-only hand-written Bourrée demo (which had no bass).
+- Subsequent patches (5.14.1–5.14.3) refined the embedded Sarabande's cadential bass to a clean descending F→E→A.
+
 ## [5.13.0] - 2026-06-01
 
 ### 🌍 Changed — Heim info fully localized
