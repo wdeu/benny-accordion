@@ -6,6 +6,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.15.0] - 2026-06-05
+
+### 🎯 Added — Benny-fit indicator on load
+- Every loaded piece now shows how well it suits a C/G Benny, measured by the share of notes whose melody forces the bellows opposite to the harmony: 🟢 sehr gut (≤5%), 🟡 gut spielbar (≤15%), 🟠 fordernd (≤30%), 🔴 chromatisch / außerhalb der Komfortzone (>30%).
+- Honest about the diatonic instrument's limits — a chromatic tune (e.g. the Godfather Waltz in Dm) reads 🟠, reflecting real push/pull conflicts rather than a file or import error.
+- Shown across all load paths (MusicXML, MIDI, default demo).
+
 ## [5.14.3] - 2026-06-05
 
 ### 🎵 Changed — Smarter bass on import
