@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.14.3</title>
-<meta name="version" content="5.14.3">
+<title>Castagnari Benny Accordion v5.15.0</title>
+<meta name="version" content="5.15.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -657,7 +657,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.14.3</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.15.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -2597,8 +2597,20 @@ function loadSongData(data) {
     document.getElementById('songFileName').textContent = data.name;
     document.getElementById('songTempo').value = song.bpm;
     document.getElementById('songTempoVal').textContent = song.bpm + ' bpm';
-    const playable = resolved.filter(r => !r.rest).length;
-    setSongStatus(playable + ' Noten geladen');
+    const notes = resolved.filter(r => !r.rest);
+    const playable = notes.length;
+    // Benny-fit: how many notes force the bellows opposite to their chord.
+    // Pure-diatonic tunes ≈ 0%; chromatic tunes (out of the C/G comfort zone) climb.
+    const forced = notes.filter(r => r.forced).length;
+    const pct = playable ? Math.round(100 * forced / playable) : 0;
+    let fit;
+    if (pct <= 5)       fit = '🟢 sehr gut für Benny';
+    else if (pct <= 15) fit = '🟡 gut spielbar';
+    else if (pct <= 30) fit = '🟠 fordernd (' + pct + '% Balgwechsel gegen die Harmonie)';
+    else                fit = '🔴 chromatisch — teils außerhalb der C/G-Komfortzone (' + pct + '%)';
+    song.fit = fit;
+    song.forcedPct = pct;
+    setSongStatus(playable + ' Noten · ' + fit);
 }
 
 function setSongStatus(t){ const s=document.getElementById('songStatus'); if(s) s.textContent=t||''; }
@@ -2993,7 +3005,7 @@ function importMIDI(parsed, fileName) {
     if (!melodic) throw new Error('keine spielbaren Noten im MIDI');
     const title = fileName.replace(/\.(mid|midi)$/i, '');
     loadSongData({ name: title, bpm, events });
-    setSongStatus(melodic + ' Noten · MIDI · Akkorde geschätzt · ' + bpm + ' bpm');
+    setSongStatus(melodic + ' Noten · MIDI · Akkorde geschätzt · ' + bpm + ' bpm · ' + (song.fit || ''));
 }
 
 // ── Parse MusicXML → loadSongData. Melody = first part, voice 1; chord drives direction. ──
@@ -3120,7 +3132,7 @@ async function importMusicXML(xmlText, fileName) {
     bpm = Math.max(40, Math.min(200, bpm));
     loadSongData({ name: title, bpm, events });
     setSongStatus(melodic + ' Noten · ' + nMeas + ' Takte · Bass: '
-        + bassSource + ' · ' + bpm + ' bpm');
+        + bassSource + ' · ' + bpm + ' bpm · ' + (song.fit || ''));
 }
 
 // Delegated listener: survives treble re-renders, feeds the Wait-mode hit test
