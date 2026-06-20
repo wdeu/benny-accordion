@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.15.0</title>
-<meta name="version" content="5.15.0">
+<title>Castagnari Benny Accordion v5.16.0</title>
+<meta name="version" content="5.16.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -22,8 +22,7 @@
     --bg:#1c1c1e; --bg-card:#2c2c2e; --bg-inset:#3a3a3c;
     --txt:#f2f2f7; --txt2:#8e8e93; --txt3:#636366;
     --sep:#38383a;
-    --accent:#0a84ff; --accent-sub:rgba(10,132,255,0.18);
-    --p0:#f0ece7; --p1:#ddd8d1; --p2:#ccc7bf;
+    --accent:#0a84ff; --accent-sub:rgba(10,132,255,0.18);    --p0:#f0ece7; --p1:#ddd8d1; --p2:#ccc7bf;
     --p-shadow:rgba(0,0,0,0.30);
     --p-text:#3a3a3c;
     --act-bg:#4a4a4c;
@@ -651,13 +650,36 @@ body.playalong-mode .playalong-btn {
     .root-btn { min-width:34px; height:30px; font-size:0.78em; }
     .bellows-btn { width:100px; height:56px; font-size:0.8em; }
 }
+.rep-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000;
+  display:flex; align-items:center; justify-content:center; padding:16px; }
+.rep-overlay[hidden]{ display:none; }
+.rep-modal{ background:var(--bg-card); border-radius:16px; width:100%; max-width:560px;
+  max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 48px rgba(0,0,0,.5); }
+.rep-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--bg-inset); }
+.rep-title{ font-weight:600; font-size:1rem; }
+.rep-close{ background:var(--bg-inset); border:none; color:var(--txt); width:30px; height:30px;
+  border-radius:50%; font-size:.9rem; cursor:pointer; }
+.rep-controls{ display:flex; gap:8px; padding:12px 16px; flex-wrap:wrap; align-items:center; }
+.rep-controls input,.rep-controls select{ background:var(--bg-inset); color:var(--txt); border:1px solid var(--bg-inset);
+  border-radius:8px; padding:7px 10px; font-size:.85rem; outline:none; }
+.rep-controls input{ flex:1 1 130px; min-width:110px; }
+.rep-controls input:focus,.rep-controls select:focus{ border-color:var(--accent); }
+.rep-count{ color:var(--txt2); font-size:.78rem; margin-left:auto; }
+.rep-list{ overflow-y:auto; padding:0 16px; flex:1; }
+.rep-row{ display:flex; align-items:baseline; gap:8px; padding:9px 0; border-bottom:1px solid var(--bg-inset); }
+.rep-row .fit{ font-size:.95rem; flex:0 0 auto; }
+.rep-row .meta{ flex:1; min-width:0; }
+.rep-row .t{ font-weight:600; font-size:.9rem; }
+.rep-row .s{ color:var(--txt2); font-size:.78rem; }
+.rep-row .typ{ color:var(--txt2); font-size:.74rem; background:var(--bg-inset); padding:1px 7px; border-radius:999px; white-space:nowrap; flex:0 0 auto; }
+.rep-foot{ padding:11px 16px; border-top:1px solid var(--bg-inset); color:var(--txt2); font-size:.74rem; line-height:1.4; }
 </style>
 </head>
 <body>
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.15.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -699,6 +721,7 @@ body.playalong-mode .playalong-btn {
             <div class="song-panel">
                 <div class="song-file-row">
                     <button class="song-load-btn" id="songLoadBtn">📂 Load</button>
+                    <button class="song-load-btn" id="repertoireBtn" title="Repertoire-Liste: was passt zum Benny">🎵 Repertoire</button>
                     <input type="file" id="songFileInput" accept=".mxl,.xml,.musicxml,.mid,.midi" style="display:none">
                     <span class="song-file-name" id="songFileName">Sarabande — G. F. Händel</span>
                 </div>
@@ -905,6 +928,58 @@ body.playalong-mode .playalong-btn {
 
 <!-- Heim overlay removed - now inline panel in jam-column -->
 
+<!-- Repertoire modal -->
+<div class="rep-overlay" id="repOverlay" hidden>
+  <div class="rep-modal">
+    <div class="rep-head">
+      <span class="rep-title">🎵 Repertoire für Benny</span>
+      <button class="rep-close" id="repClose" title="Schließen">✕</button>
+    </div>
+    <div class="rep-controls">
+      <input type="search" id="repQ" placeholder="Suchen …">
+      <select id="repType"><option value="">Alle Typen</option></select>
+      <select id="repFit"><option value="">Eignung</option>
+        <option value="🟢">🟢</option><option value="🟡">🟡</option>
+        <option value="🟠">🟠</option><option value="🔴">🔴</option></select>
+      <span class="rep-count" id="repCount"></span>
+    </div>
+    <div class="rep-list" id="repList"></div>
+    <div class="rep-foot">🟢 sehr gut · 🟡 gut · 🟠 fordernd · 🔴 chromatisch. Eigene Dateien über 📂 Load (MusicXML/MIDI) — der Indikator misst dann die echte Balg-Belastung.</div>
+  </div>
+</div>
+
+<script>
+// ── Repertoire modal data + logic (reference list; loading own files via 📂 Load) ──
+const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polka des Tailleurs","Polka","🟢","Naragonia"],["Scottish du Berry","Scottish","🟢","La Machine"],["Bourrée d'Avignon","Bourrée 2t","🟢","Riccardo Tesi"],["Bourrée à Malochet","Bourrée 2t","🟢","Jean Blanchard"],["Polka des 4 Ventres","Polka","🟢","Trio Loubelya"],["Scottish à Virmoux","Scottish","🟡","Riccardo Tesi"],["Bourrée de Lignières","Bourrée 2t","🟡","Patrick Bouffard"],["La Marianne","Bourrée 3t","🟢","Gilles Chabenat"],["Mazurka pour le Vendredi","Mazurka","🟡","Naragonia"],["Bourrée du Berry","Bourrée 2t","🟢","La Machine"],["Bourrée des Grandes Poteries","Bourrée 2t","🟢","Jean Blanchard"],["Bourrée de Montagnac","Bourrée 2t","🟡","Marc Perrone"],["Bourrée des Dindes","Bourrée 2t","🟢","Trio Loubelya"],["Bourrée du Morvan","Bourrée 2t","🟢","La Machine"],["Bourrée de Saint-Flour","Bourrée 3t","🟡","Gilles Chabenat"],["Bourrée de la Vallée Noire","Bourrée 3t","🟡","Gilles Chabenat"],["Bourrée de Boussac","Bourrée 3t","🟡","Patrick Bouffard"],["Bourrée d'Auvergne","Bourrée 2t","🟢","Naragonia"],["Schottis (trad.)","Scottish","🟢","trad."],["An Dro (trad.)","An Dro","🟡","trad."],["Hanter Dro (trad.)","Hanter Dro","🟡","trad."],["Cercle Circassien (trad.)","Cercle/Chapelloise","🟢","trad."],["Valse à 3 temps (trad.)","Walzer","🟢","trad."],["Maraîchine (trad.)","Maraîchine","🟢","trad."],["Rondeau (Gascogne, trad.)","Rondeau","🟢","trad."],["Valse écossaise (trad.)","Walzer","🟢","trad."],["Polka piquée (trad.)","Polka","🟢","trad."],["Valse musette (trad.)","Walzer","🟠","trad."],["Y'a pas d'Air","Walzer","🟡","J.-M. Bencetti"],["Le Chamichou","Cercle/Chapelloise","🟢","J.-M. Bencetti"],["Chocolatine","Cercle/Chapelloise","🟢","J.-M. Bencetti"],["Pique-Nique","Scottish","🟢","J.-M. Bencetti"],["Noirs-Moutons (Branle de Noirmoutier)","Branle","🟢","J.-M. Bencetti"],["V'Là Arthur","Cercle/Chapelloise","🟢","J.-M. Bencetti"],["Médiéval Rock","Neo/Rock","🟠","J.-M. Bencetti"],["Les Pas Perdus","Polka","🟢","J.-M. Bencetti"],["Les Béliers","Bourrée 3t","🟡","J.-M. Bencetti"],["La Ficelle à 1 bout","Rondeau","🟢","J.-M. Bencetti"],["Déséquilibre","Walzer","🟠","J.-M. Bencetti"],["Papier Mâché","Neo","🟡","J.-M. Bencetti"],["Scottish du Premier Jour","Scottish","🟢","J.-M. Bencetti"],["Il est temps","Walzer","🟡","J.-M. Bencetti"],["Valse du Vent","Walzer","🟡","J.-M. Bencetti"],["Valse d'Hiver","Walzer","🟡","J.-M. Bencetti"],["La Mère Michèle","Mazurka","🟡","J.-M. Bencetti"],["Le Réverbère","Mazurka","🟡","J.-M. Bencetti"],["Il Pleut","Mazurka","🟡","J.-M. Bencetti"],["Casser des Briques","Scottish","🟢","J.-M. Bencetti"],["Encore Un Peu","Mazurka","🟡","J.-M. Bencetti"],["Archipel","Mazurka","🟠","J.-M. Bencetti"],["Où est Passé l'Été","Walzer","🟠","J.-M. Bencetti"],["La Révision","Walzer","🟡","J.-M. Bencetti"],["Irish Coffee","Polka","🟡","Rémi Geffroy"],["Au bord de l'eau","Mazurka","🟡","Rémi Geffroy"],["Cranberrie","Scottish","🟡","Rémi Geffroy"],["Matin d'automne","Mazurka","🟡","Rémi Geffroy"],["Maladire","Gavotte","🟠","Rémi Geffroy"],["Rosa Alba","Walzer","🟡","Rémi Geffroy"],["Evanescence","Walzer","🟡","Rémi Geffroy"],["Aleph","Bourrée 3t","🟠","Rémi Geffroy"],["Elle","Walzer","🔴","Rémi Geffroy"],["Suite de Planières","Neo/Swing","🔴","Rémi Geffroy"],["Ajde Jano (SRB, trad.)","Kolo","🟡","trad."],["Moj Dilbere (SRB, trad.)","Sevdah","🟡","trad."],["Der Gasn Nigun (Klezmer, trad.)","Nigun","🟡","trad."],["Bulbul Pjeva (BIH, trad.)","Sevdah","🟡","trad."],["Ljiljano Mome (MKD, trad.)","Oro","🟠","trad."],["Hijaz-Melodien (allg.)","Horo/Oro","🔴","trad."]];
+(function(){
+  const ov=document.getElementById('repOverlay'); if(!ov) return;
+  const listEl=document.getElementById('repList'), q=document.getElementById('repQ'),
+        fT=document.getElementById('repType'), fF=document.getElementById('repFit'),
+        cnt=document.getElementById('repCount');
+  [...new Set(REP_DATA.map(r=>r[1]))].sort().forEach(t=>{
+    const o=document.createElement('option'); o.value=t; o.textContent=t; fT.appendChild(o); });
+  const RANK={'🟢':0,'🟡':1,'🟠':2,'🔴':3};
+  function esc(x){return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+  function draw(){
+    const term=(q.value||'').trim().toLowerCase(), ft=fT.value, ff=fF.value;
+    let rows=REP_DATA.filter(r=>{
+      if(ft&&r[1]!==ft)return false; if(ff&&r[2]!==ff)return false;
+      if(term&&!(r[0]+' '+r[3]).toLowerCase().includes(term))return false; return true;});
+    rows.sort((a,b)=>RANK[a[2]]-RANK[b[2]] || a[0].localeCompare(b[0]));
+    listEl.innerHTML=rows.map(r=>`<div class="rep-row"><span class="fit">${r[2]}</span>`+
+      `<span class="meta"><div class="t">${esc(r[0])}</div><div class="s">${esc(r[3])}</div></span>`+
+      `<span class="typ">${esc(r[1])}</span></div>`).join('')||'<div class="rep-row"><span class="s">Nichts gefunden.</span></div>';
+    cnt.textContent=rows.length+' / '+REP_DATA.length;
+  }
+  function open(){ ov.hidden=false; draw(); setTimeout(()=>q.focus(),50); }
+  function close(){ ov.hidden=true; }
+  document.getElementById('repertoireBtn').addEventListener('click',open);
+  document.getElementById('repClose').addEventListener('click',close);
+  ov.addEventListener('click',e=>{ if(e.target===ov) close(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!ov.hidden) close(); });
+  q.addEventListener('input',draw); fT.addEventListener('change',draw); fF.addEventListener('change',draw);
+})();
+</script>
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
 // AUDIO ENGINE
