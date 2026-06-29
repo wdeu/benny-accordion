@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.16.2</title>
-<meta name="version" content="5.16.2">
+<title>Castagnari Benny Accordion v5.16.3</title>
+<meta name="version" content="5.16.3">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -58,9 +58,10 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
         top: 20px;
         max-height: calc(100vh - 40px);
         overflow-y: auto;
+        min-width: 0;
     }
     
-    .treble-column { grid-column: 2; }
+    .treble-column { grid-column: 2; min-width: 0; }
     
     /* Jam-Box column: STICKY! */
     .jam-box-column { 
@@ -69,6 +70,7 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
         top: 20px;
         max-height: calc(100vh - 100px);
         overflow-y: auto;
+        min-width: 0;
     }
     
     /* Kompaktere Spacing auf iPad */
@@ -525,7 +527,7 @@ body.playalong-mode .playalong-btn {
 /* ──────────── BASS-TASTE ──────────── */
 .bass-container { display:flex; gap:8px; justify-content:center; margin-top:4px;
     width:100%; box-sizing:border-box; }
-.bass-column { display:flex; flex-direction:column; gap:4px; align-items:center;
+.bass-col { display:flex; flex-direction:column; gap:4px; align-items:center;
     flex-shrink:0; }
 .bass-col-label { font-size:0.66em; color:var(--txt3); font-weight:600;
     letter-spacing:0.7px; margin-bottom:2px; }
@@ -680,7 +682,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.2</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.3</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -1858,7 +1860,7 @@ function renderBass() {
     cont.innerHTML = '';
     ['col1','col2'].forEach(col => {
         const column = document.createElement('div');
-        column.className = 'bass-column';
+        column.className = 'bass-col';
         const lbl = document.createElement('div');
         lbl.className = 'bass-col-label';
         lbl.textContent = 'Spalte '+(col==='col1'?'1':'2');
