@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.16.0</title>
-<meta name="version" content="5.16.0">
+<title>Castagnari Benny Accordion v5.16.2</title>
+<meta name="version" content="5.16.2">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -586,13 +586,14 @@ body.playalong-mode .playalong-btn {
 .legend-link-item .link-icon { color:var(--txt3); font-size:0.85em; }
 
 /* Heim toggle as a link-style item */
-.legend-heim-toggle { cursor:pointer; color:var(--accent);
-    font-size:0.8em; display:flex; align-items:center; gap:6px;
-    line-height:1.6; }
+.legend-heim-toggle { cursor:pointer; color:var(--accent); }
 .legend-heim-toggle:hover { text-decoration:underline; }
 
-/* Bottom: Benny photo centered */
-.legend-benny { display:flex; justify-content:center; margin-top:4px; }
+/* Bottom: Benny photo + Soufflet icon, side by side */
+.legend-benny { display:flex; justify-content:center; align-items:flex-end; gap:14px; margin-top:4px; }
+.soufflet-link { display:block; flex-shrink:0; transition:transform 0.2s, opacity 0.2s; }
+.soufflet-link:hover { transform:scale(1.05); opacity:0.9; }
+.soufflet-icon { width:120px; height:120px; display:block; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
 
 /* Old styles kept for heim expand */
 .legend-symbols { margin-bottom:6px; }
@@ -679,7 +680,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.2</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -911,6 +912,46 @@ body.playalong-mode .playalong-btn {
                     <div class="legend-benny">
                         <a href="https://castagnari.com/prodotto.html?id=6&k=39" target="_blank" rel="noopener" class="benny-link" title="Castagnari Benny – Manufacturer's Website">
                             <img src="assets/hero-benny.jpg" alt="Castagnari Benny" class="benny-image" style="width:120px; max-width:120px;">
+                        </a>
+                        <a href="https://wdeu.github.io/soufflet/" target="_blank" rel="noopener" class="soufflet-link" title="Soufflet – MusicXML zu D.E.S.-Tablatur">
+                            <svg class="soufflet-icon" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0" y="0" width="120" height="120" rx="8" fill="#f7f3ea"/>
+                                <rect x="0.75" y="0.75" width="118.5" height="118.5" rx="7.25" fill="none" stroke="#0a84ff" stroke-opacity="0.25" stroke-width="1.5"/>
+                                <!-- D.E.S. tab numbers: underline = Zug (pull) -->
+                                <g font-family="Georgia, 'Times New Roman', serif" font-size="11" fill="#2a2a2a">
+                                    <text x="20" y="30">5''</text>
+                                    <line x1="18" y1="33" x2="32" y2="33" stroke="#2a2a2a" stroke-width="1"/>
+                                    <text x="42" y="30">7</text>
+                                    <text x="56" y="30">4'</text>
+                                    <line x1="54" y1="33" x2="66" y2="33" stroke="#2a2a2a" stroke-width="1"/>
+                                    <text x="76" y="30">7'</text>
+                                    <line x1="74" y1="33" x2="86" y2="33" stroke="#2a2a2a" stroke-width="1"/>
+                                    <text x="96" y="30">7</text>
+                                </g>
+                                <!-- 5-line staff -->
+                                <g stroke="#3a3a3a" stroke-width="1">
+                                    <line x1="14" y1="48" x2="106" y2="48"/>
+                                    <line x1="14" y1="56" x2="106" y2="56"/>
+                                    <line x1="14" y1="64" x2="106" y2="64"/>
+                                    <line x1="14" y1="72" x2="106" y2="72"/>
+                                    <line x1="14" y1="80" x2="106" y2="80"/>
+                                </g>
+                                <!-- beamed note group -->
+                                <g fill="#2a2a2a">
+                                    <line x1="28" y1="76" x2="28" y2="50" stroke="#2a2a2a" stroke-width="1.4"/>
+                                    <line x1="46" y1="72" x2="46" y2="50" stroke="#2a2a2a" stroke-width="1.4"/>
+                                    <line x1="64" y1="68" x2="64" y2="50" stroke="#2a2a2a" stroke-width="1.4"/>
+                                    <line x1="82" y1="64" x2="82" y2="50" stroke="#2a2a2a" stroke-width="1.4"/>
+                                    <polygon points="28,50 82,50 82,54 28,54" />
+                                    <ellipse cx="28" cy="76" rx="5" ry="3.6" transform="rotate(-18 28 76)"/>
+                                    <ellipse cx="46" cy="72" rx="5" ry="3.6" transform="rotate(-18 46 72)"/>
+                                    <ellipse cx="64" cy="68" rx="5" ry="3.6" transform="rotate(-18 64 68)"/>
+                                    <ellipse cx="82" cy="64" rx="5" ry="3.6" transform="rotate(-18 82 64)"/>
+                                </g>
+                                <!-- bellows-fold motif, lower right -->
+                                <polyline points="86,98 92,104 98,98 104,104 110,98" fill="none" stroke="#0a84ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+                                <text x="14" y="106" font-family="-apple-system,sans-serif" font-size="9" letter-spacing="1.5" fill="#0a84ff" opacity="0.85">D.E.S.</text>
+                            </svg>
                         </a>
                     </div>
                 </div>
