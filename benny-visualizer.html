@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.16.3</title>
-<meta name="version" content="5.16.3">
+<title>Castagnari Benny Accordion v5.16.4</title>
+<meta name="version" content="5.16.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -682,7 +682,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.3</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.4</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -743,6 +743,9 @@ body.playalong-mode .playalong-btn {
                     <input type="range" id="songTempo" min="40" max="200" step="2" value="80">
                     <span class="val" id="songTempoVal">80 bpm</span>
                 </div>
+                <label class="song-kuer-row" id="songMetroRow" title="Zählt 1 Takt (4 Schläge) vor dem Start ein; optional Klick während des Spiels.">
+                    <input type="checkbox" id="songMetro"> 🔔 Metronom (+ Einzählen)
+                </label>
                 <label class="song-kuer-row" id="songMicRow" title="Wait-Modus: Abspielkopf rückt vor, wenn das Mikro den richtigen Melodieton hört (am echten Benny). Standard: aus.">
                     <input type="checkbox" id="songMic"> 🎤 Zuhören (echtes Instrument)
                 </label>
@@ -2704,6 +2707,10 @@ let songMode = 'watch';     // 'watch' | 'wait' | 'flow'
 let songTimer = null;
 let songWaiting = false;    // Wait mode: holding for the student's finger
 let songAwaitBellows = false;  // Kür: holding for the student's bellows switch
+let metronomeOn = false;       // 🔔 click during playback + count-in before start
+let metroTimer = null;
+let metroBeatCount = 0;
+let songCountingIn = false;
 
 function loadSongData(data) {
     const resolved = data.events
@@ -2904,29 +2911,77 @@ function micDisable() {
 }
 
 
+// ── 🔔 Metronom: kurzer Klick (eigener Oszillator, kein Eingriff in Treble/Bass-Pools) ──
+function metroClickSound(accent) {
+    if (audioContext.state === 'suspended') audioContext.resume();
+    const t = audioContext.currentTime;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = 'square';
+    osc.frequency.value = accent ? 1500 : 1000;
+    gain.gain.setValueAtTime(accent ? 0.16 : 0.09, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+    osc.connect(gain); gain.connect(audioContext.destination);
+    osc.start(t); osc.stop(t + 0.06);
+}
+
+// 1 Takt (4 Schläge, 4/4 — wie an anderer Stelle im MIDI-Import angenommen) einzählen, dann callback.
+function songCountIn(callback) {
+    let n = 0;
+    setSongStatus('Einzählen…');
+    const tick = () => {
+        metroClickSound(n === 0);
+        n++;
+        metroTimer = setTimeout(n < 4 ? tick : callback, songBeatMs());
+    };
+    tick();
+}
+
+// Durchlaufender Klick während des Abspielens, unabhängig von songStep()'s Notenlängen.
+function metroLoop() {
+    if (!songPlaying || !metronomeOn) { metroTimer = null; return; }
+    metroClickSound(metroBeatCount % 4 === 0);
+    metroBeatCount++;
+    metroTimer = setTimeout(metroLoop, songBeatMs());
+}
+
+function stopMetro() { if (metroTimer) { clearTimeout(metroTimer); metroTimer = null; } }
+
 function songFinish() {
     songPlaying = false; songWaiting = false; songAwaitBellows = false;
     if (songTimer) { clearTimeout(songTimer); songTimer = null; }
+    stopMetro();
     clearSongTarget();
     document.getElementById('songPlayBtn').textContent = '▶';
     setSongStatus(song ? 'Fertig — ⏮ für Anfang' : '');
 }
 
 function songPlay() {
-    if (!song) return;
+    if (!song || songCountingIn) return;
     if (songPlaying) { songPause(); return; }
     if (songIdx >= song.events.length) songIdx = 0;
-    songPlaying = true;
-    document.getElementById('songPlayBtn').textContent = '⏸';
-    songStep();
+    const start = () => {
+        songCountingIn = false;
+        songPlaying = true;
+        document.getElementById('songPlayBtn').textContent = '⏸';
+        if (metronomeOn) { metroBeatCount = 0; metroLoop(); }
+        songStep();
+    };
+    if (metronomeOn) {
+        songCountingIn = true;
+        songCountIn(start);
+    } else {
+        start();
+    }
 }
 function songPause() {
-    songPlaying = false; songWaiting = false;
+    songPlaying = false; songWaiting = false; songCountingIn = false;
     if (songTimer) { clearTimeout(songTimer); songTimer = null; }
+    stopMetro();
     document.getElementById('songPlayBtn').textContent = '▶';
     setSongStatus('Pause');
 }
-function songStop() { songPlaying=false; songIdx=0; songFinish(); setSongStatus(song?'Bereit':''); }
+function songStop() { songPlaying=false; songCountingIn=false; songIdx=0; stopMetro(); songFinish(); setSongStatus(song?'Bereit':''); }
 function songRestart() { songStop(); songIdx=0; if(song) setSongStatus('Bereit'); }
 
 // ── Wiring ──
@@ -2935,6 +2990,9 @@ document.getElementById('songStopBtn').addEventListener('click', songStop);
 document.getElementById('songBackBtn').addEventListener('click', songRestart);
 document.getElementById('songTempo').addEventListener('input', e => {
     document.getElementById('songTempoVal').textContent = e.target.value + ' bpm';
+});
+document.getElementById('songMetro').addEventListener('change', e => {
+    metronomeOn = e.target.checked;
 });
 function updateMicRowVisibility() {
     const row = document.getElementById('songMicRow');
