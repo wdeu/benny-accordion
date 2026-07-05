@@ -1,0 +1,9 @@
+{
+  "name": "benny-repertoire-tools",
+  "private": true,
+  "type": "module",
+  "description": "Analyse-Pipeline: MusicXML → Balg-Belastung/Schwierigkeit → repertoire/index.json",
+  "dependencies": {
+    "linkedom": "^0.18.12"
+  }
+}

@@ -6,6 +6,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.17.0] - 2026-07-05
+
+### 🎶 Added — "Meine Stücke": analysiertes Repertoire im Modal
+- Neuer Tab **Meine Stücke** im Repertoire-Modal: lädt `repertoire/index.json` (lokal `../repertoire/`, auf Pages die gesyncte publish-Auswahl) und listet die eigenen, von der Pipeline analysierten Stücke — gruppiert nach Übestatus (Kann ich / In Arbeit / Neu), innerhalb sortiert nach Schwierigkeit.
+- **1-Klick-Laden**: Zeile anklicken → Stück landet direkt im Play-Along (Watch/Wait/Flow); 📜 öffnet dasselbe Stück mit D.E.S.-Tablatur in Soufflet.
+- **Übestatus** pro Stück direkt im Modal umschaltbar, persistiert in `localStorage` (`benny.uebestatus`).
+- Ohne `index.json` (404, `file://`) verhält sich das Modal exakt wie bisher (nur Referenzliste).
+
+### 🛠 Added — Analyse-Pipeline (`tools/`)
+- `tools/analyze-repertoire.mjs`: scannt `~/Projects/partituren`, konvertiert `.mscz` per MuseScore-4-CLI, berechnet **dieselbe Balg-Belastung wie der 📂-Load-Analyzer** (Logik nach `tools/lib/benny-core.mjs` extrahiert, Parität verifiziert) plus `unplayablePct`, Schwierigkeits-Tier und Metadaten → `~/Projects/repertoire/index.json`. `--sync` veröffentlicht nur Stücke mit `publish: true`.
+
 ## [5.15.0] - 2026-06-05
 
 ### 🎯 Added — Benny-fit indicator on load

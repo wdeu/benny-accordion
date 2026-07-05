@@ -1,0 +1,34 @@
+{
+ "version": 1,
+ "generated": "2026-07-05T16:12:16.536Z",
+ "instrument": "Castagnari Benny C/G (Heim)",
+ "pieces": [
+  {
+   "id": "Scottish_Ba_-_Jean-Michel_Bencetti",
+   "file": "files/Scottish_Ba_-_Jean-Michel_Bencetti.mxl",
+   "title": "Scottish à Béa",
+   "artist": "Jean-Michel Bencetti",
+   "type": "Scottish",
+   "key": "G",
+   "meter": "4/4",
+   "bpm": 160,
+   "measures": 14,
+   "notes": 84,
+   "bellowsLoadPct": 2,
+   "unplayablePct": 0,
+   "fit": "🟢",
+   "difficulty": "leicht",
+   "difficultyScore": 7.4,
+   "notesPerSec": 4,
+   "rowCrossPct": 54,
+   "bassSource": "Akkorde",
+   "hasChordSymbols": true,
+   "uebestatus": "kannIch",
+   "publish": true,
+   "source": "mxl/Scottish__Ba_-_Jean-Michel_Bencetti.mxl",
+   "sourceSha1": "fc4fc7a702d4a346125606d022f3a4e013006d07",
+   "addedAt": "2026-07-05T16:06:48.174Z",
+   "analyzedAt": "2026-07-05T16:11:04.656Z"
+  }
+ ]
+}

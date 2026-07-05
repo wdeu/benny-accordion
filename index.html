@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Castagnari Benny Accordion v5.16.4</title>
-<meta name="version" content="5.16.4">
+<meta name="version" content="5.17.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -676,6 +676,19 @@ body.playalong-mode .playalong-btn {
 .rep-row .s{ color:var(--txt2); font-size:.78rem; }
 .rep-row .typ{ color:var(--txt2); font-size:.74rem; background:var(--bg-inset); padding:1px 7px; border-radius:999px; white-space:nowrap; flex:0 0 auto; }
 .rep-foot{ padding:11px 16px; border-top:1px solid var(--bg-inset); color:var(--txt2); font-size:.74rem; line-height:1.4; }
+.rep-tabs{ display:flex; gap:8px; padding:10px 16px 0; }
+.rep-tab{ background:var(--bg-inset); color:var(--txt2); border:none; border-radius:999px;
+  padding:5px 14px; font-size:.82rem; cursor:pointer; }
+.rep-tab.active{ background:var(--accent); color:#fff; }
+.rep-group{ color:var(--txt2); font-size:.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.06em; padding:12px 0 3px; border-bottom:1px solid var(--bg-inset); }
+.rep-row.mine{ cursor:pointer; }
+.rep-row.mine:hover .t{ color:var(--accent); }
+.rep-row .stat{ flex:0 0 auto; }
+.rep-row .stat select{ background:var(--bg-inset); color:var(--txt2); border:none;
+  border-radius:8px; font-size:.7rem; padding:2px 4px; }
+.rep-row .souff{ flex:0 0 auto; text-decoration:none; font-size:.8rem; opacity:.7; }
+.rep-row .souff:hover{ opacity:1; }
 </style>
 </head>
 <body>
@@ -981,6 +994,10 @@ body.playalong-mode .playalong-btn {
       <span class="rep-title">🎵 Repertoire für Benny</span>
       <button class="rep-close" id="repClose" title="Schließen">✕</button>
     </div>
+    <div class="rep-tabs" id="repTabs" hidden>
+      <button class="rep-tab active" data-tab="mine">🎶 Meine Stücke</button>
+      <button class="rep-tab" data-tab="ref">📖 Referenz</button>
+    </div>
     <div class="rep-controls">
       <input type="search" id="repQ" placeholder="Suchen …">
       <select id="repType"><option value="">Alle Typen</option></select>
@@ -990,7 +1007,7 @@ body.playalong-mode .playalong-btn {
       <span class="rep-count" id="repCount"></span>
     </div>
     <div class="rep-list" id="repList"></div>
-    <div class="rep-foot">🟢 sehr gut · 🟡 gut · 🟠 fordernd · 🔴 chromatisch. Eigene Dateien über 📂 Load (MusicXML/MIDI) — der Indikator misst dann die echte Balg-Belastung.</div>
+    <div class="rep-foot">🟢 sehr gut · 🟡 gut · 🟠 fordernd · 🔴 chromatisch. „Meine Stücke": Klick lädt in den Play-Along, 📜 öffnet die D.E.S.-Tablatur in Soufflet. Einzelne Dateien weiterhin über 📂 Load (MusicXML/MIDI).</div>
   </div>
 </div>
 
@@ -1001,12 +1018,40 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
   const ov=document.getElementById('repOverlay'); if(!ov) return;
   const listEl=document.getElementById('repList'), q=document.getElementById('repQ'),
         fT=document.getElementById('repType'), fF=document.getElementById('repFit'),
-        cnt=document.getElementById('repCount');
-  [...new Set(REP_DATA.map(r=>r[1]))].sort().forEach(t=>{
-    const o=document.createElement('option'); o.value=t; o.textContent=t; fT.appendChild(o); });
+        cnt=document.getElementById('repCount'), tabs=document.getElementById('repTabs');
   const RANK={'🟢':0,'🟡':1,'🟠':2,'🔴':3};
   function esc(x){return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-  function draw(){
+
+  // ── Meine Stücke: repertoire/index.json (Pipeline-Output). Fehlt es (404,
+  //    file://), bleibt alles beim alten Verhalten: nur die Referenzliste. ──
+  let MY=null, tab='ref', repBase='repertoire/';   // MY: null=ungeladen, false=nicht da, []=Stücke
+  const STATUS_KEY='benny.uebestatus';
+  const STATUS_LABELS={kannIch:'Kann ich',inArbeit:'In Arbeit',neu:'Neu'};
+  const readStatus=()=>{ try{return JSON.parse(localStorage.getItem(STATUS_KEY))||{};}catch(e){return {};} };
+  const statusOf=p=>readStatus()[p.id]||p.uebestatus||'neu';
+  async function loadIndex(){
+    // lokal (Server über ~/Projects): ../repertoire/ = kompletter Kanon-Ordner;
+    // GitHub Pages: repertoire/ = gesyncte publish-Auswahl im Repo
+    for(const base of ['../repertoire/','repertoire/']){
+      try{
+        const r=await fetch(base+'index.json',{cache:'no-cache'});
+        if(!r.ok) continue;
+        MY=(await r.json()).pieces||[]; repBase=base;
+        if(MY.length){ tabs.hidden=false; tab='mine'; }
+        break;
+      }catch(e){}
+    }
+    if(MY===null) MY=false;
+    fillTypes(); draw();
+  }
+  function fillTypes(){
+    const set=new Set(REP_DATA.map(r=>r[1]));
+    if(Array.isArray(MY)) MY.forEach(p=>{ if(p.type&&p.type!=='?') set.add(p.type); });
+    fT.innerHTML='<option value="">Alle Typen</option>';
+    [...set].sort().forEach(t=>{
+      const o=document.createElement('option'); o.value=t; o.textContent=t; fT.appendChild(o); });
+  }
+  function drawRef(){
     const term=(q.value||'').trim().toLowerCase(), ft=fT.value, ff=fF.value;
     let rows=REP_DATA.filter(r=>{
       if(ft&&r[1]!==ft)return false; if(ff&&r[2]!==ff)return false;
@@ -1017,7 +1062,69 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
       `<span class="typ">${esc(r[1])}</span></div>`).join('')||'<div class="rep-row"><span class="s">Nichts gefunden.</span></div>';
     cnt.textContent=rows.length+' / '+REP_DATA.length;
   }
-  function open(){ ov.hidden=false; draw(); setTimeout(()=>q.focus(),50); }
+  function drawMine(){
+    const term=(q.value||'').trim().toLowerCase(), ft=fT.value, ff=fF.value;
+    const rows=MY.filter(p=>{
+      if(ft&&p.type!==ft)return false; if(ff&&p.fit!==ff)return false;
+      if(term&&!(p.title+' '+p.artist).toLowerCase().includes(term))return false; return true;});
+    const groups={kannIch:[],inArbeit:[],neu:[]};
+    rows.forEach(p=>(groups[statusOf(p)]||groups.neu).push(p));
+    let html='';
+    for(const g of ['kannIch','inArbeit','neu']){
+      if(!groups[g].length) continue;
+      groups[g].sort((a,b)=>(a.difficultyScore??99)-(b.difficultyScore??99) || a.title.localeCompare(b.title));
+      html+=`<div class="rep-group">${STATUS_LABELS[g]} · ${groups[g].length}</div>`;
+      html+=groups[g].map(p=>{
+        const st=statusOf(p);
+        const info=[p.artist!=='?'?p.artist:null, p.key!=='?'?p.key:null,
+                    p.bpm?p.bpm+' bpm':null, p.difficulty, p.bellowsLoadPct+'% Balg'
+                   ].filter(Boolean).join(' · ');
+        const souff=new URL('../soufflet/',location.href).href
+          +'?score='+encodeURIComponent(new URL(repBase+p.file,location.href).href);
+        return `<div class="rep-row mine" data-id="${esc(p.id)}"><span class="fit">${p.fit}</span>`+
+          `<span class="meta"><div class="t">${esc(p.title)}</div><div class="s">${esc(info)}</div></span>`+
+          (p.type&&p.type!=='?'?`<span class="typ">${esc(p.type)}</span>`:'')+
+          `<span class="stat"><select data-id="${esc(p.id)}">`+
+            ['neu','inArbeit','kannIch'].map(s=>`<option value="${s}"${s===st?' selected':''}>${STATUS_LABELS[s]}</option>`).join('')+
+          `</select></span>`+
+          `<a class="souff" href="${esc(souff)}" target="_blank" title="In Soufflet öffnen (D.E.S.-Tablatur)">📜</a></div>`;
+      }).join('');
+    }
+    listEl.innerHTML=html||'<div class="rep-row"><span class="s">Nichts gefunden.</span></div>';
+    cnt.textContent=rows.length+' / '+MY.length;
+  }
+  function draw(){ if(tab==='mine'&&Array.isArray(MY)) drawMine(); else drawRef(); }
+
+  async function loadPiece(p){
+    songStop();
+    try{
+      setSongStatus('Lade '+p.title+' …');
+      const r=await fetch(repBase+p.file); if(!r.ok) throw new Error('HTTP '+r.status);
+      const buf=await r.arrayBuffer();
+      const xml=/\.mxl$/i.test(p.file) ? await unzipMxl(buf) : new TextDecoder().decode(buf);
+      await importMusicXML(xml, p.file.split('/').pop());
+      close();
+    }catch(err){ console.error(err); setSongStatus('Laden fehlgeschlagen: '+(err.message||err)); }
+  }
+  listEl.addEventListener('change',e=>{
+    const sel=e.target.closest('.stat select'); if(!sel) return;
+    const map=readStatus(); map[sel.dataset.id]=sel.value;
+    localStorage.setItem(STATUS_KEY,JSON.stringify(map));
+    drawMine();
+  });
+  listEl.addEventListener('click',e=>{
+    if(e.target.closest('.stat')||e.target.closest('.souff')) return;
+    const row=e.target.closest('.rep-row.mine'); if(!row) return;
+    const p=MY&&MY.find(x=>x.id===row.dataset.id); if(p) loadPiece(p);
+  });
+  tabs.addEventListener('click',e=>{
+    const b=e.target.closest('.rep-tab'); if(!b) return;
+    tab=b.dataset.tab;
+    tabs.querySelectorAll('.rep-tab').forEach(x=>x.classList.toggle('active',x===b));
+    draw();
+  });
+
+  function open(){ ov.hidden=false; if(MY===null) loadIndex(); else draw(); setTimeout(()=>q.focus(),50); }
   function close(){ ov.hidden=true; }
   document.getElementById('repertoireBtn').addEventListener('click',open);
   document.getElementById('repClose').addEventListener('click',close);
