@@ -6,6 +6,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.18.0] - 2026-07-05
+
+### 🎼 Changed — Gavotte en Bois als Default-Stück
+- Die Händel-Sarabande weicht **„Gavotte en Bois" (J.-M. Bencetti, Gavote de Grenoble)** — akkordeontypischer und mit 0% erzwungenen Balgwechseln ein echtes Schaufenster für den C/G Benny.
+- Events per Pipeline-Modulen direkt aus `repertoire/files/Gavotte_en_Bois_….mxl` generiert (identischer Resolver-Pfad wie beim Datei-Laden). „Encore Un Peu" wäre nach Score noch leichter gewesen, scheidet aber aus: die Melodiestimme der Datei pausiert 49 Takte.
+
 ## [5.17.0] - 2026-07-05
 
 ### 🎶 Added — "Meine Stücke": analysiertes Repertoire im Modal
