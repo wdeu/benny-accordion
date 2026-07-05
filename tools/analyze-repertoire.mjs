@@ -6,12 +6,19 @@
 //   node analyze-repertoire.mjs --src ~/Projects/partituren --out ~/Projects/repertoire \
 //        [--convert] [--fetch-jmib] [--force] [--only "Bourr*"] \
 //        [--sync ~/Projects/benny-accordion/repertoire]
+//
+// Publish-Kuration ohne JSON-Editieren (Muster matcht id, Titel oder Artist):
+//   node analyze-repertoire.mjs --out ~/Projects/repertoire --publish "Il Pleut" \
+//        [--sync ~/Projects/benny-accordion/repertoire]
+//   node analyze-repertoire.mjs --out ~/Projects/repertoire --unpublish "*"
+//   node analyze-repertoire.mjs --out ~/Projects/repertoire --list
 
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { DOMParser } from 'linkedom';
 import { readScoreXml } from './lib/mxl.mjs';
 import { musicXmlToEvents } from './lib/musicxml-events.mjs';
@@ -27,7 +34,7 @@ const DENSITY_WEIGHT = 5;    // Punkte pro Note/Sek. darüber
 const CROSS_WEIGHT = 10;     // Punkte bei 100% Reihenwechseln (linear)
 const TIER_EASY = 10, TIER_MEDIUM = 25;   // <10 leicht, <25 mittel, sonst schwer
 
-const TYPE_PATTERNS = [
+export const TYPE_PATTERNS = [
     [/bourr.e.*3|3.*temps.*bourr/i, 'Bourrée 3t'],
     [/bourr/i, 'Bourrée 2t'],
     [/mazur/i, 'Mazurka'],
@@ -50,21 +57,31 @@ const TYPE_PATTERNS = [
 
 function args() {
     const a = process.argv.slice(2), o = { convert:false, fetchJmib:false, force:false,
-        src:null, out:null, only:null, sync:null };
+        src:null, out:null, only:null, sync:null, publish:null, unpublish:null, list:false };
     for (let i = 0; i < a.length; i++) {
         if (a[i] === '--convert') o.convert = true;
         else if (a[i] === '--fetch-jmib') o.fetchJmib = true;
         else if (a[i] === '--force') o.force = true;
+        else if (a[i] === '--list') o.list = true;
         else if (a[i] === '--src') o.src = a[++i];
         else if (a[i] === '--out') o.out = a[++i];
         else if (a[i] === '--only') o.only = a[++i];
         else if (a[i] === '--sync') o.sync = a[++i];
+        else if (a[i] === '--publish') o.publish = a[++i];
+        else if (a[i] === '--unpublish') o.unpublish = a[++i];
         else { console.error('Unbekanntes Argument: ' + a[i]); process.exit(1); }
     }
-    if (!o.src || !o.out) { console.error('--src und --out sind Pflicht'); process.exit(1); }
+    o.publishMode = !!(o.publish || o.unpublish || o.list);
+    if (!o.out || (!o.src && !o.publishMode)) {
+        console.error(o.publishMode ? '--out ist Pflicht' : '--src und --out sind Pflicht');
+        process.exit(1);
+    }
     for (const k of ['src','out','sync']) if (o[k]) o[k] = path.resolve(o[k].replace(/^~/, os.homedir()));
     return o;
 }
+
+const globToRe = g => new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*/g, '.*').replace(/\?/g, '.') + '$', 'i');
 
 const walk = (dir, ext) => {
     const hits = [];
@@ -84,7 +101,7 @@ const slugify = name => name.normalize('NFC')
 
 const sha1 = buf => crypto.createHash('sha1').update(buf).digest('hex');
 
-function guessType(title, meter) {
+export function guessType(title, meter) {
     for (const [re, t] of TYPE_PATTERNS) if (re.test(title)) return t;
     if (meter === '3/8') return 'Bourrée 3t?';
     return '?';
@@ -168,8 +185,30 @@ function convertMscz(srcDir) {
     if (failed.length) console.log('  Fehlgeschlagen: ' + failed.map(j => path.basename(j.in)).join(', '));
 }
 
+// --publish/--unpublish/--list: Flags im Index setzen, ohne neu zu analysieren
+function publishMode(opt) {
+    const indexPath = path.join(opt.out, 'index.json');
+    const index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+    for (const [pattern, val] of [[opt.publish, true], [opt.unpublish, false]]) {
+        if (!pattern) continue;
+        const re = globToRe(pattern);
+        const hits = index.pieces.filter(p =>
+            re.test(p.id) || re.test(p.title) || re.test(p.artist) || re.test(p.source || ''));
+        for (const p of hits) p.publish = val;
+        console.log((val ? '→ publish: ' : '→ unpublish: ') + hits.length + ' Stück(e)'
+            + (hits.length ? ' — ' + hits.map(p => p.title).join(', ') : ''));
+        if (!hits.length) console.log('   (Muster matcht id, Titel oder Artist; * und ? erlaubt)');
+    }
+    if (opt.publish || opt.unpublish) fs.writeFileSync(indexPath, JSON.stringify(index, null, 1));
+    const pub = index.pieces.filter(p => p.publish);
+    console.log(`→ veröffentlicht: ${pub.length}/${index.pieces.length}`
+        + (opt.list && pub.length ? '\n' + pub.map(p => '   🌐 ' + p.title + ' (' + p.artist + ')').join('\n') : ''));
+    if (opt.sync) syncPublish(opt.out, opt.sync, index);
+}
+
 function main() {
     const opt = args();
+    if (opt.publishMode) { publishMode(opt); return; }
     if (opt.fetchJmib) fetchJmib(opt.src);
     if (opt.convert) convertMscz(opt.src);
 
@@ -182,7 +221,7 @@ function main() {
     // scan: alle .mxl/.musicxml unter --src; bei gleichem Slug gewinnt partituren/mxl/
     let sources = walk(opt.src, /\.(mxl|musicxml)$/i);
     if (opt.only) {
-        const re = new RegExp('^' + opt.only.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.') + '$', 'i');
+        const re = globToRe(opt.only);
         sources = sources.filter(p => re.test(path.basename(p)));
     }
     const bySlug = new Map();
@@ -299,4 +338,4 @@ function syncPublish(outDir, syncDir, index) {
     console.log('   (git add/commit/push im App-Repo nicht vergessen)');
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

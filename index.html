@@ -1082,7 +1082,7 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
         const souff=new URL('../soufflet/',location.href).href
           +'?score='+encodeURIComponent(new URL(repBase+p.file,location.href).href);
         return `<div class="rep-row mine" data-id="${esc(p.id)}"><span class="fit">${p.fit}</span>`+
-          `<span class="meta"><div class="t">${esc(p.title)}</div><div class="s">${esc(info)}</div></span>`+
+          `<span class="meta"><div class="t">${esc(p.title)}${p.publish?' <span title="veröffentlicht (auch auf GitHub Pages)">🌐</span>':''}</div><div class="s">${esc(info)}</div></span>`+
           (p.type&&p.type!=='?'?`<span class="typ">${esc(p.type)}</span>`:'')+
           `<span class="stat"><select data-id="${esc(p.id)}">`+
             ['neu','inArbeit','kannIch'].map(s=>`<option value="${s}"${s===st?' selected':''}>${STATUS_LABELS[s]}</option>`).join('')+
