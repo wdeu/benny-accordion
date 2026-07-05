@@ -1,6 +1,6 @@
 # 🎨 Assets
 
-Dieser Ordner enthält alle Icons und Metadaten für die Benny Visualizer Web-App.
+Dieser Ordner enthält alle Icons und Metadaten für die Benny Accordion Web-App.
 
 ## 📁 Dateien
 
@@ -28,7 +28,7 @@ Alle Icons wurden generiert aus **Benny.png** (Castagnari Benny Akkordeon).
 ```bash
 # Ordnerstruktur:
 /
-├── benny-visualizer.html
+├── benny-accordion.html
 └── assets/
     ├── favicon-16x16.png
     ├── favicon-32x32.png
@@ -42,7 +42,7 @@ Alle Icons wurden generiert aus **Benny.png** (Castagnari Benny Akkordeon).
 ```bash
 # Via FTP/SFTP hochladen:
 /htdocs/
-├── benny-visualizer.html
+├── benny-accordion.html
 └── assets/
     └── [alle Dateien]
 ```
@@ -50,7 +50,7 @@ Alle Icons wurden generiert aus **Benny.png** (Castagnari Benny Akkordeon).
 ## ✅ Testen
 
 ### Favicon
-1. Öffne `benny-visualizer.html` im Browser
+1. Öffne `benny-accordion.html` im Browser
 2. Schaue auf den Tab → Benny-Icon sollte sichtbar sein
 
 ### iOS Home-Screen

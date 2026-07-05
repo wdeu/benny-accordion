@@ -82,7 +82,7 @@ In **Wait**, tick **🎤 Listen**. The app asks once for microphone permission, 
 # 2. Clone, add files
 git clone https://github.com/YOURNAME/benny-accordion.git
 cd benny-accordion
-cp ~/Downloads/benny-visualizer.html index.html
+cp ~/Downloads/benny-accordion.html index.html
 cp -r ~/Downloads/assets/ .
 git add .
 git commit -m "release v5.12.0"

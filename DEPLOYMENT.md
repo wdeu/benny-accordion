@@ -3,7 +3,7 @@
 ## ✅ Vor dem Deployment
 
 - [ ] Alle Dateien vorhanden:
-  - `benny-visualizer.html`
+  - `benny-accordion.html`
   - `assets/` Ordner mit allen Icons
   - `assets/manifest.json`
   
@@ -18,7 +18,7 @@
 
 ### 1. Repository vorbereiten
 ```bash
-cd benny-visualizer
+cd benny-accordion
 git add .
 git commit -m "Add PWA icons and manifest"
 git push origin main
@@ -27,7 +27,7 @@ git push origin main
 ### 2. Ordnerstruktur auf GitHub
 ```
 /
-├── index.html              (= benny-visualizer.html umbenannt)
+├── index.html              (= benny-accordion.html umbenannt)
 ├── README.md
 ├── INSTALLATION.md
 └── assets/
@@ -48,7 +48,7 @@ git push origin main
 5. Warte 1-2 Minuten
 
 ### 4. Testen
-- URL: `https://DEINNAME.github.io/benny-visualizer`
+- URL: `https://DEINNAME.github.io/benny-accordion`
 - Check: Favicon im Tab
 - Check: PWA-Installation (Chrome: Adressleiste → Install-Icon)
 
@@ -60,13 +60,13 @@ git push origin main
 
 ```bash
 # Lokale Struktur:
-/benny-visualizer/
-├── benny-visualizer.html
+/benny-accordion/
+├── benny-accordion.html
 └── assets/
 
 # Hochladen nach:
 /htdocs/akkordeon/
-├── index.html              (= benny-visualizer.html)
+├── index.html              (= benny-accordion.html)
 └── assets/
 ```
 
@@ -74,13 +74,13 @@ git push origin main
 
 ```bash
 # 1. IONOS als Remote hinzufügen
-git remote add ionos ssh://user@deine-domain.de/~/benny-visualizer.git
+git remote add ionos ssh://user@deine-domain.de/~/benny-accordion.git
 
 # 2. Pushen
 git push ionos main
 
 # 3. Post-Receive Hook auf IONOS Server:
-# ~/benny-visualizer.git/hooks/post-receive
+# ~/benny-accordion.git/hooks/post-receive
 #!/bin/bash
 GIT_WORK_TREE=/var/www/html/akkordeon git checkout -f
 ```
@@ -89,7 +89,7 @@ GIT_WORK_TREE=/var/www/html/akkordeon git checkout -f
 
 ```bash
 rsync -avz --delete \
-  benny-visualizer.html assets/ \
+  benny-accordion.html assets/ \
   user@deine-domain.de:/var/www/html/akkordeon/
 ```
 
@@ -179,7 +179,7 @@ tail -f /var/log/nginx/access.log
 
 ## ✅ Deployment erfolgreich!
 
-**GitHub Pages URL:** `https://DEINNAME.github.io/benny-visualizer`  
+**GitHub Pages URL:** `https://DEINNAME.github.io/benny-accordion`  
 **IONOS URL:** `https://deine-domain.de/akkordeon/`
 
 🎉 Die App ist live und installierbar!
