@@ -74,7 +74,7 @@ git push origin main
 
 ```bash
 # 1. IONOS als Remote hinzufügen
-git remote add ionos ssh://user@deine-domain.de/~/benny-accordion.git
+git remote add ionos ssh://user@benny.wdeu.de/~/benny-accordion.git
 
 # 2. Pushen
 git push ionos main
@@ -90,7 +90,7 @@ GIT_WORK_TREE=/var/www/html/akkordeon git checkout -f
 ```bash
 rsync -avz --delete \
   benny-accordion.html assets/ \
-  user@deine-domain.de:/var/www/html/akkordeon/
+  user@benny.wdeu.de:/var/www/html/akkordeon/
 ```
 
 ---
@@ -150,7 +150,7 @@ git push ionos main
 
 ### IONOS Logs
 ```bash
-ssh user@deine-domain.de
+ssh user@benny.wdeu.de
 tail -f /var/log/apache2/access.log
 # Oder nginx:
 tail -f /var/log/nginx/access.log
@@ -180,6 +180,6 @@ tail -f /var/log/nginx/access.log
 ## ✅ Deployment erfolgreich!
 
 **GitHub Pages URL:** `https://DEINNAME.github.io/benny-accordion`  
-**IONOS URL:** `https://deine-domain.de/akkordeon/`
+**IONOS URL:** `https://benny.wdeu.de/`
 
 🎉 Die App ist live und installierbar!
