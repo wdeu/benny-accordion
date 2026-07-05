@@ -1,4 +1,4 @@
-# Castagnari Benny Accordion — Installation & Use (v5.12)
+# Castagnari Benny Accordion — Installation & Use (v5.18)
 
 ## What is this?
 
@@ -11,6 +11,7 @@ An interactive web app for the **Castagnari Benny C/G (3-row, Heim Standard)** �
 - ▶️ **Watch / Wait / Flow** — three practice stages from "plays itself" to "you keep up at tempo".
 - 🎤 **Listen mode** — at the real Benny, the app hears the correct note and advances on its own.
 - 🖥️ **Fit-to-Screen** — scales the layout to phone, tablet or desktop window; on by default in Play-Along.
+- 📚 **Meine Stücke** (since v5.17) — a "Meine Stücke" tab in the Repertoire dialog lists your own analysed pieces (bellows-load %, difficulty, practice status), fed by the pipeline in `tools/`. See the README for details.
 
 ---
 

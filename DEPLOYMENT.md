@@ -1,5 +1,12 @@
 # 🚀 Deployment-Checkliste
 
+> **Aktueller Weg (Stand 2026-07):** Deploy läuft über das Raycast-Skript
+> `~/Projects/raycast-scripts/benny-deploy.sh` — committet, pusht nach GitHub
+> (Pages baut automatisch), spiegelt danach per `ionos-sync.sh` nach
+> `benny.wdeu.de` (inkl. `.ionos-overrides/`). Die manuellen FTP/rsync/Git-Hook-
+> Anleitungen unten sind der historische Weg vor den Raycast-Skripten — als
+> Fallback bzw. Erklärung, was das Skript im Hintergrund tut, weiterhin gültig.
+
 ## ✅ Vor dem Deployment
 
 - [ ] Alle Dateien vorhanden:
