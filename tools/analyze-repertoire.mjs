@@ -214,7 +214,20 @@ function publishMode(opt) {
 function main() {
     const opt = args();
     if (opt.publishMode) { publishMode(opt); return; }
-    if (opt.fetchJmib) fetchJmib(opt.src);
+
+    if (!fs.existsSync(opt.src)) {
+        console.error('❌ Quellordner nicht gefunden: ' + opt.src);
+        console.error('   (falscher Pfad, oder Ordner umbenannt/verschoben?)');
+        process.exit(1);
+    }
+
+    // Netzwerk-Hänger bei jmi.ovh dürfen den lokalen Scan nie verhindern —
+    // ohne dieses try/catch würde ein DNS-/Timeout-Fehler main() komplett
+    // abbrechen, bevor auch nur eine lokale Datei analysiert wurde.
+    if (opt.fetchJmib) {
+        try { fetchJmib(opt.src); }
+        catch (e) { console.log('⚠ JMiB-Abruf fehlgeschlagen (' + (e.message || e).split('\n')[0] + ') — fahre mit lokalem Scan fort'); }
+    }
     if (opt.convert) convertMscz(opt.src);
 
     const filesDir = path.join(opt.out, 'files');
