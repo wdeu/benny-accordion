@@ -6,6 +6,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.19.0] - 2026-07-06
+
+### ⇄ Added — Schwester-App-Toggle + Live-Folgen (Benny ⇄ Soufflet)
+- Neuer, fest platzierter Button unten links: **„⇄ 📜 Zu Soufflet"** — wechselt zur Schwester-App und lädt dort **dasselbe Repertoire-Stück** (via neuem `?piece=<id>`-Deeplink, den beide Apps verstehen). Wiederholtes Umschalten nutzt denselben Tab wieder (`window.name`).
+- **Live-Folgen:** Sind beide Apps auf derselben Origin geöffnet (wdeu.github.io, lokaler Server), zieht die Schwester beim Laden eines Repertoire-Stücks **automatisch nach** — ohne Klick, ohne Reload (localStorage-Events, Key `diato.nowPlaying`). Auf den IONOS-Subdomains (verschiedene Origins) greift stattdessen der Toggle-Klick.
+- Manuell per 📂 geladene Dateien werden bewusst **nicht** übergeben (keine Repertoire-Identität) — der Toggle öffnet die Schwester im letzten Zustand, mit Hinweis in der Statuszeile.
+- **Fix:** Der 📜-Link im Repertoire-Modal baute eine absolute `?score=`-URL des aktuellen Hosts — von benny.wdeu.de aus scheiterte deren Abruf in Soufflet an CORS. Jetzt `?piece=<id>`, die Schwester löst selbst auf.
+- Bekannte Grenze: einen **unabhängig geöffneten** Schwester-Tab findet der Namens-Lookup nicht (erster Toggle-Klick öffnet dann einen neuen Tab) — Live-Folgen hält den unabhängigen Tab trotzdem synchron.
+
 ## [5.18.0] - 2026-07-05
 
 ### 🎼 Changed — Gavotte en Bois als Default-Stück

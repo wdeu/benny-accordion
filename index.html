@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.18.0</title>
-<meta name="version" content="5.18.0">
+<title>Castagnari Benny Accordion v5.19.0</title>
+<meta name="version" content="5.19.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -465,6 +465,17 @@ body.playalong-mode .playalong-btn {
     background: var(--accent); color: #fff; border-color: var(--accent);
 }
 
+/* Sister-app toggle (same piece in Soufflet) — mirrors .playalong-btn bottom-left */
+.sister-btn {
+    position: fixed; bottom: 16px; left: 16px; z-index: 100;
+    background: var(--bg-card); border: 1px solid var(--b);
+    border-radius: 20px; padding: 8px 14px;
+    font-size: 0.78em; font-weight: 600; color: var(--txt2);
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.sister-btn:hover { color: var(--accent); border-color: var(--accent); }
+
 /* ──────────── TREBLE TAP ZONES ──────────── */
 .treble-tap-wrapper {
     display: flex;
@@ -695,7 +706,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.18.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.19.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -985,6 +996,11 @@ body.playalong-mode .playalong-btn {
     🎹 Play-Along
 </button>
 
+<!-- SISTER-APP TOGGLE: gleiches Stück in Soufflet (D.E.S.-Tablatur) -->
+<button class="sister-btn" id="sisterBtn" data-i18n="toSoufflet" title="Gleiches Stück in Soufflet (D.E.S.-Tablatur)">
+    ⇄ 📜 Zu Soufflet
+</button>
+
 <!-- Heim overlay removed - now inline panel in jam-column -->
 
 <!-- Repertoire modal -->
@@ -1079,8 +1095,9 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
         const info=[p.artist!=='?'?p.artist:null, p.key!=='?'?p.key:null,
                     p.bpm?p.bpm+' bpm':null, p.difficulty, p.bellowsLoadPct+'% Balg'
                    ].filter(Boolean).join(' · ');
-        const souff=new URL('../soufflet/',location.href).href
-          +'?score='+encodeURIComponent(new URL(repBase+p.file,location.href).href);
+        // ?piece= statt absoluter ?score=-URL: die Schwester löst die id über ihre
+        // eigene Quellkette auf — vermeidet den CORS-Toten-Ast von IONOS aus.
+        const souff=sisterBase()+'?piece='+encodeURIComponent(p.id);
         return `<div class="rep-row mine" data-id="${esc(p.id)}"><span class="fit">${p.fit}</span>`+
           `<span class="meta"><div class="t">${esc(p.title)}${p.publish?' <span title="veröffentlicht (auch auf GitHub Pages)">🌐</span>':''}</div><div class="s">${esc(info)}</div></span>`+
           (p.type&&p.type!=='?'?`<span class="typ">${esc(p.type)}</span>`:'')+
@@ -1095,7 +1112,7 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
   }
   function draw(){ if(tab==='mine'&&Array.isArray(MY)) drawMine(); else drawRef(); }
 
-  async function loadPiece(p){
+  async function loadPiece(p, broadcast = true){
     songStop();
     try{
       setSongStatus('Lade '+p.title+' …');
@@ -1103,9 +1120,20 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
       const buf=await r.arrayBuffer();
       const xml=/\.mxl$/i.test(p.file) ? await unzipMxl(buf) : new TextDecoder().decode(buf);
       await importMusicXML(xml, p.file.split('/').pop());
+      currentPieceId = p.id; manualScoreLoaded = false;
+      if (broadcast) broadcastNowPlaying(p.id);
       close();
     }catch(err){ console.error(err); setSongStatus('Laden fehlgeschlagen: '+(err.message||err)); }
   }
+
+  // Für ?piece=-Deeplinks und Live-Folgen (storage-Events) von außen aufrufbar.
+  window.loadPieceById = async function(id, { broadcast = true } = {}){
+    if (MY === null) await loadIndex();   // Nebeneffekte (fillTypes/draw) sind bei verstecktem Modal harmlos
+    const p = Array.isArray(MY) && MY.find(x => x.id === id);
+    if (!p) { setSongStatus('Stück nicht im Repertoire: ' + id); return false; }
+    await loadPiece(p, broadcast);
+    return true;
+  };
   listEl.addEventListener('change',e=>{
     const sel=e.target.closest('.stat select'); if(!sel) return;
     const map=readStatus(); map[sel.dataset.id]=sel.value;
@@ -2242,6 +2270,7 @@ const I18N = {
         legendTitle:  'Key',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 To Soufflet',
         back:         '✕ Back',
         heimInfo:     'Heim Info',
         col1:         'Col 1',
@@ -2284,6 +2313,7 @@ const I18N = {
         legendTitle:  'Legende',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 Zu Soufflet',
         back:         '✕ Zurück',
         heimInfo:     'Heim-Info',
         col1:         'Sp. 1',
@@ -2326,6 +2356,7 @@ const I18N = {
         legendTitle:  'Légende',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 Vers Soufflet',
         back:         '✕ Retour',
         heimInfo:     'Info Heim',
         col1:         'Col. 1',
@@ -2368,6 +2399,7 @@ const I18N = {
         legendTitle:  'Legenda',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 Vai a Soufflet',
         back:         '✕ Indietro',
         heimInfo:     'Info Heim',
         col1:         'Col. 1',
@@ -3147,6 +3179,7 @@ document.getElementById('songFileInput').addEventListener('change', async e => {
         } else {
             setSongStatus('Unbekanntes Format: ' + f.name);
         }
+        currentPieceId = null; manualScoreLoaded = true;   // Datei-Picker: keine Repertoire-Identität
     } catch (err) {
         console.error(err);
         setSongStatus('Import fehlgeschlagen: ' + (err.message || err));
@@ -3428,10 +3461,56 @@ document.getElementById('treble-container').addEventListener('touchstart', e => 
 }, true);
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SISTER-APP: Toggle zu Soufflet + Live-Folgen (gleiches Repertoire-Stück)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Aktuell geladenes Repertoire-Stück (null = Demo oder manuell geladene Datei).
+let currentPieceId = null, manualScoreLoaded = false;
+const SISTER_SELF = 'benny';
+
+// Schwester-URL: Host-Map für die IONOS-Subdomains, sonst relativer
+// Geschwister-Pfad — deckt GitHub Pages UND lokalen Server ab (Zwei-Host-Regel).
+function sisterBase() {
+    const h = location.hostname;
+    if (h === 'benny.wdeu.de') return 'https://soufflet.wdeu.de/';
+    if (h === 'soufflet.wdeu.de') return 'https://benny.wdeu.de/';
+    return new URL('../soufflet/', location.href).href;
+}
+
+function broadcastNowPlaying(id) {
+    try { localStorage.setItem('diato.nowPlaying', JSON.stringify({ id, from: SISTER_SELF, ts: Date.now() })); } catch (e) {}
+}
+
+// Live-Folgen: lädt die Schwester (gleiche Origin, anderer Tab) ein Stück,
+// ziehen wir ohne Reload nach. from===SELF und id===currentPieceId verhindern
+// Ping-Pong; der Auto-Load rebroadcastet nicht.
+window.addEventListener('storage', e => {
+    if (e.key !== 'diato.nowPlaying' || !e.newValue) return;
+    let m; try { m = JSON.parse(e.newValue); } catch (err) { return; }
+    if (!m.id || m.from === SISTER_SELF || m.id === currentPieceId) return;
+    currentPieceId = m.id;
+    loadPieceById(m.id, { broadcast: false });
+});
+
+function gotoSister() {
+    if (!currentPieceId && manualScoreLoaded)
+        setSongStatus('Stück nicht im Repertoire — nicht übergeben');
+    const url = sisterBase() + (currentPieceId ? '?piece=' + encodeURIComponent(currentPieceId) : '');
+    const w = window.open(url, 'diato.soufflet');
+    if (w) w.focus();
+}
+document.getElementById('sisterBtn').addEventListener('click', gotoSister);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
+window.name = 'diato.benny';   // Toggle der Schwester findet/fokussiert diesen Tab
 loadSongData(DEMO_SONG);
+// ?piece=<id>: Deeplink aus Soufflet/Repertoire — Demo lädt synchron zuerst,
+// das Stück ersetzt sie asynchron; bei Fehlschlag bleibt die Demo stehen.
+const pieceParam = new URLSearchParams(location.search).get('piece');
+if (pieceParam) loadPieceById(pieceParam);
 renderRootGrid();
 renderAll();
 

@@ -88,6 +88,7 @@ The **🎵 Repertoire** dialog has a **Meine Stücke** tab alongside the curated
 - Each piece is scored with the **same bellows-load metric** as loading a file by hand (`tools/lib/benny-core.mjs`, kept in sync with the in-app resolver), plus an `unplayablePct` for notes with no button at all, a difficulty tier (leicht/mittel/schwer), and metadata (key, meter, bpm, type).
 - Grouped by **Übestatus** (Kann ich / In Arbeit / Neu) — editable right in the list, persisted in `localStorage`. Sorted by difficulty within each group.
 - Tap a piece to load it straight into Watch/Wait/Flow; a 📜 link opens the same piece with D.E.S. tablature in [Soufflet](https://wdeu.github.io/soufflet/).
+- **⇄ sister-app toggle** (bottom-left, mirrored in Soufflet): switches to the sister app with the same repertoire piece loaded (`?piece=<id>` deep link). With both apps open on the same origin, loading a piece in one makes the other **follow live** (localStorage events) — ideal for split-screen practice.
 - Only pieces marked `publish: true` in the index are synced into this repo (`repertoire/`) and go live — the full analysed collection stays local under `~/Projects/repertoire/`, so copyrighted arrangements aren't published by default.
 
 Building the repertoire:
