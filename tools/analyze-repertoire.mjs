@@ -4,8 +4,12 @@
 // <out>/index.json (merge — kuratierte Felder bleiben erhalten).
 //
 //   node analyze-repertoire.mjs --src ~/Projects/partituren --out ~/Projects/repertoire \
-//        [--convert] [--fetch-jmib] [--force] [--only "Bourr*"] \
+//        [--convert] [--fetch-jmib] [--force] [--only "Bourr*"] [--prune] \
 //        [--sync ~/Projects/benny-accordion/repertoire]
+//
+// --prune ist standardmäßig AUS: Index-Einträge, deren Quelldatei unter --src
+// nicht mehr existiert (z.B. weil --src zur Duplikat-Verringerung geleert wurde),
+// bleiben ohne --prune erhalten. Nur mit --prune werden sie aus dem Index entfernt.
 //
 // Publish-Kuration ohne JSON-Editieren (Muster matcht id, Titel oder Artist):
 //   node analyze-repertoire.mjs --out ~/Projects/repertoire --publish "Il Pleut" \
@@ -57,12 +61,13 @@ export const TYPE_PATTERNS = [
 
 function args() {
     const a = process.argv.slice(2), o = { convert:false, fetchJmib:false, force:false,
-        src:null, out:null, only:null, sync:null, publish:null, unpublish:null, list:false };
+        src:null, out:null, only:null, sync:null, publish:null, unpublish:null, list:false, prune:false };
     for (let i = 0; i < a.length; i++) {
         if (a[i] === '--convert') o.convert = true;
         else if (a[i] === '--fetch-jmib') o.fetchJmib = true;
         else if (a[i] === '--force') o.force = true;
         else if (a[i] === '--list') o.list = true;
+        else if (a[i] === '--prune') o.prune = true;
         else if (a[i] === '--src') o.src = a[++i];
         else if (a[i] === '--out') o.out = a[++i];
         else if (a[i] === '--only') o.only = a[++i];
@@ -283,13 +288,16 @@ function main() {
         }
     }
 
-    // Nicht gescannte Index-Einträge behalten (z.B. bei --only). Beim Vollscan
-    // fliegen nur Einträge raus, deren Quelldatei nicht mehr existiert.
+    // Nicht gescannte Index-Einträge bleiben standardmäßig erhalten — auch wenn
+    // --src (teilweise) geleert wurde, um Duplikate zu reduzieren: repertoire/files/
+    // enthält bereits unabhängige Kopien, der Index braucht das Original danach
+    // nicht mehr. Löschen wegen fehlender Quelle nur mit explizitem --prune.
     const scanned = new Set([...bySlug.keys()]);
     for (const old of prev.pieces) {
         if (scanned.has(old.id)) continue;
-        if (opt.only || fs.existsSync(path.join(opt.src, old.source))) pieces.push(old);
-        else console.log('  (entfernt, Quelle fehlt: ' + old.id + ')');
+        const missing = opt.prune && !opt.only && !fs.existsSync(path.join(opt.src, old.source));
+        if (missing) console.log('  (entfernt, Quelle fehlt: ' + old.id + ')');
+        else pieces.push(old);
     }
 
     pieces.sort((x, y) => x.id.localeCompare(y.id));
