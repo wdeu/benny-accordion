@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.19.0</title>
-<meta name="version" content="5.19.0">
+<title>Castagnari Benny Accordion v5.20.0</title>
+<meta name="version" content="5.20.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -350,12 +350,34 @@ body.bellows-demand .treble-push-indicator,
 .song-kuer-row { display:flex; align-items:center; gap:8px; font-size:0.76em; color:var(--txt2); cursor:pointer; margin-top:4px; }
 .song-kuer-row input { width:18px; height:18px; cursor:pointer; }
 .song-status { font-size:0.72em; color:var(--txt3); margin-top:8px; min-height:1.1em; text-align:center; }
-/* In Play-Along: collapse the song panel to the essentials (transport + mode),
-   so bass + treble fit side by side again on iPhone portrait. */
-body.playalong-mode .song-file-row,
+/* In Play-Along: collapse the song panel to the essentials (transport + mode
+   + Titel/Repertoire, damit man ohne Verlassen des Modus das Stück wechseln
+   oder nachschauen kann, was gerade läuft), so bass + treble fit side by
+   side again on iPhone portrait. */
 body.playalong-mode .song-ctl-row,
 body.playalong-mode .song-kuer-row,
 body.playalong-mode .song-status { display: none !important; }
+body.playalong-mode #songLoadBtn { display: none !important; }
+body.playalong-mode .song-file-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
+}
+body.playalong-mode .song-file-name {
+    order: -1;
+    white-space: normal !important;
+    text-align: center !important;
+    font-size: 0.7em !important;
+    line-height: 1.25 !important;
+    max-height: 2.6em !important;
+    overflow: hidden !important;
+}
+body.playalong-mode #repertoireBtn {
+    width: 100% !important;
+    height: 32px !important;
+    font-size: 0.74em !important;
+}
 body.playalong-mode .song-panel { padding: 6px 4px 0 !important; }
 body.playalong-mode .song-transport { margin-bottom: 6px !important; }
 body.playalong-mode .song-transport .song-tbtn { height: 34px; font-size: 0.95em; }
@@ -706,7 +728,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.19.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>

@@ -6,6 +6,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.20.0] - 2026-07-08
+
+### 🎹 Added — Titel + Repertoire-Button im Play-Along
+- Im Play-Along-Modus (nur Buttons + Bellows) waren bisher Titel und der 🎵-Repertoire-Button ausgeblendet — man musste den Modus verlassen, um zu sehen, was gerade läuft, oder um ein anderes Stück zu wählen. Beide sind jetzt kompakt (gestapelt) sichtbar; der 📂-Load-Button bleibt ausgeblendet, da er den Play-Along-Fluss unterbricht.
+- Damit lässt sich mitten im Üben, ohne Zurück-Klick, direkt zum nächsten Repertoire-Stück wechseln.
+
 ## [5.19.0] - 2026-07-06
 
 ### ⇄ Added — Schwester-App-Toggle + Live-Folgen (Benny ⇄ Soufflet)
