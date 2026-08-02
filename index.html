@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.20.0</title>
-<meta name="version" content="5.20.0">
+<title>Castagnari Benny Accordion v5.20.1</title>
+<meta name="version" content="5.20.1">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -459,6 +459,11 @@ body.playalong-mode .treble-column {
     overflow-y: auto !important;
     overflow-x: hidden !important;
 }
+/* Diskant-Reihen im Play-Along weiter auseinander: der Basis-Gap (8px, auf
+   schmalen Screens sogar 5px) lässt die vertikal versetzten Perlmutt-Kreise
+   optisch verschränken. Play-Along hat den Platz (nur Bass + Diskant), also
+   klare Luft zwischen ROW3/C-ROW/G-ROW. Normales 3-Spalten-Layout unberührt. */
+body.playalong-mode #treble-container { gap: 14px !important; }
 /* Keep bellows switches visible in play-along */
 body.playalong-mode .bellows-container { display: block !important; }
 /* In portrait play-along, bellows switches stack */
@@ -728,7 +733,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.0</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.1</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -2642,7 +2647,11 @@ function applyFitScale() {
     }
 
     const availH = window.innerHeight - 32;
-    const availW = window.innerWidth - 160;   // reserve the bass column
+    // Echte Breite der Diskant-Spalte messen statt innerWidth-160 zu schätzen:
+    // die Schätzung ignorierte Grid-Padding + Gap und ließ den Container bei
+    // größerem Reihen-Abstand rechts überlaufen (overflow-x:hidden schnitt dann
+    // die G-Reihe ab). clientWidth ist der real verfügbare Platz.
+    const availW = ((container.closest('.treble-column')?.clientWidth) || (window.innerWidth - 160)) - 20;
 
     const naturalW = container.scrollWidth;
     const naturalH = container.scrollHeight;

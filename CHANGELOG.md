@@ -6,6 +6,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.20.1] - 2026-07-08
+
+### 🐛 Fixed — Diskant-Reihen überlappten im Play-Along (iPhone)
+- Im Play-Along-Modus standen die drei Diskant-Reihen (ROW 3 / C / G) auf schmalen Screens (Reihen-Gap 5px) so dicht, dass die vertikal versetzten Perlmutt-Kreise optisch ineinander liefen. Der Reihen-Abstand ist im Play-Along jetzt auf 14px erhöht (nur dort — das normale 3-Spalten-Layout bleibt unberührt).
+- Zugrundeliegender Fit-Bug mitbehoben: `applyFitScale()` schätzte die verfügbare Breite als `innerWidth − 160` und ignorierte Grid-Padding + Gap; bei größerem Reihen-Abstand wäre der Diskant rechts übergelaufen und `overflow-x:hidden` hätte die G-Reihe abgeschnitten. Jetzt wird die reale Spaltenbreite gemessen. Verifiziert auf 375/393/402/430px — überall klare Luft, nichts abgeschnitten.
+
 ## [5.20.0] - 2026-07-08
 
 ### 🎹 Added — Titel + Repertoire-Button im Play-Along
