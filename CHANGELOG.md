@@ -6,6 +6,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.20.3] - 2026-07-08
+
+### 🔗 Fixed — Castagnari-Herstellerlink (404)
+- Castagnari hat die Produktseite umgezogen; der Benny-Foto-Link zeigte auf eine 404. Aktualisiert auf `castagnari.com/catalogo/i-piccoli-formati/benny` (in index.html, benny-accordion.html, docs/benny-visualizer.html).
+
 ## [5.20.2] - 2026-07-08
 
 ### 🐛 Fixed — ROW 3 verschwand hinter dem Bass-Panel (iPhone Play-Along)
