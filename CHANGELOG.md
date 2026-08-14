@@ -6,6 +6,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.20.2] - 2026-07-08
+
+### 🐛 Fixed — ROW 3 verschwand hinter dem Bass-Panel (iPhone Play-Along)
+- Der 5.20.1-Fix (Reihen-Gap 14px) verbreiterte den Diskant-Block und drückte auf 66px-Button-Geräten (iPhone ≥400px) die linke Diskant-Reihe (ROW 3) samt Label unter das Bass-Panel — es wurde links angeschnitten.
+- Jetzt ist die Trennung zwischen Bass- und Diskant-Spalte im Play-Along fest auf 16px erhöht (main-grid gap), der Reihen-Gap auf 10px zurückgenommen (schmaler, immer noch klare Luft). Verifiziert über 375–430px Breite × 720–950px Höhe (Scale 0,79–1,03): Abstand Bass↔ROW 3 durchgehend ≥19px, nichts links/rechts abgeschnitten, Reihen-Randabstand ≥14px.
+
 ## [5.20.1] - 2026-07-08
 
 ### 🐛 Fixed — Diskant-Reihen überlappten im Play-Along (iPhone)

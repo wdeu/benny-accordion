@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.20.1</title>
-<meta name="version" content="5.20.1">
+<title>Castagnari Benny Accordion v5.20.2</title>
+<meta name="version" content="5.20.2">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -443,7 +443,7 @@ body.playalong-mode .main-grid {
     /* ALWAYS side-by-side in play-along, even portrait! */
     display: flex !important;
     flex-direction: row !important;
-    gap: 6px !important;
+    gap: 16px !important;   /* klarer Abstand Bass ↔ Diskant, damit ROW 3 nie unter dem Bass-Panel verschwindet */
     padding: 6px !important;
     height: 100vh;
     align-items: stretch;
@@ -463,7 +463,7 @@ body.playalong-mode .treble-column {
    schmalen Screens sogar 5px) lässt die vertikal versetzten Perlmutt-Kreise
    optisch verschränken. Play-Along hat den Platz (nur Bass + Diskant), also
    klare Luft zwischen ROW3/C-ROW/G-ROW. Normales 3-Spalten-Layout unberührt. */
-body.playalong-mode #treble-container { gap: 14px !important; }
+body.playalong-mode #treble-container { gap: 10px !important; }
 /* Keep bellows switches visible in play-along */
 body.playalong-mode .bellows-container { display: block !important; }
 /* In portrait play-along, bellows switches stack */
@@ -733,7 +733,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.1</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.2</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
