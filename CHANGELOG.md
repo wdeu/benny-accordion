@@ -18,6 +18,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 - Der vertikale Versatz der Diskant-Reihen (bisher hart 35/70px für 66px-Buttons) hängt jetzt über `--btn`/`--pitch` an der Button-Größe; auf ≤400px (56px-Buttons) ergibt das korrekt 30/60px.
 
 **Hinweis:** Nicht im Browser verifiziert (der Bug ist im Emulator ohnehin nicht reproduzierbar) — Test am echten iPhone steht aus.
+**Nachtrag 2026-11-15:** Am echten iPhone (16 Pro, Safari, Fit: On) vom Nutzer getestet — Bug behoben.
 
 ## [5.20.3] - 2026-07-08
 
