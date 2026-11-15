@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.20.3</title>
-<meta name="version" content="5.20.3">
+<title>Castagnari Benny Accordion v5.20.4</title>
+<meta name="version" content="5.20.4">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -181,18 +181,22 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 .treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start;
     flex:1; width:100%; }
-.row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:70px; }
+/* Reihen-Versatz an die Button-Größe gekoppelt: Pitch = Button + 4px Gap.
+   Jede Reihe sitzt einen halben Pitch höher als die vorige (66px → 35/70px,
+   56px auf ≤400px → 30/60px; vorher hart auf 66px gerechnet). */
+.treble-side { --btn:66px; --pitch:calc(var(--btn) + 4px); }
+.row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:var(--pitch); }
 
 .row:nth-child(1) { margin-top: 0; }
-.row:nth-child(2) { margin-top: -35px; }
-.row:nth-child(3) { margin-top: -70px; }
+.row:nth-child(2) { margin-top: calc(var(--pitch) / -2); }
+.row:nth-child(3) { margin-top: calc(var(--pitch) * -1); }
 
 .row-label { font-size:0.66em; color:var(--txt3); font-weight:600; letter-spacing:0.7px;
     text-align:center; margin-bottom:8px; }
 
 /* ──────────── PERLMUTT-TASTE ──────────── */
 .note-button {
-    width:66px; height:66px; border-radius:50%;
+    width:var(--btn, 66px); height:var(--btn, 66px); border-radius:50%;
     background:linear-gradient(160deg, var(--p0) 0%, var(--p1) 42%, var(--p2) 100%);
     border:1.5px solid rgba(255,255,255,.30);
     box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
@@ -412,8 +416,8 @@ body.playalong-mode .treble-column .section {
 
 /* FIT mode: scale treble to viewport height */
 body.playalong-fit #treble-container {
-    transform-origin: top center;
-    /* Scale set dynamically via JS */
+    transform-origin: top left;
+    /* Scale + width + margin-right set dynamically via JS (applyFitScale) */
 }
 
 /* Fit toggle button - under bass trapezoids */
@@ -464,6 +468,21 @@ body.playalong-mode .treble-column {
    optisch verschränken. Play-Along hat den Platz (nur Bass + Diskant), also
    klare Luft zwischen ROW3/C-ROW/G-ROW. Normales 3-Spalten-Layout unberührt. */
 body.playalong-mode #treble-container { gap: 10px !important; }
+/* Diskant-Block nie über die linke Clip-Kante zentrieren (5.20.4):
+   Vorher lag der Block als flex:1-Item in einem justify-content:center-Wrapper.
+   War sein Layout-Kasten breiter als die Spalte (transform:scale verkleinert nur
+   die Optik, nicht den Layout-Kasten), verteilte `center` den Überlauf auf BEIDE
+   Seiten — der linke Teil ist unerreichbar und wurde von overflow-x:hidden
+   gekappt ("OW 3 (10)"). Jetzt: Wrapper startet links, zentriert wird nur über
+   auto-Margins (die nie negativ werden), der Block hat seine Inhaltsbreite und
+   die Tap-Zonen dürfen schrumpfen, statt den Block hinauszuschieben. */
+body.playalong-mode .treble-tap-wrapper { justify-content: flex-start !important; }
+body.playalong-mode #treble-container { flex: 0 0 auto !important; width: max-content; }
+body.playalong-mode .treble-tap-zone { flex: 0 1 32px !important; min-width: 0 !important; }
+body.playalong-mode .pull-zone { margin-left: auto !important; }
+body.playalong-mode .push-zone { margin-right: auto !important; }
+/* Fit aus: Block kann breiter als die Spalte sein → scrollbar statt abgeschnitten */
+body.playalong-mode:not(.playalong-fit) .treble-column { overflow-x: auto !important; }
 /* Keep bellows switches visible in play-along */
 body.playalong-mode .bellows-container { display: block !important; }
 /* In portrait play-along, bellows switches stack */
@@ -682,7 +701,7 @@ body.playalong-mode .playalong-btn {
     .treble-wrapper { order:1; }
 }
 @media (max-width:400px) {
-    .note-button { width:56px; height:56px; }
+    .treble-side { --btn:56px; }
     .note-button .note-name { font-size:0.9em; }
     .bass-button { width:46px; height:46px; font-size:0.80em; }
     .treble-side { gap:5px; }
@@ -733,7 +752,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.3</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.4</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -2642,29 +2661,40 @@ function applyFitScale() {
         container.style.transformOrigin = '';
         container.style.width = '';
         container.style.height = '';
+        container.style.marginRight = '';
         if (bass) { bass.style.transform=''; bass.style.transformOrigin=''; bass.style.width=''; bass.style.height=''; }
         return;
     }
 
     const availH = window.innerHeight - 32;
-    // Echte Breite der Diskant-Spalte messen statt innerWidth-160 zu schätzen:
-    // die Schätzung ignorierte Grid-Padding + Gap und ließ den Container bei
-    // größerem Reihen-Abstand rechts überlaufen (overflow-x:hidden schnitt dann
-    // die G-Reihe ab). clientWidth ist der real verfügbare Platz.
-    const availW = ((container.closest('.treble-column')?.clientWidth) || (window.innerWidth - 160)) - 20;
+    // Echte Breite der Diskant-Spalte messen (nicht innerWidth-160 schätzen).
+    // 10px Luft je Seite.
+    const col = container.closest('.treble-column');
+    const availW = ((col && col.clientWidth) || (window.innerWidth - 160)) - 20;
 
-    const naturalW = container.scrollWidth;
+    // Natürliche Größe frisch messen: alte Fit-Werte zurücksetzen und die
+    // Inhaltsbreite (max-content = Summe der Reihen inkl. Labels + Gaps) nehmen.
+    // scrollWidth taugt hier nicht: bei zentriertem Überlauf fehlt der linke Teil.
+    container.style.transform = '';
+    container.style.marginRight = '';
+    container.style.height = '';
+    container.style.width = 'max-content';
+    const naturalW = Math.ceil(container.getBoundingClientRect().width);
     const naturalH = container.scrollHeight;
 
     const scaleW = availW / naturalW;
     const scaleH = availH / naturalH;
     const MAX = 2.6;                          // allow enlargement (desktop), capped
-    const scale = Math.min(scaleW, scaleH, MAX);
+    const scale = Math.floor(Math.min(scaleW, scaleH, MAX) * 1000) / 1000;  // abrunden: nie breiter als availW
 
     container.style.transformOrigin = 'top left';
-    container.style.transform = `scale(${scale.toFixed(3)})`;
+    container.style.transform = `scale(${scale})`;
     container.style.width = naturalW + 'px';
     container.style.height = (naturalH * scale) + 'px';
+    // Layout-Fußabdruck = sichtbare (skalierte) Breite. transform ändert den
+    // Layout-Kasten nicht; ohne diesen Ausgleich bleibt der Kasten naturalW breit,
+    // läuft über die Spalte hinaus und der Block steht nicht dort, wo er aussieht.
+    container.style.marginRight = (naturalW * scale - naturalW) + 'px';
     container.style.overflow = 'visible';
 
     // Bass: grow together ONLY when enlarging (desktop). On iPad/iPhone the
@@ -2719,6 +2749,7 @@ document.getElementById('playalongBtn').addEventListener('click', () => {
             container.style.transform = '';
             container.style.height = '';
             container.style.width = '';
+            container.style.marginRight = '';
         }
         const bassC = document.getElementById('bass-container');
         if (bassC) { bassC.style.transform=''; bassC.style.height=''; bassC.style.width=''; }

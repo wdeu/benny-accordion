@@ -6,6 +6,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.20.4] - 2026-11-15
+
+### 🐛 Fixed — ROW-3-Label links abgeschnitten ("OW 3 (10)") im iPhone Play-Along
+- **Ursache (endlich die eigentliche):** Der Diskant-Block lag als `flex:1`-Item in einem Wrapper mit `justify-content:center`. `transform:scale` (Fit) verkleinert nur die Optik, der Layout-Kasten blieb in natürlicher Breite. War dieser breiter als die Diskant-Spalte, verteilte `center` den Überlauf auf beide Seiten — der Block rutschte um die halbe Differenz nach links über die Spaltenkante, wo `overflow-x:hidden` ihn kappte. Die natürliche Breite hängt von den Reihen-Labels ab (breiter als die Buttons); auf dem echten iPhone rendern sie breiter als im Emulator — daher der Versatz von ~15–20px nur am Gerät. Die Fixes 5.20.1/5.20.2 (Gaps) haben nur an den Abständen gedreht, nicht an dieser Zentrierung.
+- **Fix:** Im Play-Along startet der Wrapper links und zentriert nur noch über auto-Margins (werden nie negativ); der Block hat Inhaltsbreite, die Tap-Zonen dürfen schrumpfen. `applyFitScale()` misst die natürliche Breite jetzt als `max-content` (statt `scrollWidth`, das bei zentriertem Überlauf den linken Teil nicht mitzählt), rundet den Scale ab und gleicht den Layout-Kasten per `margin-right` an die skalierte Breite an. Damit ist die sichtbare Breite konstruktiv ≤ Spaltenbreite − 20px und der Block steht dort, wo das Layout ihn rechnet — unabhängig von Label-/Schriftbreite, Gerätebreite und Button-Größe.
+- Fit aus: Diskant-Spalte ist horizontal scrollbar statt beidseitig abgeschnitten.
+- `transform-origin` im CSS an den JS-Wert (`top left`) angeglichen.
+
+### 🔧 Changed — Reihen-Versatz an Button-Größe gekoppelt
+- Der vertikale Versatz der Diskant-Reihen (bisher hart 35/70px für 66px-Buttons) hängt jetzt über `--btn`/`--pitch` an der Button-Größe; auf ≤400px (56px-Buttons) ergibt das korrekt 30/60px.
+
+**Hinweis:** Nicht im Browser verifiziert (der Bug ist im Emulator ohnehin nicht reproduzierbar) — Test am echten iPhone steht aus.
+
 ## [5.20.3] - 2026-07-08
 
 ### 🔗 Fixed — Castagnari-Herstellerlink (404)
