@@ -39,6 +39,12 @@ td:first-child{white-space:nowrap;font-weight:600}
 .note{font-size:.9em;color:var(--txt2);margin:12px 0 0}
 .sw{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px;border:2px solid transparent}
 footer{color:var(--txt3,#636366);font-size:.8em;text-align:center;margin-top:24px}
+.lb{display:none;position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.94);overflow:auto;-webkit-overflow-scrolling:touch;padding:calc(60px + env(safe-area-inset-top)) 0 calc(20px + env(safe-area-inset-bottom))}
+.lb.open{display:block}
+.lb img{display:block;width:100%;height:auto;margin:0 auto;background:#fff;cursor:zoom-in}
+.lb.zoom img{width:250%;max-width:none;cursor:zoom-out}
+.lb-x{position:fixed;top:calc(12px + env(safe-area-inset-top));right:12px;z-index:11;font:600 16px/1 inherit;padding:10px 16px;border:0;border-radius:18px;background:var(--accent);color:#fff}
+body.lb-on{overflow:hidden}
 </style>
 </head>
 <body>
@@ -76,5 +82,30 @@ footer{color:var(--txt3,#636366);font-size:.8em;text-align:center;margin-top:24p
 </section>
 <footer>Castagnari Benny Accordion · <a href="https://github.com/wdeu/benny-accordion" style="color:inherit">GitHub</a></footer>
 </div>
+<script>
+/* Lightbox: Screenshots im Overlay statt als nackte Bilddatei öffnen —
+   in der iOS-PWA (standalone, guide/ liegt im Manifest-Scope) gäbe es dort kein Zurück. */
+(function(){
+var lb=document.createElement('div');lb.className='lb';lb.setAttribute('role','dialog');lb.setAttribute('aria-modal','true');
+lb.innerHTML='<button class="lb-x" type="button"></button><img alt="">';
+var x=lb.firstChild,im=lb.lastChild,pushed=false;
+x.textContent=document.documentElement.lang==='de'?'✕ Schließen':'✕ Close';
+document.body.appendChild(lb);
+function show(a){im.src=a.getAttribute('href');im.alt=a.querySelector('img').alt;lb.classList.remove('zoom');lb.classList.add('open');document.body.classList.add('lb-on');lb.scrollTop=0;lb.scrollLeft=0;history.pushState({lb:1},'');pushed=true;x.focus();}
+function hide(){lb.classList.remove('open','zoom');document.body.classList.remove('lb-on');}
+function close(){if(pushed){pushed=false;history.back();}else hide();}
+window.addEventListener('popstate',function(){pushed=false;hide();});
+document.querySelectorAll('figure a').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();show(a);});});
+im.addEventListener('click',function(e){
+  e.stopPropagation();
+  var rx=e.offsetX/im.clientWidth,ry=e.offsetY/im.clientHeight;
+  lb.classList.toggle('zoom');
+  if(lb.classList.contains('zoom')){lb.scrollLeft=rx*im.clientWidth-lb.clientWidth/2;lb.scrollTop=im.offsetTop+ry*im.clientHeight-lb.clientHeight/2;}
+});
+lb.addEventListener('click',function(e){if(e.target===lb)close();});
+x.addEventListener('click',close);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&lb.classList.contains('open'))close();});
+})();
+</script>
 </body>
 </html>

@@ -6,6 +6,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.21.1] - 2026-11-16
+
+### 🐛 Fixed — Kein Zurück nach Tap auf Screenshot in der iPhone-PWA
+- **Ursache:** `guide/` liegt im Manifest-Scope (`"scope": "../"`), die Anleitung öffnet in der installierten PWA daher im Standalone-Fenster ohne Browserleiste. Der Tap auf einen Screenshot navigierte zur nackten `.webp`-Datei — dort gibt es weder Link noch Zurück-Button; nur App schließen half.
+- **Fix:** Lightbox in `guide/index.html` und `guide/de.html`: Tap öffnet das Bild im Overlay auf derselben Seite, erneuter Tap aufs Bild zoomt (250 %, scrollbar, zentriert auf die Tap-Stelle) bzw. zurück. Schließen per „✕ Schließen“/„✕ Close“, Tap auf den dunklen Rand, Escape oder Zurück-Geste (Overlay legt einen History-Eintrag an). Ohne JavaScript bleibt der alte Link aufs Bild als Fallback.
+
+**Hinweis:** Nicht im Browser verifiziert — Test am echten iPhone (PWA-Modus) steht aus.
+
 ## [5.21.0] - 2026-11-16
 
 ### ✨ Added — Bedienungsanleitung / User Guide
@@ -15,6 +23,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 - README: Link auf die Anleitung, `guide/` im Repository-Layout.
 
 **Hinweis:** In Chrome (Headless, iPhone-Viewport) geprüft — Link-Text/-Ziel je Sprache, Öffnen im neuen Tab, alle Bilder laden. Am echten iPhone (PWA-Modus) noch nicht getestet.
+**Nachtrag 2026-11-16:** Am iPhone geprüft — Link und Seiten okay; Tap auf einen Screenshot führte aber in eine Sackgasse ohne Zurück → behoben in 5.21.1.
 
 ## [5.20.4] - 2026-11-15
 
