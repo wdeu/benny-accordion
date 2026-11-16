@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Benny – Bedienungsanleitung</title>
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<style>
+:root{--bg:#1c1c1e;--card:#2c2c2e;--inset:#3a3a3c;--txt:#f2f2f7;--txt2:#8e8e93;--accent:#0a84ff;--ann:#ff6b00}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.9em}
+.top a{color:var(--accent);text-decoration:none}
+.lang a{display:inline-block;padding:2px 8px;border-radius:6px;background:var(--card);margin-left:4px}
+.lang a.on{background:var(--accent);color:#fff}
+h1{font-size:1.7em;margin:18px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--txt2);font-size:.78em;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+nav.toc a{background:var(--card);color:var(--txt);text-decoration:none;padding:6px 12px;border-radius:16px;font-size:.88em}
+section{background:var(--card);border-radius:12px;padding:16px 18px 18px;margin:14px 0;scroll-margin-top:12px}
+h2{font-size:1.2em;margin:2px 0 6px}
+.lead{color:var(--txt2);margin:0 0 12px}
+figure{margin:0 0 12px}
+figure a{display:block}
+figure img{display:block;width:100%;height:auto;border-radius:10px;background:#fff}
+figcaption{font-size:.75em;color:var(--txt2);margin-top:4px}
+ol.ann{list-style:none;counter-reset:n;padding:0;margin:0}
+ol.ann li{counter-increment:n;position:relative;padding:5px 0 5px 38px;border-top:1px solid var(--inset)}
+ol.ann li:first-child{border-top:0}
+ol.ann li::before{content:counter(n);position:absolute;left:0;top:6px;width:26px;height:26px;border-radius:50%;background:var(--ann);color:#fff;font-weight:700;font-size:.82em;display:flex;align-items:center;justify-content:center}
+table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:.95em}
+th,td{text-align:left;padding:7px 10px;border-top:1px solid var(--inset);vertical-align:top}
+th{color:var(--txt2);font-weight:600;font-size:.85em;border-top:0}
+td:first-child{white-space:nowrap;font-weight:600}
+.note{font-size:.9em;color:var(--txt2);margin:12px 0 0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px;border:2px solid transparent}
+footer{color:var(--txt3,#636366);font-size:.8em;text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><a href="../">← Zurück zu Benny</a><span class="lang"><a href="index.html">EN</a><a href="de.html" class=on>DE</a></span></div>
+<h1>Benny – Bedienungsanleitung</h1>
+<div class="sub">C/G · 3-row · Heim</div>
+<nav class="toc"><a href="#main">1 · Hauptansicht</a><a href="#play-along">2 · Play-Along</a><a href="#jam-box">3 · Jam-Box</a><a href="#key">4 · Legende &amp; Info</a></nav>
+<section id="main">
+<h2>1 · Hauptansicht</h2>
+<p class="lead">Oben stellst du Sprache und Balgrichtung ein, unten steuerst du das Übungsstück.</p>
+<figure><a href="img/01-main-de.webp"><img src="img/01-main-de.webp" alt="Hauptansicht mit nummerierten Bedienelementen" width="1970" height="2528" loading="lazy" decoding="async"></a><figcaption>Bild antippen zum Vergrößern.</figcaption></figure>
+<ol class="ann"><li><b>Sprache</b> – EN · DE · FR · IT.</li><li><b>Bassfeld</b> – zeigt die Bässe der aktuellen Balgrichtung in zwei Spalten; dunkle Knöpfe sind aktiv.</li><li><b>Balg</b> – Pull / Push umschalten; Bass- und Diskantbelegung wechseln mit.</li><li><b>Load</b> öffnet eine eigene MusicXML- oder MIDI-Datei, <b>Repertoire</b> die kuratierte Stückliste mit Benny-Fit-Ampel (grün = rein diatonisch bis rot = chromatisch).</li><li><b>Transport</b> – zum Anfang · Play/Pause · Stop.</li><li><b>Play-Along</b> – wechselt in die Übungsansicht mit Bass und Diskant nebeneinander.</li></ol>
+<p class="note">Im Song-Panel darunter (nicht im Bild): Tempo in bpm, Metronom mit einem Takt Einzählen, und <b>Zuhören</b> – im Wait-Modus rückt Benny dann per Mikrofon vor, sobald du am echten Instrument den richtigen Ton spielst.</p>
+</section>
+<section id="play-along">
+<h2>2 · Play-Along</h2>
+<p class="lead">Bass links, Diskant rechts: der grüne Knopf ist der nächste Ton, Benny führt dich durchs Stück.</p>
+<figure><a href="img/02-play-along-de.webp"><img src="img/02-play-along-de.webp" alt="Play-Along-Ansicht mit nummerierten Bedienelementen" width="2430" height="2485" loading="lazy" decoding="async"></a><figcaption>Bild antippen zum Vergrößern.</figcaption></figure>
+<ol class="ann"><li><b>Bässe</b> der aktuellen Balgrichtung.</li><li><b>Balg</b> – blinkt kurz, wenn ein Balgwechsel fällig ist.</li><li><b>Fit</b> – passt die Tastatur auf den Bildschirm (beim Öffnen an; aus = größere Knöpfe).</li><li><b>Stück / Repertoire</b> – aktuelles Stück, Auswahl wie in der Hauptansicht.</li><li><b>Transport</b> – zum Anfang · Play/Pause · Stop.</li><li><b>Modus</b> – siehe Tabelle.</li><li><b>→ Soufflet</b> – wechselt zum Tabulatur-Konverter.</li><li><b>Diskant</b> – Row 3, C-Reihe, G-Reihe; die kleine Zahl ist die Knopfnummer.</li><li><b>Blauer Ring</b> – Grundton der Jam-Box-Auswahl.</li><li><b>Grün</b> – jetzt spielen (im Wait-Modus pulsierend).</li><li><b>Back</b> – zurück zur Hauptansicht.</li></ol>
+<table><thead><tr><th>Modus</th><th>Was passiert</th></tr></thead><tbody><tr><td>Watch</td><td>Benny spielt vor, Knöpfe leuchten mit.</td></tr><tr><td>Wait</td><td>Wartet, bis du den grünen Knopf tippst (oder das Mikro ihn hört).</td></tr><tr><td>Flow</td><td>Die Uhr läuft im Tempo weiter, ohne Vorspielen – du spielst selbst.</td></tr></tbody></table>
+</section>
+<section id="jam-box">
+<h2>3 · Jam-Box</h2>
+<p class="lead">Akkord oder Skala wählen, Grundton tippen: Benny markiert die Knöpfe auf beiden Seiten und spielt die Töne.</p>
+<figure><a href="img/03-jam-box-de.webp"><img src="img/03-jam-box-de.webp" alt="Jam-Box mit nummerierten Bedienelementen" width="1970" height="1693" loading="lazy" decoding="async"></a><figcaption>Bild antippen zum Vergrößern.</figcaption></figure>
+<ol class="ann"><li><b>Akkordtyp</b> – Dur, Moll, dim, aug, sus2, sus4, 7, maj7, m7, dim7, ø, 6, m6.</li><li><b>Modale Skalen</b> – Ionisch bis Äolisch.</li><li><b>Grundton</b> – C, D, E, F, G, A, B♭, A♭, E♭.</li><li><b>Play / Stop</b> – spielt die Töne nacheinander.</li><li><b>Klangfarbe</b> – z. B. „Benny Original“.</li><li><b>Tempo</b> – Sekunden pro Ton.</li><li><b>Auto-Play</b> spielt bei jeder neuen Auswahl sofort, <b>Loop</b> wiederholt endlos.</li></ol>
+</section>
+<section id="key">
+<h2>4 · Legende &amp; Info</h2>
+<p class="lead">Die Knopffarben gelten in allen Ansichten.</p>
+<figure><a href="img/04-key-info-de.webp"><img src="img/04-key-info-de.webp" alt="Legende, Info-Links und Soufflet-Kachel" width="2470" height="900" loading="lazy" decoding="async"></a><figcaption>Bild antippen zum Vergrößern.</figcaption></figure>
+<table><thead><tr><th>Darstellung</th><th>Bedeutung</th></tr></thead><tbody><tr><td><span class="sw" style="background:#f0ece7"></span>Hell</td><td>Knopf inaktiv</td></tr><tr><td><span class="sw" style="background:#48484a"></span>Dunkel</td><td>Knopf aktiv (Ton der Auswahl)</td></tr><tr><td><span class="sw" style="background:#2c2c2e;border-color:#0a84ff"></span>Blauer Ring</td><td>Grundton</td></tr><tr><td><span class="sw" style="background:#f0ece7;border-color:#0a84ff;box-shadow:0 0 6px #0a84ff"></span>Blau leuchtend</td><td>Skalenton</td></tr><tr><td><span class="sw" style="background:#30d158;border-color:#30d158"></span>Grün</td><td>Play-Along: jetzt spielen</td></tr></tbody></table>
+<ol class="ann"><li><b>Farb-Legende</b> – siehe Tabelle.</li><li><b>Info</b> – Heim Info klappt Infos zum Heim-System auf; Anleitung (diese Seite), README, Bass-Analyse und GitHub öffnen separat.</li><li><b>Soufflet-Kachel</b> – öffnet Soufflet (MusicXML → D.E.S.-Tabulatur); „Zu Soufflet“ unten links wechselt direkt dorthin.</li></ol>
+</section>
+<footer>Castagnari Benny Accordion · <a href="https://github.com/wdeu/benny-accordion" style="color:inherit">GitHub</a></footer>
+</div>
+</body>
+</html>

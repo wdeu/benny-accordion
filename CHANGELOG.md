@@ -6,6 +6,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 
 ---
 
+## [5.21.0] - 2026-11-16
+
+### ✨ Added — Bedienungsanleitung / User Guide
+- Neue statische Seiten `guide/index.html` (EN) und `guide/de.html` (DE): vier Abschnitte (Hauptansicht, Play-Along, Jam-Box, Legende & Info), je ein annotierter iPhone-Screenshot mit nummerierten Markern plus Kurzlegende; Modus- und Farbtabelle.
+- Bilder als WebP (`guide/img/`, ~65–155 KB pro Bild); Antippen öffnet das Bild in voller Größe.
+- In der App unter *Info* neuer Link „User Guide“ / „Anleitung“ / „Mode d’emploi“ / „Guida“ (I18N-Key `guide`). Relativer Pfad, funktioniert auf GitHub Pages und dem IONOS-Mirror; DE öffnet `guide/de.html`, alle anderen Sprachen die englische Seite.
+- README: Link auf die Anleitung, `guide/` im Repository-Layout.
+
+**Hinweis:** In Chrome (Headless, iPhone-Viewport) geprüft — Link-Text/-Ziel je Sprache, Öffnen im neuen Tab, alle Bilder laden. Am echten iPhone (PWA-Modus) noch nicht getestet.
+
 ## [5.20.4] - 2026-11-15
 
 ### 🐛 Fixed — ROW-3-Label links abgeschnitten ("OW 3 (10)") im iPhone Play-Along

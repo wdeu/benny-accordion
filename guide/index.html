@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Benny – User Guide</title>
+<link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<style>
+:root{--bg:#1c1c1e;--card:#2c2c2e;--inset:#3a3a3c;--txt:#f2f2f7;--txt2:#8e8e93;--accent:#0a84ff;--ann:#ff6b00}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.9em}
+.top a{color:var(--accent);text-decoration:none}
+.lang a{display:inline-block;padding:2px 8px;border-radius:6px;background:var(--card);margin-left:4px}
+.lang a.on{background:var(--accent);color:#fff}
+h1{font-size:1.7em;margin:18px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--txt2);font-size:.78em;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+nav.toc a{background:var(--card);color:var(--txt);text-decoration:none;padding:6px 12px;border-radius:16px;font-size:.88em}
+section{background:var(--card);border-radius:12px;padding:16px 18px 18px;margin:14px 0;scroll-margin-top:12px}
+h2{font-size:1.2em;margin:2px 0 6px}
+.lead{color:var(--txt2);margin:0 0 12px}
+figure{margin:0 0 12px}
+figure a{display:block}
+figure img{display:block;width:100%;height:auto;border-radius:10px;background:#fff}
+figcaption{font-size:.75em;color:var(--txt2);margin-top:4px}
+ol.ann{list-style:none;counter-reset:n;padding:0;margin:0}
+ol.ann li{counter-increment:n;position:relative;padding:5px 0 5px 38px;border-top:1px solid var(--inset)}
+ol.ann li:first-child{border-top:0}
+ol.ann li::before{content:counter(n);position:absolute;left:0;top:6px;width:26px;height:26px;border-radius:50%;background:var(--ann);color:#fff;font-weight:700;font-size:.82em;display:flex;align-items:center;justify-content:center}
+table{width:100%;border-collapse:collapse;margin:12px 0 0;font-size:.95em}
+th,td{text-align:left;padding:7px 10px;border-top:1px solid var(--inset);vertical-align:top}
+th{color:var(--txt2);font-weight:600;font-size:.85em;border-top:0}
+td:first-child{white-space:nowrap;font-weight:600}
+.note{font-size:.9em;color:var(--txt2);margin:12px 0 0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px;border:2px solid transparent}
+footer{color:var(--txt3,#636366);font-size:.8em;text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><a href="../">← Back to Benny</a><span class="lang"><a href="index.html" class=on>EN</a><a href="de.html">DE</a></span></div>
+<h1>Benny – User Guide</h1>
+<div class="sub">C/G · 3-row · Heim</div>
+<nav class="toc"><a href="#main">1 · Main view</a><a href="#play-along">2 · Play-Along</a><a href="#jam-box">3 · Jam-Box</a><a href="#key">4 · Colour key &amp; info</a></nav>
+<section id="main">
+<h2>1 · Main view</h2>
+<p class="lead">Set language and bellows direction at the top; control the practice piece at the bottom.</p>
+<figure><a href="img/01-main-en.webp"><img src="img/01-main-en.webp" alt="Main view with numbered controls" width="1970" height="2528" loading="lazy" decoding="async"></a><figcaption>Tap the image to zoom.</figcaption></figure>
+<ol class="ann"><li><b>Language</b> – EN · DE · FR · IT.</li><li><b>Bass buttons</b> – the basses for the current bellows direction, in two columns; dark buttons are active.</li><li><b>Bellows</b> – toggle Pull / Push; bass and treble layout switch with it.</li><li><b>Load</b> opens your own MusicXML or MIDI file, <b>Repertoire</b> the curated list with its Benny-fit rating (green = purely diatonic to red = chromatic).</li><li><b>Transport</b> – back to start · Play/Pause · Stop.</li><li><b>Play-Along</b> – opens the practice view with bass and treble side by side.</li></ol>
+<p class="note">In the song panel below (not in the picture): tempo in bpm, metronome with a one-bar count-in, and <b>Listen</b> – in Wait mode Benny then advances via the microphone as soon as you play the right note on the real instrument.</p>
+</section>
+<section id="play-along">
+<h2>2 · Play-Along</h2>
+<p class="lead">Bass on the left, treble on the right: the green button is the next note, and Benny walks you through the piece.</p>
+<figure><a href="img/02-play-along-en.webp"><img src="img/02-play-along-en.webp" alt="Play-Along view with numbered controls" width="2430" height="2485" loading="lazy" decoding="async"></a><figcaption>Tap the image to zoom.</figcaption></figure>
+<ol class="ann"><li><b>Bass</b> for the current bellows direction.</li><li><b>Bellows</b> – flashes briefly when a bellows change is due.</li><li><b>Fit</b> – scales the keyboard to the screen (on when the view opens; off = larger buttons).</li><li><b>Piece / Repertoire</b> – current piece, same picker as in the main view.</li><li><b>Transport</b> – back to start · Play/Pause · Stop.</li><li><b>Mode</b> – see table.</li><li><b>→ Soufflet</b> – switches to the tablature converter.</li><li><b>Treble</b> – Row 3, C row, G row; the small number is the button number.</li><li><b>Blue ring</b> – root note of the Jam-Box selection.</li><li><b>Green</b> – play now (pulsing in Wait mode).</li><li><b>Back</b> – returns to the main view.</li></ol>
+<table><thead><tr><th>Mode</th><th>What happens</th></tr></thead><tbody><tr><td>Watch</td><td>Benny plays the piece, buttons light up along.</td></tr><tr><td>Wait</td><td>Waits until you tap the green button (or the mic hears it).</td></tr><tr><td>Flow</td><td>The clock keeps running at tempo, no guide sound – you play.</td></tr></tbody></table>
+</section>
+<section id="jam-box">
+<h2>3 · Jam-Box</h2>
+<p class="lead">Pick a chord or scale, tap a root: Benny marks the buttons on both sides and plays the notes.</p>
+<figure><a href="img/03-jam-box-en.webp"><img src="img/03-jam-box-en.webp" alt="Jam-Box with numbered controls" width="1970" height="1693" loading="lazy" decoding="async"></a><figcaption>Tap the image to zoom.</figcaption></figure>
+<ol class="ann"><li><b>Chord type</b> – major (Dur), minor (Moll), dim, aug, sus2, sus4, 7, maj7, m7, dim7, ø, 6, m6.</li><li><b>Modal scales</b> – Ionian to Aeolian.</li><li><b>Root</b> – C, D, E, F, G, A, B♭, A♭, E♭.</li><li><b>Play / Stop</b> – plays the notes one after another.</li><li><b>Tone</b> – e.g. “Benny Original”.</li><li><b>Tempo</b> – seconds per note.</li><li><b>Auto-Play</b> plays on every new selection, <b>Loop</b> repeats endlessly.</li></ol>
+</section>
+<section id="key">
+<h2>4 · Colour key &amp; info</h2>
+<p class="lead">Button colours mean the same in every view.</p>
+<figure><a href="img/04-key-info-en.webp"><img src="img/04-key-info-en.webp" alt="Colour key, info links and Soufflet tile" width="2470" height="900" loading="lazy" decoding="async"></a><figcaption>Tap the image to zoom.</figcaption></figure>
+<table><thead><tr><th>Look</th><th>Meaning</th></tr></thead><tbody><tr><td><span class="sw" style="background:#f0ece7"></span>Light</td><td>Button inactive</td></tr><tr><td><span class="sw" style="background:#48484a"></span>Dark</td><td>Button active (note of the selection)</td></tr><tr><td><span class="sw" style="background:#2c2c2e;border-color:#0a84ff"></span>Blue ring</td><td>Root note</td></tr><tr><td><span class="sw" style="background:#f0ece7;border-color:#0a84ff;box-shadow:0 0 6px #0a84ff"></span>Blue glow</td><td>Scale tone</td></tr><tr><td><span class="sw" style="background:#30d158;border-color:#30d158"></span>Green</td><td>Play-Along: play now</td></tr></tbody></table>
+<ol class="ann"><li><b>Colour key</b> – see table.</li><li><b>Info</b> – Heim Info expands notes on the Heim system; User Guide (this page), README, Bass Analysis and GitHub open separately.</li><li><b>Soufflet tile</b> – opens Soufflet (MusicXML → D.E.S. tablature); “To Soufflet” at the bottom left switches there directly.</li></ol>
+</section>
+<footer>Castagnari Benny Accordion · <a href="https://github.com/wdeu/benny-accordion" style="color:inherit">GitHub</a></footer>
+</div>
+</body>
+</html>

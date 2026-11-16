@@ -110,6 +110,8 @@ node analyze-repertoire.mjs --out ~/Projects/repertoire --publish "Muster" --syn
 4. Start in **Watch** to see it, switch to **Wait** to practise note by note, then **Flow** to bring it up to tempo.
 5. At the real instrument, enter **Wait** and enable **🎤 Listen**.
 
+An illustrated, annotated walkthrough of every control is in the **[User Guide](https://wdeu.github.io/benny-accordion/guide/)** ([Deutsch](https://wdeu.github.io/benny-accordion/guide/de.html)) — also linked in the app under *Info*.
+
 ---
 
 ## Languages
@@ -131,6 +133,7 @@ Interface available in **English, German, French and Italian**. Button labels ar
 ```
 index.html                — the app itself (UI, logic, audio engine, repertoire modal)
 assets/                   — icons, manifest.json, hero images
+guide/                    — user guide (index.html = EN, de.html = DE) with annotated screenshots (img/*.webp)
 repertoire/               — synced subset of the analysed repertoire (publish:true only)
 tools/                    — Node analysis pipeline (analyze-repertoire.mjs, curate-titles.mjs, lib/)
 .ionos-overrides/         — files that should differ ONLY on the benny.wdeu.de mirror

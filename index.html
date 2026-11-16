@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.20.4</title>
-<meta name="version" content="5.20.4">
+<title>Castagnari Benny Accordion v5.21.0</title>
+<meta name="version" content="5.21.0">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -752,7 +752,7 @@ body.playalong-mode .playalong-btn {
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.20.4</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.21.0</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -931,6 +931,10 @@ body.playalong-mode .playalong-btn {
                                 <span class="link-icon">▸</span>
                                 <span class="legend-heim-toggle" id="legendHeader" title="Heim G/C System Info">Heim Info</span>
                                 <button class="legend-toggle-btn" id="legendToggleBtn" style="display:none;">▸</button>
+                            </div>
+                            <div class="legend-link-item">
+                                <span class="link-icon">↗</span>
+                                <a href="guide/" id="guideLink" target="_blank" rel="noopener">User Guide</a>
                             </div>
                             <div class="legend-link-item">
                                 <span class="link-icon">↗</span>
@@ -2319,6 +2323,7 @@ const I18N = {
         toSoufflet:   '⇄ 📜 To Soufflet',
         back:         '✕ Back',
         heimInfo:     'Heim Info',
+        guide:        'User Guide',
         col1:         'Col 1',
         col2:         'Col 2',
         scaleHints: {
@@ -2362,6 +2367,7 @@ const I18N = {
         toSoufflet:   '⇄ 📜 Zu Soufflet',
         back:         '✕ Zurück',
         heimInfo:     'Heim-Info',
+        guide:        'Anleitung',
         col1:         'Sp. 1',
         col2:         'Sp. 2',
         scaleHints: {
@@ -2405,6 +2411,7 @@ const I18N = {
         toSoufflet:   '⇄ 📜 Vers Soufflet',
         back:         '✕ Retour',
         heimInfo:     'Info Heim',
+        guide:        'Mode d’emploi',
         col1:         'Col. 1',
         col2:         'Col. 2',
         scaleHints: {
@@ -2448,6 +2455,7 @@ const I18N = {
         toSoufflet:   '⇄ 📜 Vai a Soufflet',
         back:         '✕ Indietro',
         heimInfo:     'Info Heim',
+        guide:        'Guida',
         col1:         'Col. 1',
         col2:         'Col. 2',
         scaleHints: {
@@ -2546,6 +2554,14 @@ function applyLanguage(lang) {
         heimToggle.textContent = (t.heimInfo || 'Heim Info') + (isOpen ? ' ▾' : '');
     }
     
+    // 6b. User-guide link — relative path (works on GitHub Pages and the IONOS mirror);
+    //     only EN + DE pages exist, FR/IT fall back to the English guide.
+    const guideLink = document.getElementById('guideLink');
+    if (guideLink) {
+        guideLink.textContent = t.guide || 'User Guide';
+        guideLink.href = lang === 'de' ? 'guide/de.html' : 'guide/';
+    }
+
     // 7. Play-Along button
     const paBtn = document.getElementById('playalongBtn');
     if (paBtn) paBtn.textContent = document.body.classList.contains('playalong-mode')
