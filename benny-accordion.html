@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Castagnari Benny Accordion v5.16.4</title>
-<meta name="version" content="5.16.4">
+<title>Castagnari Benny Accordion v5.21.1</title>
+<meta name="version" content="5.21.1">
 <meta name="description" content="Interactive learning tool for Castagnari Benny C/G (3-row, Heim tuning) – chords, scales, and bellows technique">
 <meta name="theme-color" content="#0a84ff">
 
@@ -181,18 +181,22 @@ header .sub { font-size:0.74em; color:var(--txt2); letter-spacing:1.2px; margin-
 
 .treble-side { display:flex; gap:8px; justify-content:center; align-items:flex-start;
     flex:1; width:100%; }
-.row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:70px; }
+/* Reihen-Versatz an die Button-Größe gekoppelt: Pitch = Button + 4px Gap.
+   Jede Reihe sitzt einen halben Pitch höher als die vorige (66px → 35/70px,
+   56px auf ≤400px → 30/60px; vorher hart auf 66px gerechnet). */
+.treble-side { --btn:66px; --pitch:calc(var(--btn) + 4px); }
+.row { display:flex; flex-direction:column; gap:4px; align-items:center; padding-top:var(--pitch); }
 
 .row:nth-child(1) { margin-top: 0; }
-.row:nth-child(2) { margin-top: -35px; }
-.row:nth-child(3) { margin-top: -70px; }
+.row:nth-child(2) { margin-top: calc(var(--pitch) / -2); }
+.row:nth-child(3) { margin-top: calc(var(--pitch) * -1); }
 
 .row-label { font-size:0.66em; color:var(--txt3); font-weight:600; letter-spacing:0.7px;
     text-align:center; margin-bottom:8px; }
 
 /* ──────────── PERLMUTT-TASTE ──────────── */
 .note-button {
-    width:66px; height:66px; border-radius:50%;
+    width:var(--btn, 66px); height:var(--btn, 66px); border-radius:50%;
     background:linear-gradient(160deg, var(--p0) 0%, var(--p1) 42%, var(--p2) 100%);
     border:1.5px solid rgba(255,255,255,.30);
     box-shadow: inset 0 2px 3px rgba(255,255,255,.50),
@@ -350,12 +354,34 @@ body.bellows-demand .treble-push-indicator,
 .song-kuer-row { display:flex; align-items:center; gap:8px; font-size:0.76em; color:var(--txt2); cursor:pointer; margin-top:4px; }
 .song-kuer-row input { width:18px; height:18px; cursor:pointer; }
 .song-status { font-size:0.72em; color:var(--txt3); margin-top:8px; min-height:1.1em; text-align:center; }
-/* In Play-Along: collapse the song panel to the essentials (transport + mode),
-   so bass + treble fit side by side again on iPhone portrait. */
-body.playalong-mode .song-file-row,
+/* In Play-Along: collapse the song panel to the essentials (transport + mode
+   + Titel/Repertoire, damit man ohne Verlassen des Modus das Stück wechseln
+   oder nachschauen kann, was gerade läuft), so bass + treble fit side by
+   side again on iPhone portrait. */
 body.playalong-mode .song-ctl-row,
 body.playalong-mode .song-kuer-row,
 body.playalong-mode .song-status { display: none !important; }
+body.playalong-mode #songLoadBtn { display: none !important; }
+body.playalong-mode .song-file-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
+}
+body.playalong-mode .song-file-name {
+    order: -1;
+    white-space: normal !important;
+    text-align: center !important;
+    font-size: 0.7em !important;
+    line-height: 1.25 !important;
+    max-height: 2.6em !important;
+    overflow: hidden !important;
+}
+body.playalong-mode #repertoireBtn {
+    width: 100% !important;
+    height: 32px !important;
+    font-size: 0.74em !important;
+}
 body.playalong-mode .song-panel { padding: 6px 4px 0 !important; }
 body.playalong-mode .song-transport { margin-bottom: 6px !important; }
 body.playalong-mode .song-transport .song-tbtn { height: 34px; font-size: 0.95em; }
@@ -390,8 +416,8 @@ body.playalong-mode .treble-column .section {
 
 /* FIT mode: scale treble to viewport height */
 body.playalong-fit #treble-container {
-    transform-origin: top center;
-    /* Scale set dynamically via JS */
+    transform-origin: top left;
+    /* Scale + width + margin-right set dynamically via JS (applyFitScale) */
 }
 
 /* Fit toggle button - under bass trapezoids */
@@ -421,7 +447,7 @@ body.playalong-mode .main-grid {
     /* ALWAYS side-by-side in play-along, even portrait! */
     display: flex !important;
     flex-direction: row !important;
-    gap: 6px !important;
+    gap: 16px !important;   /* klarer Abstand Bass ↔ Diskant, damit ROW 3 nie unter dem Bass-Panel verschwindet */
     padding: 6px !important;
     height: 100vh;
     align-items: stretch;
@@ -437,6 +463,26 @@ body.playalong-mode .treble-column {
     overflow-y: auto !important;
     overflow-x: hidden !important;
 }
+/* Diskant-Reihen im Play-Along weiter auseinander: der Basis-Gap (8px, auf
+   schmalen Screens sogar 5px) lässt die vertikal versetzten Perlmutt-Kreise
+   optisch verschränken. Play-Along hat den Platz (nur Bass + Diskant), also
+   klare Luft zwischen ROW3/C-ROW/G-ROW. Normales 3-Spalten-Layout unberührt. */
+body.playalong-mode #treble-container { gap: 10px !important; }
+/* Diskant-Block nie über die linke Clip-Kante zentrieren (5.20.4):
+   Vorher lag der Block als flex:1-Item in einem justify-content:center-Wrapper.
+   War sein Layout-Kasten breiter als die Spalte (transform:scale verkleinert nur
+   die Optik, nicht den Layout-Kasten), verteilte `center` den Überlauf auf BEIDE
+   Seiten — der linke Teil ist unerreichbar und wurde von overflow-x:hidden
+   gekappt ("OW 3 (10)"). Jetzt: Wrapper startet links, zentriert wird nur über
+   auto-Margins (die nie negativ werden), der Block hat seine Inhaltsbreite und
+   die Tap-Zonen dürfen schrumpfen, statt den Block hinauszuschieben. */
+body.playalong-mode .treble-tap-wrapper { justify-content: flex-start !important; }
+body.playalong-mode #treble-container { flex: 0 0 auto !important; width: max-content; }
+body.playalong-mode .treble-tap-zone { flex: 0 1 32px !important; min-width: 0 !important; }
+body.playalong-mode .pull-zone { margin-left: auto !important; }
+body.playalong-mode .push-zone { margin-right: auto !important; }
+/* Fit aus: Block kann breiter als die Spalte sein → scrollbar statt abgeschnitten */
+body.playalong-mode:not(.playalong-fit) .treble-column { overflow-x: auto !important; }
 /* Keep bellows switches visible in play-along */
 body.playalong-mode .bellows-container { display: block !important; }
 /* In portrait play-along, bellows switches stack */
@@ -464,6 +510,17 @@ body.playalong-mode .bass-column .bellows-btn {
 body.playalong-mode .playalong-btn {
     background: var(--accent); color: #fff; border-color: var(--accent);
 }
+
+/* Sister-app toggle (same piece in Soufflet) — mirrors .playalong-btn bottom-left */
+.sister-btn {
+    position: fixed; bottom: 16px; left: 16px; z-index: 100;
+    background: var(--bg-card); border: 1px solid var(--b);
+    border-radius: 20px; padding: 8px 14px;
+    font-size: 0.78em; font-weight: 600; color: var(--txt2);
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.sister-btn:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ──────────── TREBLE TAP ZONES ──────────── */
 .treble-tap-wrapper {
@@ -644,7 +701,7 @@ body.playalong-mode .playalong-btn {
     .treble-wrapper { order:1; }
 }
 @media (max-width:400px) {
-    .note-button { width:56px; height:56px; }
+    .treble-side { --btn:56px; }
     .note-button .note-name { font-size:0.9em; }
     .bass-button { width:46px; height:46px; font-size:0.80em; }
     .treble-side { gap:5px; }
@@ -676,13 +733,26 @@ body.playalong-mode .playalong-btn {
 .rep-row .s{ color:var(--txt2); font-size:.78rem; }
 .rep-row .typ{ color:var(--txt2); font-size:.74rem; background:var(--bg-inset); padding:1px 7px; border-radius:999px; white-space:nowrap; flex:0 0 auto; }
 .rep-foot{ padding:11px 16px; border-top:1px solid var(--bg-inset); color:var(--txt2); font-size:.74rem; line-height:1.4; }
+.rep-tabs{ display:flex; gap:8px; padding:10px 16px 0; }
+.rep-tab{ background:var(--bg-inset); color:var(--txt2); border:none; border-radius:999px;
+  padding:5px 14px; font-size:.82rem; cursor:pointer; }
+.rep-tab.active{ background:var(--accent); color:#fff; }
+.rep-group{ color:var(--txt2); font-size:.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.06em; padding:12px 0 3px; border-bottom:1px solid var(--bg-inset); }
+.rep-row.mine{ cursor:pointer; }
+.rep-row.mine:hover .t{ color:var(--accent); }
+.rep-row .stat{ flex:0 0 auto; }
+.rep-row .stat select{ background:var(--bg-inset); color:var(--txt2); border:none;
+  border-radius:8px; font-size:.7rem; padding:2px 4px; }
+.rep-row .souff{ flex:0 0 auto; text-decoration:none; font-size:.8rem; opacity:.7; }
+.rep-row .souff:hover{ opacity:1; }
 </style>
 </head>
 <body>
 <div class="container">
 
 <header>
-    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.16.4</span></h1>
+    <h1><img src="assets/icon.svg" alt="Benny Accordion" style="width:40px; height:40px; vertical-align:middle; margin-right:8px; border-radius:8px;">Castagnari Benny Accordion <span style="font-size:0.5em; color:#999; font-weight:300; margin-left:8px;">v5.21.1</span></h1>
         <div style="display:flex; gap:6px; justify-content:center; margin-top:4px;">
             <button class="lang-btn active" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="de">DE</button>
@@ -864,6 +934,10 @@ body.playalong-mode .playalong-btn {
                             </div>
                             <div class="legend-link-item">
                                 <span class="link-icon">↗</span>
+                                <a href="guide/" id="guideLink" target="_blank" rel="noopener">User Guide</a>
+                            </div>
+                            <div class="legend-link-item">
+                                <span class="link-icon">↗</span>
                                 <a href="https://github.com/wdeu/benny-accordion#readme" target="_blank" rel="noopener">README</a>
                             </div>
                             <div class="legend-link-item">
@@ -972,6 +1046,11 @@ body.playalong-mode .playalong-btn {
     🎹 Play-Along
 </button>
 
+<!-- SISTER-APP TOGGLE: gleiches Stück in Soufflet (D.E.S.-Tablatur) -->
+<button class="sister-btn" id="sisterBtn" data-i18n="toSoufflet" title="Gleiches Stück in Soufflet (D.E.S.-Tablatur)">
+    ⇄ 📜 Zu Soufflet
+</button>
+
 <!-- Heim overlay removed - now inline panel in jam-column -->
 
 <!-- Repertoire modal -->
@@ -980,6 +1059,10 @@ body.playalong-mode .playalong-btn {
     <div class="rep-head">
       <span class="rep-title">🎵 Repertoire für Benny</span>
       <button class="rep-close" id="repClose" title="Schließen">✕</button>
+    </div>
+    <div class="rep-tabs" id="repTabs" hidden>
+      <button class="rep-tab active" data-tab="mine">🎶 Meine Stücke</button>
+      <button class="rep-tab" data-tab="ref">📖 Referenz</button>
     </div>
     <div class="rep-controls">
       <input type="search" id="repQ" placeholder="Suchen …">
@@ -990,7 +1073,7 @@ body.playalong-mode .playalong-btn {
       <span class="rep-count" id="repCount"></span>
     </div>
     <div class="rep-list" id="repList"></div>
-    <div class="rep-foot">🟢 sehr gut · 🟡 gut · 🟠 fordernd · 🔴 chromatisch. Eigene Dateien über 📂 Load (MusicXML/MIDI) — der Indikator misst dann die echte Balg-Belastung.</div>
+    <div class="rep-foot">🟢 sehr gut · 🟡 gut · 🟠 fordernd · 🔴 chromatisch. „Meine Stücke": Klick lädt in den Play-Along, 📜 öffnet die D.E.S.-Tablatur in Soufflet. Einzelne Dateien weiterhin über 📂 Load (MusicXML/MIDI).</div>
   </div>
 </div>
 
@@ -1001,12 +1084,40 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
   const ov=document.getElementById('repOverlay'); if(!ov) return;
   const listEl=document.getElementById('repList'), q=document.getElementById('repQ'),
         fT=document.getElementById('repType'), fF=document.getElementById('repFit'),
-        cnt=document.getElementById('repCount');
-  [...new Set(REP_DATA.map(r=>r[1]))].sort().forEach(t=>{
-    const o=document.createElement('option'); o.value=t; o.textContent=t; fT.appendChild(o); });
+        cnt=document.getElementById('repCount'), tabs=document.getElementById('repTabs');
   const RANK={'🟢':0,'🟡':1,'🟠':2,'🔴':3};
   function esc(x){return String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-  function draw(){
+
+  // ── Meine Stücke: repertoire/index.json (Pipeline-Output). Fehlt es (404,
+  //    file://), bleibt alles beim alten Verhalten: nur die Referenzliste. ──
+  let MY=null, tab='ref', repBase='repertoire/';   // MY: null=ungeladen, false=nicht da, []=Stücke
+  const STATUS_KEY='benny.uebestatus';
+  const STATUS_LABELS={kannIch:'Kann ich',inArbeit:'In Arbeit',neu:'Neu'};
+  const readStatus=()=>{ try{return JSON.parse(localStorage.getItem(STATUS_KEY))||{};}catch(e){return {};} };
+  const statusOf=p=>readStatus()[p.id]||p.uebestatus||'neu';
+  async function loadIndex(){
+    // lokal (Server über ~/Projects): ../repertoire/ = kompletter Kanon-Ordner;
+    // GitHub Pages: repertoire/ = gesyncte publish-Auswahl im Repo
+    for(const base of ['../repertoire/','repertoire/']){
+      try{
+        const r=await fetch(base+'index.json',{cache:'no-cache'});
+        if(!r.ok) continue;
+        MY=(await r.json()).pieces||[]; repBase=base;
+        if(MY.length){ tabs.hidden=false; tab='mine'; }
+        break;
+      }catch(e){}
+    }
+    if(MY===null) MY=false;
+    fillTypes(); draw();
+  }
+  function fillTypes(){
+    const set=new Set(REP_DATA.map(r=>r[1]));
+    if(Array.isArray(MY)) MY.forEach(p=>{ if(p.type&&p.type!=='?') set.add(p.type); });
+    fT.innerHTML='<option value="">Alle Typen</option>';
+    [...set].sort().forEach(t=>{
+      const o=document.createElement('option'); o.value=t; o.textContent=t; fT.appendChild(o); });
+  }
+  function drawRef(){
     const term=(q.value||'').trim().toLowerCase(), ft=fT.value, ff=fF.value;
     let rows=REP_DATA.filter(r=>{
       if(ft&&r[1]!==ft)return false; if(ff&&r[2]!==ff)return false;
@@ -1017,7 +1128,81 @@ const REP_DATA=[["Chapelloise","Cercle/Chapelloise","🟢","Blowzabella"],["Polk
       `<span class="typ">${esc(r[1])}</span></div>`).join('')||'<div class="rep-row"><span class="s">Nichts gefunden.</span></div>';
     cnt.textContent=rows.length+' / '+REP_DATA.length;
   }
-  function open(){ ov.hidden=false; draw(); setTimeout(()=>q.focus(),50); }
+  function drawMine(){
+    const term=(q.value||'').trim().toLowerCase(), ft=fT.value, ff=fF.value;
+    const rows=MY.filter(p=>{
+      if(ft&&p.type!==ft)return false; if(ff&&p.fit!==ff)return false;
+      if(term&&!(p.title+' '+p.artist).toLowerCase().includes(term))return false; return true;});
+    const groups={kannIch:[],inArbeit:[],neu:[]};
+    rows.forEach(p=>(groups[statusOf(p)]||groups.neu).push(p));
+    let html='';
+    for(const g of ['kannIch','inArbeit','neu']){
+      if(!groups[g].length) continue;
+      groups[g].sort((a,b)=>(a.difficultyScore??99)-(b.difficultyScore??99) || a.title.localeCompare(b.title));
+      html+=`<div class="rep-group">${STATUS_LABELS[g]} · ${groups[g].length}</div>`;
+      html+=groups[g].map(p=>{
+        const st=statusOf(p);
+        const info=[p.artist!=='?'?p.artist:null, p.key!=='?'?p.key:null,
+                    p.bpm?p.bpm+' bpm':null, p.difficulty, p.bellowsLoadPct+'% Balg'
+                   ].filter(Boolean).join(' · ');
+        // ?piece= statt absoluter ?score=-URL: die Schwester löst die id über ihre
+        // eigene Quellkette auf — vermeidet den CORS-Toten-Ast von IONOS aus.
+        const souff=sisterBase()+'?piece='+encodeURIComponent(p.id);
+        return `<div class="rep-row mine" data-id="${esc(p.id)}"><span class="fit">${p.fit}</span>`+
+          `<span class="meta"><div class="t">${esc(p.title)}${p.publish?' <span title="veröffentlicht (auch auf GitHub Pages)">🌐</span>':''}</div><div class="s">${esc(info)}</div></span>`+
+          (p.type&&p.type!=='?'?`<span class="typ">${esc(p.type)}</span>`:'')+
+          `<span class="stat"><select data-id="${esc(p.id)}">`+
+            ['neu','inArbeit','kannIch'].map(s=>`<option value="${s}"${s===st?' selected':''}>${STATUS_LABELS[s]}</option>`).join('')+
+          `</select></span>`+
+          `<a class="souff" href="${esc(souff)}" target="_blank" title="In Soufflet öffnen (D.E.S.-Tablatur)">📜</a></div>`;
+      }).join('');
+    }
+    listEl.innerHTML=html||'<div class="rep-row"><span class="s">Nichts gefunden.</span></div>';
+    cnt.textContent=rows.length+' / '+MY.length;
+  }
+  function draw(){ if(tab==='mine'&&Array.isArray(MY)) drawMine(); else drawRef(); }
+
+  async function loadPiece(p, broadcast = true){
+    songStop();
+    try{
+      setSongStatus('Lade '+p.title+' …');
+      const r=await fetch(repBase+p.file); if(!r.ok) throw new Error('HTTP '+r.status);
+      const buf=await r.arrayBuffer();
+      const xml=/\.mxl$/i.test(p.file) ? await unzipMxl(buf) : new TextDecoder().decode(buf);
+      await importMusicXML(xml, p.file.split('/').pop());
+      currentPieceId = p.id; manualScoreLoaded = false;
+      if (broadcast) broadcastNowPlaying(p.id);
+      close();
+    }catch(err){ console.error(err); setSongStatus('Laden fehlgeschlagen: '+(err.message||err)); }
+  }
+
+  // Für ?piece=-Deeplinks und Live-Folgen (storage-Events) von außen aufrufbar.
+  window.loadPieceById = async function(id, { broadcast = true } = {}){
+    if (MY === null) await loadIndex();   // Nebeneffekte (fillTypes/draw) sind bei verstecktem Modal harmlos
+    const p = Array.isArray(MY) && MY.find(x => x.id === id);
+    if (!p) { setSongStatus('Stück nicht im Repertoire: ' + id); return false; }
+    await loadPiece(p, broadcast);
+    return true;
+  };
+  listEl.addEventListener('change',e=>{
+    const sel=e.target.closest('.stat select'); if(!sel) return;
+    const map=readStatus(); map[sel.dataset.id]=sel.value;
+    localStorage.setItem(STATUS_KEY,JSON.stringify(map));
+    drawMine();
+  });
+  listEl.addEventListener('click',e=>{
+    if(e.target.closest('.stat')||e.target.closest('.souff')) return;
+    const row=e.target.closest('.rep-row.mine'); if(!row) return;
+    const p=MY&&MY.find(x=>x.id===row.dataset.id); if(p) loadPiece(p);
+  });
+  tabs.addEventListener('click',e=>{
+    const b=e.target.closest('.rep-tab'); if(!b) return;
+    tab=b.dataset.tab;
+    tabs.querySelectorAll('.rep-tab').forEach(x=>x.classList.toggle('active',x===b));
+    draw();
+  });
+
+  function open(){ ov.hidden=false; if(MY===null) loadIndex(); else draw(); setTimeout(()=>q.focus(),50); }
   function close(){ ov.hidden=true; }
   document.getElementById('repertoireBtn').addEventListener('click',open);
   document.getElementById('repClose').addEventListener('click',close);
@@ -2135,8 +2320,10 @@ const I18N = {
         legendTitle:  'Key',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 To Soufflet',
         back:         '✕ Back',
         heimInfo:     'Heim Info',
+        guide:        'User Guide',
         col1:         'Col 1',
         col2:         'Col 2',
         scaleHints: {
@@ -2177,8 +2364,10 @@ const I18N = {
         legendTitle:  'Legende',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 Zu Soufflet',
         back:         '✕ Zurück',
         heimInfo:     'Heim-Info',
+        guide:        'Anleitung',
         col1:         'Sp. 1',
         col2:         'Sp. 2',
         scaleHints: {
@@ -2219,8 +2408,10 @@ const I18N = {
         legendTitle:  'Légende',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 Vers Soufflet',
         back:         '✕ Retour',
         heimInfo:     'Info Heim',
+        guide:        'Mode d’emploi',
         col1:         'Col. 1',
         col2:         'Col. 2',
         scaleHints: {
@@ -2261,8 +2452,10 @@ const I18N = {
         legendTitle:  'Legenda',
         infoTitle:    'Info',
         playAlong:    '🎹 Play-Along',
+        toSoufflet:   '⇄ 📜 Vai a Soufflet',
         back:         '✕ Indietro',
         heimInfo:     'Info Heim',
+        guide:        'Guida',
         col1:         'Col. 1',
         col2:         'Col. 2',
         scaleHints: {
@@ -2361,6 +2554,14 @@ function applyLanguage(lang) {
         heimToggle.textContent = (t.heimInfo || 'Heim Info') + (isOpen ? ' ▾' : '');
     }
     
+    // 6b. User-guide link — relative path (works on GitHub Pages and the IONOS mirror);
+    //     only EN + DE pages exist, FR/IT fall back to the English guide.
+    const guideLink = document.getElementById('guideLink');
+    if (guideLink) {
+        guideLink.textContent = t.guide || 'User Guide';
+        guideLink.href = lang === 'de' ? 'guide/de.html' : 'guide/';
+    }
+
     // 7. Play-Along button
     const paBtn = document.getElementById('playalongBtn');
     if (paBtn) paBtn.textContent = document.body.classList.contains('playalong-mode')
@@ -2476,25 +2677,40 @@ function applyFitScale() {
         container.style.transformOrigin = '';
         container.style.width = '';
         container.style.height = '';
+        container.style.marginRight = '';
         if (bass) { bass.style.transform=''; bass.style.transformOrigin=''; bass.style.width=''; bass.style.height=''; }
         return;
     }
 
     const availH = window.innerHeight - 32;
-    const availW = window.innerWidth - 160;   // reserve the bass column
+    // Echte Breite der Diskant-Spalte messen (nicht innerWidth-160 schätzen).
+    // 10px Luft je Seite.
+    const col = container.closest('.treble-column');
+    const availW = ((col && col.clientWidth) || (window.innerWidth - 160)) - 20;
 
-    const naturalW = container.scrollWidth;
+    // Natürliche Größe frisch messen: alte Fit-Werte zurücksetzen und die
+    // Inhaltsbreite (max-content = Summe der Reihen inkl. Labels + Gaps) nehmen.
+    // scrollWidth taugt hier nicht: bei zentriertem Überlauf fehlt der linke Teil.
+    container.style.transform = '';
+    container.style.marginRight = '';
+    container.style.height = '';
+    container.style.width = 'max-content';
+    const naturalW = Math.ceil(container.getBoundingClientRect().width);
     const naturalH = container.scrollHeight;
 
     const scaleW = availW / naturalW;
     const scaleH = availH / naturalH;
     const MAX = 2.6;                          // allow enlargement (desktop), capped
-    const scale = Math.min(scaleW, scaleH, MAX);
+    const scale = Math.floor(Math.min(scaleW, scaleH, MAX) * 1000) / 1000;  // abrunden: nie breiter als availW
 
     container.style.transformOrigin = 'top left';
-    container.style.transform = `scale(${scale.toFixed(3)})`;
+    container.style.transform = `scale(${scale})`;
     container.style.width = naturalW + 'px';
     container.style.height = (naturalH * scale) + 'px';
+    // Layout-Fußabdruck = sichtbare (skalierte) Breite. transform ändert den
+    // Layout-Kasten nicht; ohne diesen Ausgleich bleibt der Kasten naturalW breit,
+    // läuft über die Spalte hinaus und der Block steht nicht dort, wo er aussieht.
+    container.style.marginRight = (naturalW * scale - naturalW) + 'px';
     container.style.overflow = 'visible';
 
     // Bass: grow together ONLY when enlarging (desktop). On iPad/iPhone the
@@ -2549,6 +2765,7 @@ document.getElementById('playalongBtn').addEventListener('click', () => {
             container.style.transform = '';
             container.style.height = '';
             container.style.width = '';
+            container.style.marginRight = '';
         }
         const bassC = document.getElementById('bass-container');
         if (bassC) { bassC.style.transform=''; bassC.style.height=''; bassC.style.width=''; }
@@ -2671,31 +2888,32 @@ function songResolve(ev) {
     return r;
 }
 
-// ── Default demo: Sarabande (G. F. Händel), accordéon diatonique arrangement ──
-// Pre-resolved once from the MusicXML via the same resolver path (melody = staff 1,
-// per-measure bass root from chord symbols). Embedded as events so the page needs
-// no file load to show melody + bass + bellows behaviour. Source of truth for
-// fingering remains BUTTON_OCTAVES; chord drives the bellows direction.
+// ── Default demo: Gavotte en Bois (J.-M. Bencetti), Gavote de Grenoble ──
+// Generated from repertoire/files/Gavotte_en_Bois_….mxl via the pipeline modules
+// (tools/lib: mxl → musicXmlToEvents), same resolver path as any loaded piece
+// (melody = staff 1, per-measure bass root from chord symbols). Embedded as
+// events so the page needs no file load to show melody + bass + bellows
+// behaviour. 0% forced bellows on the C/G Benny — a true diato showcase.
+// Source of truth for fingering remains BUTTON_OCTAVES; chord drives direction.
 const DEMO_SONG = {
-    name: "Sarabande — G. F. Händel",
-    bpm: 160,
+    name: "Gavotte en Bois — J.-M. Bencetti",
+    bpm: 80,
     events: [
-        {name:'C5',chord:'A',beats:2,bassRoot:'A'},{name:'C5',chord:'A',beats:2},{rest:1,beats:1},{name:'D5',chord:'A',beats:1},
-        {name:'B4',chord:'E',beats:2,bassRoot:'E'},{name:'B4',chord:'E',beats:2},{rest:1,beats:2},{name:'E5',chord:'C',beats:2,bassRoot:'C'},
-        {name:'E5',chord:'C',beats:2},{rest:1,beats:1},{name:'F5',chord:'C',beats:1},{name:'D5',chord:'G',beats:2,bassRoot:'G'},
-        {name:'D5',chord:'G',beats:2},{rest:1,beats:1},{name:'E5',chord:'G',beats:1},{name:'F5',chord:'D',beats:2,bassRoot:'D'},
-        {name:'F5',chord:'D',beats:2},{rest:1,beats:1},{name:'G5',chord:'D',beats:1},{name:'E5',chord:'A',beats:2,bassRoot:'A'},
-        {name:'E5',chord:'A',beats:2},{rest:1,beats:1},{name:'E5',chord:'A',beats:1},{name:'A5',chord:'F',beats:2,bassRoot:'F'},
-        {name:'A5',chord:'F',beats:2},{rest:1,beats:1},{name:'B5',chord:'F',beats:1},{name:'G#5',chord:'E',beats:2,bassRoot:'E'},
-        {name:'G#5',chord:'E',beats:2},{rest:1,beats:2},{name:'C5',chord:'A',beats:2,bassRoot:'A'},{name:'C5',chord:'A',beats:2},
-        {rest:1,beats:1},{name:'D5',chord:'A',beats:1},{name:'B4',chord:'E',beats:2,bassRoot:'E'},{name:'B4',chord:'E',beats:2},
-        {rest:1,beats:2},{name:'E5',chord:'C',beats:2,bassRoot:'C'},{name:'E5',chord:'C',beats:2},{rest:1,beats:1},
-        {name:'F5',chord:'C',beats:1},{name:'D5',chord:'G',beats:2,bassRoot:'G'},{name:'D5',chord:'G',beats:2},{rest:1,beats:1},
-        {name:'E5',chord:'G',beats:1},{name:'F5',chord:'D',beats:2,bassRoot:'D'},{name:'F5',chord:'D',beats:2},{rest:1,beats:1},
-        {name:'G5',chord:'D',beats:1},{name:'E5',chord:'A',beats:3,bassRoot:'A'},{name:'E5',chord:'A',beats:1},{name:'A5',chord:'F',beats:1},
-        {name:'G#5',chord:'F',beats:1},{name:'A5',chord:'F',beats:1,bassRoot:'F'},{name:'B5',chord:'F',beats:1},{name:'C6',chord:'E',beats:2,bassRoot:'E'},
-        {name:'B5',chord:'E',beats:1},{name:'A5',chord:'E',beats:1},{name:'A5',chord:'A',beats:2,bassRoot:'A'},{name:'A5',chord:'A',beats:2},
-        {rest:1,beats:2},
+        {name:"E4",chord:"A",beats:2,bassRoot:"A"},{name:"F4",chord:"F",beats:2,bassRoot:"F"},{name:"F#4",chord:"A",beats:2,bassRoot:"A"},{name:"F4",chord:"F",beats:2,bassRoot:"F"},
+        {name:"C5",chord:"A",beats:0.5,bassRoot:"A"},{name:"E5",chord:"A",beats:0.5},{name:"E5",chord:"A",beats:0.5},{name:"C5",chord:"A",beats:0.5},
+        {name:"B4",chord:"A",beats:2,bassRoot:"A"},{name:"A4",chord:"A",beats:0.5,bassRoot:"A"},{name:"C5",chord:"A",beats:0.5},{name:"C5",chord:"A",beats:0.5},
+        {name:"A4",chord:"A",beats:0.5},{name:"G4",chord:"A",beats:2,bassRoot:"A"},{name:"C5",chord:"A",beats:0.5,bassRoot:"A"},{name:"E5",chord:"A",beats:0.5},
+        {name:"E5",chord:"A",beats:0.5},{name:"C5",chord:"A",beats:0.5},{name:"B4",chord:"A",beats:0.5,bassRoot:"A"},{name:"C5",chord:"A",beats:0.5},
+        {name:"D5",chord:"A",beats:0.5},{name:"E5",chord:"A",beats:0.5},{name:"D5",chord:"B",beats:2,bassRoot:"B"},{rest:1,beats:2},
+        {name:"F5",chord:"B",beats:0.5,bassRoot:"B"},{name:"E5",chord:"B",beats:0.5},{name:"F5",chord:"B",beats:0.5},{name:"G5",chord:"B",beats:0.5},
+        {name:"E5",chord:"E",beats:2,bassRoot:"E"},{name:"C5",chord:"F",beats:2,bassRoot:"F"},{name:"D5",chord:"B",beats:2,bassRoot:"B"},{name:"E5",chord:"C",beats:0.5,bassRoot:"C"},
+        {name:"D5",chord:"C",beats:0.5},{name:"E5",chord:"C",beats:0.5},{name:"G5",chord:"C",beats:0.5},{name:"F#5",chord:"F#",beats:2,bassRoot:"F#"},
+        {name:"Eb5",chord:"D#",beats:2,bassRoot:"D#"},{name:"E5",chord:"E",beats:0.25,bassRoot:"E"},{name:"D5",chord:"E",beats:0.25},{name:"B4",chord:"E",beats:0.25},
+        {name:"G#4",chord:"E",beats:0.25},{name:"E4",chord:"E",beats:1},{name:"E5",chord:"A",beats:0.5,bassRoot:"A"},{name:"D5",chord:"A",beats:0.5},
+        {name:"C5",chord:"A",beats:0.5},{name:"B4",chord:"A",beats:0.5},{name:"A4",chord:"F",beats:2,bassRoot:"F"},{name:"G#4",chord:"F",beats:2,bassRoot:"F"},
+        {name:"A4",chord:"A",beats:2,bassRoot:"A"},{name:"E5",chord:"A",beats:0.5,bassRoot:"A"},{name:"D5",chord:"A",beats:0.5},{name:"C5",chord:"A",beats:0.5},
+        {name:"B4",chord:"A",beats:0.5},{name:"A4",chord:"F",beats:2,bassRoot:"F"},{name:"G#4",chord:"F",beats:2,bassRoot:"F"},{name:"A4",chord:"A",beats:2,bassRoot:"A"},
+        {name:"A4",chord:"A",beats:2,bassRoot:"A"},
     ]
 };
 
@@ -3039,6 +3257,7 @@ document.getElementById('songFileInput').addEventListener('change', async e => {
         } else {
             setSongStatus('Unbekanntes Format: ' + f.name);
         }
+        currentPieceId = null; manualScoreLoaded = true;   // Datei-Picker: keine Repertoire-Identität
     } catch (err) {
         console.error(err);
         setSongStatus('Import fehlgeschlagen: ' + (err.message || err));
@@ -3320,10 +3539,56 @@ document.getElementById('treble-container').addEventListener('touchstart', e => 
 }, true);
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SISTER-APP: Toggle zu Soufflet + Live-Folgen (gleiches Repertoire-Stück)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Aktuell geladenes Repertoire-Stück (null = Demo oder manuell geladene Datei).
+let currentPieceId = null, manualScoreLoaded = false;
+const SISTER_SELF = 'benny';
+
+// Schwester-URL: Host-Map für die IONOS-Subdomains, sonst relativer
+// Geschwister-Pfad — deckt GitHub Pages UND lokalen Server ab (Zwei-Host-Regel).
+function sisterBase() {
+    const h = location.hostname;
+    if (h === 'benny.wdeu.de') return 'https://soufflet.wdeu.de/';
+    if (h === 'soufflet.wdeu.de') return 'https://benny.wdeu.de/';
+    return new URL('../soufflet/', location.href).href;
+}
+
+function broadcastNowPlaying(id) {
+    try { localStorage.setItem('diato.nowPlaying', JSON.stringify({ id, from: SISTER_SELF, ts: Date.now() })); } catch (e) {}
+}
+
+// Live-Folgen: lädt die Schwester (gleiche Origin, anderer Tab) ein Stück,
+// ziehen wir ohne Reload nach. from===SELF und id===currentPieceId verhindern
+// Ping-Pong; der Auto-Load rebroadcastet nicht.
+window.addEventListener('storage', e => {
+    if (e.key !== 'diato.nowPlaying' || !e.newValue) return;
+    let m; try { m = JSON.parse(e.newValue); } catch (err) { return; }
+    if (!m.id || m.from === SISTER_SELF || m.id === currentPieceId) return;
+    currentPieceId = m.id;
+    loadPieceById(m.id, { broadcast: false });
+});
+
+function gotoSister() {
+    if (!currentPieceId && manualScoreLoaded)
+        setSongStatus('Stück nicht im Repertoire — nicht übergeben');
+    const url = sisterBase() + (currentPieceId ? '?piece=' + encodeURIComponent(currentPieceId) : '');
+    const w = window.open(url, 'diato.soufflet');
+    if (w) w.focus();
+}
+document.getElementById('sisterBtn').addEventListener('click', gotoSister);
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
+window.name = 'diato.benny';   // Toggle der Schwester findet/fokussiert diesen Tab
 loadSongData(DEMO_SONG);
+// ?piece=<id>: Deeplink aus Soufflet/Repertoire — Demo lädt synchron zuerst,
+// das Stück ersetzt sie asynchron; bei Fehlschlag bleibt die Demo stehen.
+const pieceParam = new URLSearchParams(location.search).get('piece');
+if (pieceParam) loadPieceById(pieceParam);
 renderRootGrid();
 renderAll();
 
