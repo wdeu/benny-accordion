@@ -13,6 +13,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versio
 - **Fix:** Lightbox in `guide/index.html` und `guide/de.html`: Tap öffnet das Bild im Overlay auf derselben Seite, erneuter Tap aufs Bild zoomt (250 %, scrollbar, zentriert auf die Tap-Stelle) bzw. zurück. Schließen per „✕ Schließen“/„✕ Close“, Tap auf den dunklen Rand, Escape oder Zurück-Geste (Overlay legt einen History-Eintrag an). Ohne JavaScript bleibt der alte Link aufs Bild als Fallback.
 
 **Hinweis:** Nicht im Browser verifiziert — Test am echten iPhone (PWA-Modus) steht aus.
+**Nachtrag 2026-11-16:** Lokal im Browser und am echten iPhone (PWA-Modus) bestätigt — Lightbox öffnet, zoomt und schließt, Zurück zur Anleitung funktioniert.
 
 ## [5.21.0] - 2026-11-16
 
